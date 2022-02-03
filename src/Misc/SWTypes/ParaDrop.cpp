@@ -38,7 +38,7 @@ void SW_ParaDrop::Initialize(SWTypeExt::ExtData *pData, SuperWeaponTypeClass *pS
 	pData->EVA_Ready = VoxClass::FindIndex("EVA_ReinforcementsReady");
 
 	pData->SW_AITargetingType = SuperWeaponAITargetingMode::ParaDrop;
-	pData->SW_Cursor = MouseCursor::GetCursor(MouseCursorType::ParaDrop);
+	pData->SW_Cursor = int(MouseCursorType::ParaDrop);
 }
 
 void SW_ParaDrop::LoadFromINI(SWTypeExt::ExtData *pData, SuperWeaponTypeClass *pSW, CCINIClass *pINI)

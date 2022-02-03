@@ -43,7 +43,7 @@ void SW_SonarPulse::LoadFromINI(SWTypeExt::ExtData *pData, SuperWeaponTypeClass 
 	pData->Sonar_Delay = pINI->ReadInteger(section, "SonarPulse.Delay", pData->Sonar_Delay);
 
 	// full map detection?
-	pSW->Action = (GetRange(pData).WidthOrRange < 0) ? Action::None : Actions::SuperWeaponAllowed;
+	pSW->Action = (GetRange(pData).WidthOrRange < 0) ? Action::None : CursorType::SuperWeaponAllowed;
 }
 
 bool SW_SonarPulse::Activate(SuperClass* const pThis, const CellStruct &Coords, bool const IsPlayer)

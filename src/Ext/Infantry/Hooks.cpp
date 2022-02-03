@@ -11,9 +11,10 @@
 #include <InputManagerClass.h>
 #include <VoxClass.h>
 #include <Misc/Actions.h>
+#include <WWKeyboardClass.h>
+
 // Hook changed on 3.0 -Otamaa
 // #664: Advanced Rubble - reconstruction part: Check
-
 //DEFINE_HOOK(51E63A, InfantryClass_GetCursorOverObject_EngineerOverFriendlyBuilding, 6)
 DEFINE_HOOK(51E635 ,InfantryClass_GetActionOnObject_EngineerOverFriendlyBuilding, 5)
  {
@@ -24,7 +25,7 @@ DEFINE_HOOK(51E635 ,InfantryClass_GetActionOnObject_EngineerOverFriendlyBuilding
 
 	if(BuildingTypeExt::ExtData* pData = BuildingTypeExt::ExtMap.Find(pTarget->Type)) {
 		if((pData->RubbleIntact || pData->RubbleIntactRemove) && pTarget->Owner->IsAlliedWith(pThis)) {
-			//ares insert custom cursor here -Otamaa
+			CursorType::Insert(94,Action::GRepair,false);
 			R->EAX(Action::GRepair);
 			return SkipAll;
 		}
@@ -113,18 +114,18 @@ DEFINE_HOOK(51D799, InfantryClass_PlayAnim_WaterSound, 7)
 	;
 }
 
-DEFINE_HOOK(51E5BB, InfantryClass_GetCursorOverObject_MultiEngineerA, 7) {
+DEFINE_HOOK(51E5BB, InfantryClass_GetActionOnObject_MultiEngineerA, 7) {
 	// skip old logic's way to determine the cursor
 	return 0x51E5D9;
 }
 
-DEFINE_HOOK(51E5E1, InfantryClass_GetCursorOverObject_MultiEngineerB, 7) {
+DEFINE_HOOK(51E5E1, InfantryClass_GetActionOnObject_MultiEngineerB, 7) {
 	GET(BuildingClass *, pBld, ECX);
 	Action ret = InfantryExt::GetEngineerEnterEnemyBuildingAction(pBld);
 
 	// use a dedicated cursor
 	if(ret == Action::Damage) {
-		Actions::Set(&RulesExt::Global()->EngineerDamageCursor);
+		CursorType::Insert(87,Action::Damage,false);
 	}
 
 	// return our action
@@ -173,15 +174,21 @@ DEFINE_HOOK(5201CC, InfantryClass_UpdatePanic_ProneWater, 6)
 // #1283638: ivans cannot enter grinders; they get an attack cursor. if the
 // grinder is rigged with a bomb, ivans can enter. this fix lets ivans enter
 // allied grinders. pressing the force fire key brings back the old behavior.
-DEFINE_HOOK(51EB48, InfantryClass_GetCursorOverObject_IvanGrinder, A)
+DEFINE_HOOK(51EB48, InfantryClass_GetActionOnObject_IvanGrinder, A)
 {
 	GET(InfantryClass*, pThis, EDI);
 	GET(ObjectClass*, pTarget, ESI);
 
-	if(auto pTargetBld = abstract_cast<BuildingClass*>(pTarget)) {
-		if(pTargetBld->Type->Grinding && pThis->Owner->IsAlliedWith(pTargetBld)) {
-			if(!InputManagerClass::Instance->IsForceFireKeyPressed()) {
-				static const byte return_grind[] = {
+	if(auto pTargetBld = abstract_cast<BuildingClass*>(pTarget))
+	{
+		if(pTargetBld->Type->Grinding && pThis->Owner->IsAlliedWith(pTargetBld)) 
+		{
+			bool bKeyPressed_1 = WWKeyboardClass::Instance->IsDown(*reinterpret_cast<int*>(0xA8EBF8));
+			bool bKeyPressed_2 = WWKeyboardClass::Instance->IsDown(*reinterpret_cast<int*>(0xA8EBFC));
+			if(!bKeyPressed_1 || !bKeyPressed_2) 
+			{
+				static const byte return_grind[] = 
+				{
 					0x5F, 0x5E, 0x5D, // pop edi, esi and ebp
 					0xB8, 0x0B, 0x00, 0x00, 0x00, // eax = Action::Repair (not Action::Eaten)
 					0x5B, 0x83, 0xC4, 0x28, // esp += 0x28

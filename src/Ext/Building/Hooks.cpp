@@ -351,3 +351,12 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 
 	return 0x44C968;
 }
+
+//51E4ED = InfantryClass_GetActionOnObject_EngineerRepairable, 6
+DEFINE_HOOK(51FA82 ,InfantryClass_GetActionOnCell_EngineerRepairable, 6)
+{
+	GET(BuildingTypeClass*, pBuildingType, EBP);
+	auto const& pTypeExt = BuildingTypeExt::ExtMap.Find(pBuildingType);
+	R->EAX(pTypeExt->EngineerRepairable.Get(pBuildingType->Repairable));
+	return 0x51FA88;
+}

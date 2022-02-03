@@ -130,6 +130,9 @@ void WeaponTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->ApplyDamage.Read(exINI, section, "ApplyDamage");
 
+	this->Attack_Cursor.Read(exINI, section, "Cursor.Attack");
+	this->OutOfRange_Cursor.Read(exINI, section, "Cursor.AttackOutOfRange");
+
 	//this->Ammo.Read(exINI, section, "Ammo");
 }
 
@@ -441,6 +444,10 @@ template <typename T>
 void WeaponTypeExt::ExtData::Serialize(T& Stm) {
 	Stm
 		.Process(this->Weapon_Loaded)
+		//
+		.Process(this->Attack_Cursor)
+		.Process(this->OutOfRange_Cursor)
+		//
 		.Process(this->Beam_Color)
 		.Process(this->Beam_Duration)
 		.Process(this->Beam_Amplitude)

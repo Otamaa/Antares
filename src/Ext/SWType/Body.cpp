@@ -51,25 +51,8 @@ const std::array<const AITargetingModeInfo, 15> SWTypeExt::AITargetingModes = {{
 void SWTypeExt::ExtData::InitializeConstants()
 {
 	NewSWType::Init();
-
-	MouseCursor *Cursor = &this->SW_Cursor;
-	Cursor->Frame = 53; // Attack
-	Cursor->Count = 5;
-	Cursor->Interval = 5; // test?
-	Cursor->MiniFrame = 52;
-	Cursor->MiniCount = 1;
-	Cursor->HotX = MouseHotSpotX::Center;
-	Cursor->HotY = MouseHotSpotY::Middle;
-
-	Cursor = &this->SW_NoCursor;
-	Cursor->Frame = 0;
-	Cursor->Count = 1;
-	Cursor->Interval = 5;
-	Cursor->MiniFrame = 1;
-	Cursor->MiniCount = 1;
-	Cursor->HotX = MouseHotSpotX::Center;
-	Cursor->HotY = MouseHotSpotY::Middle;
-
+	this->SW_Cursor = 20;
+	this->SW_NoCursor = 21;
 	this->Text_Ready = "TXT_READY";
 	this->Text_Hold = "TXT_HOLD";
 	this->Text_Charging = "TXT_CHARGING";
@@ -91,7 +74,7 @@ void SWTypeExt::ExtData::LoadFromRulesFile(CCINIClass *pINI)
 	INI_EX exINI(pINI);
 
 	if(exINI.ReadString(section, "Action") && !_strcmpi(exINI.value(), "Custom")) {
-		pThis->Action = Actions::SuperWeaponAllowed;
+		pThis->Action = CursorType::SuperWeaponAllowed;
 	}
 
 	if(exINI.ReadString(section, "Type")) {
@@ -108,7 +91,7 @@ void SWTypeExt::ExtData::LoadFromRulesFile(CCINIClass *pINI)
 
 	// if this is handled by a NewSWType, initialize it.
 	if(auto pNewSWType = this->GetNewSWType()) {
-		pThis->Action = Actions::SuperWeaponAllowed;
+		pThis->Action = CursorType::SuperWeaponAllowed;
 		pNewSWType->Initialize(this, pThis);
 	}
 	this->LastAction = pThis->Action;

@@ -5,6 +5,7 @@
 #include "../../Enum/Prerequisites.h"
 #include "../../Misc/Debug.h"
 #include "../../Utilities/TemplateDef.h"
+#include <Ext/WeaponType/Body.h>
 
 #include <AbstractClass.h>
 #include <HouseClass.h>
@@ -27,7 +28,7 @@ void TechnoTypeExt::ExtData::Initialize() {
 	this->Is_Deso = this->Is_Deso_Radiation = !strcmp(pThis->ID, "DESO");
 	this->Is_Cow = !strcmp(pThis->ID, "COW");
 
-	if(pThis->WhatAmI() == AircraftTypeClass::AbsID) {
+	if (pThis->WhatAmI() == AircraftTypeClass::AbsID) {
 		this->CustomMissileTrailerAnim = AnimTypeClass::Find("V3TRAIL");
 		this->CustomMissileTakeoffAnim = AnimTypeClass::Find("V3TAKOFF");
 
@@ -77,9 +78,9 @@ EXT_SAVE(TechnoTypeClass)
 void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 {
 	auto pThis = this->OwnerObject();
-	const char * section = pThis->ID;
+	const char* section = pThis->ID;
 
-	if(!pINI->GetSection(section)) {
+	if (!pINI->GetSection(section)) {
 		return;
 	}
 
@@ -88,7 +89,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	// survivors
 	this->Survivors_Pilots.Reserve(SideClass::Array->Count);
-	for(int i=this->Survivors_Pilots.Count; i<SideClass::Array->Count; ++i) {
+	for (int i = this->Survivors_Pilots.Count; i < SideClass::Array->Count; ++i) {
 		this->Survivors_Pilots[i] = nullptr;
 	}
 	this->Survivors_Pilots.Count = SideClass::Array->Count;
@@ -99,11 +100,11 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->Survivors_PassengerChance.Read(exINI, section, "Survivor.%sPassengerChance");
 
 	char flag[256];
-	for(int i = 0; i < SideClass::Array->Count; ++i) {
+	for (int i = 0; i < SideClass::Array->Count; ++i) {
 		_snprintf_s(flag, 255, "Survivor.Side%d", i);
-		if(pINI->ReadString(section, flag, "", Ares::readBuffer)) {
-			if((this->Survivors_Pilots[i] = InfantryTypeClass::Find(Ares::readBuffer)) == nullptr) {
-				if(!INIClass::IsBlank(Ares::readBuffer)) {
+		if (pINI->ReadString(section, flag, "", Ares::readBuffer)) {
+			if ((this->Survivors_Pilots[i] = InfantryTypeClass::Find(Ares::readBuffer)) == nullptr) {
+				if (!INIClass::IsBlank(Ares::readBuffer)) {
 					Debug::INIParseFailed(section, flag, Ares::readBuffer);
 				}
 			}
@@ -115,7 +116,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	// subtract the default list, get tag (not less than 0), add one back
 	auto const prerequisiteLists = static_cast<size_t>(
 		Math::max(pINI->ReadInteger(section, "Prerequisite.Lists",
-		static_cast<int>(this->PrerequisiteLists.size()) - 1), 0) + 1);
+			static_cast<int>(this->PrerequisiteLists.size()) - 1), 0) + 1);
 
 	this->PrerequisiteLists.resize(prerequisiteLists);
 
@@ -123,22 +124,23 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	Prereqs::Parse(pINI, section, "PrerequisiteOverride", pThis->PrerequisiteOverride);
 
-	for(auto i = 0u; i < this->PrerequisiteLists.size(); ++i) {
+	for (auto i = 0u; i < this->PrerequisiteLists.size(); ++i) {
 		_snprintf_s(flag, 255, "Prerequisite.List%u", i);
 		Prereqs::Parse(pINI, section, flag, this->PrerequisiteLists[i]);
 	}
 
 	Prereqs::Parse(pINI, section, "Prerequisite.Negative", this->PrerequisiteNegatives);
 
-	if(pINI->ReadString(section, "Prerequisite.RequiredTheaters", "", Ares::readBuffer)) {
+	if (pINI->ReadString(section, "Prerequisite.RequiredTheaters", "", Ares::readBuffer)) {
 		this->PrerequisiteTheaters = 0;
 
 		char* context = nullptr;
-		for(char *cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
+		for (char* cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
 			signed int idx = Theater::FindIndex(cur);
-			if(idx != -1) {
+			if (idx != -1) {
 				this->PrerequisiteTheaters |= (1 << idx);
-			} else {
+			}
+			else {
 				Debug::INIParseFailed(section, "Prerequisite.RequiredTheaters", cur);
 			}
 		}
@@ -153,19 +155,22 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->Is_Deso = pINI->ReadBool(section, "IsDesolator", this->Is_Deso);
 	this->Is_Deso_Radiation = pINI->ReadBool(section, "IsDesolator.RadDependant", this->Is_Deso_Radiation);
-	this->Is_Cow  = pINI->ReadBool(section, "IsCow", this->Is_Cow);
+	this->Is_Cow = pINI->ReadBool(section, "IsCow", this->Is_Cow);
 
 	this->Is_Spotlighted = pINI->ReadBool(section, "HasSpotlight", this->Is_Spotlighted);
 	this->Spot_Height = pINI->ReadInteger(section, "Spotlight.StartHeight", this->Spot_Height);
 	this->Spot_Distance = pINI->ReadInteger(section, "Spotlight.Distance", this->Spot_Distance);
-	if(pINI->ReadString(section, "Spotlight.AttachedTo", "", Ares::readBuffer)) {
-		if(!_strcmpi(Ares::readBuffer, "body")) {
+	if (pINI->ReadString(section, "Spotlight.AttachedTo", "", Ares::readBuffer)) {
+		if (!_strcmpi(Ares::readBuffer, "body")) {
 			this->Spot_AttachedTo = SpotlightAttachment::Body;
-		} else if(!_strcmpi(Ares::readBuffer, "turret")) {
+		}
+		else if (!_strcmpi(Ares::readBuffer, "turret")) {
 			this->Spot_AttachedTo = SpotlightAttachment::Turret;
-		} else if(!_strcmpi(Ares::readBuffer, "barrel")) {
+		}
+		else if (!_strcmpi(Ares::readBuffer, "barrel")) {
 			this->Spot_AttachedTo = SpotlightAttachment::Barrel;
-		} else {
+		}
+		else {
 			Debug::INIParseFailed(section, "Spotlight.AttachedTo", Ares::readBuffer);
 		}
 	}
@@ -176,41 +181,43 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->Is_Bomb = pINI->ReadBool(section, "IsBomb", this->Is_Bomb);
 
-/*
-	this is too late - Art files are loaded before this hook fires... brilliant
-	if(pINI->ReadString(section, "WaterVoxel", "", buffer, 256)) {
-		this->WaterAlt = 1;
-	}
-*/
+	/*
+		this is too late - Art files are loaded before this hook fires... brilliant
+		if(pINI->ReadString(section, "WaterVoxel", "", buffer, 256)) {
+			this->WaterAlt = 1;
+		}
+	*/
 
 	this->Insignia.Read(exINI, section, "Insignia.%s");
 	this->Parachute_Anim.Read(exINI, section, "Parachute.Anim");
 
 	// new on 08.11.09 for #342 (Operator=)
-	if(pINI->ReadString(section, "Operator", "", Ares::readBuffer)) { // try to read the flag
+	if (pINI->ReadString(section, "Operator", "", Ares::readBuffer)) { // try to read the flag
 		this->IsAPromiscuousWhoreAndLetsAnyoneRideIt = (strcmp(Ares::readBuffer, "_ANY_") == 0); // set whether this type accepts all operators
-		if(!this->IsAPromiscuousWhoreAndLetsAnyoneRideIt) { // if not, find the specific operator it allows
-			if(auto const pOperator = InfantryTypeClass::Find(Ares::readBuffer)) {
+		if (!this->IsAPromiscuousWhoreAndLetsAnyoneRideIt) { // if not, find the specific operator it allows
+			if (auto const pOperator = InfantryTypeClass::Find(Ares::readBuffer)) {
 				this->Operator = pOperator;
-			} else if(!INIClass::IsBlank(Ares::readBuffer)) {
+			}
+			else if (!INIClass::IsBlank(Ares::readBuffer)) {
 				Debug::INIParseFailed(section, "Operator", Ares::readBuffer);
 			}
 		}
 	}
-	
+
 	this->InitialPayload_Types.Read(exINI, section, "InitialPayload.Types");
 	this->InitialPayload_Nums.Read(exINI, section, "InitialPayload.Nums");
 	this->CameoPal.LoadFromINI(pINIArt, pThis->ImageFile, "CameoPalette");
 
-	if(pINI->ReadString(section, "Prerequisite.StolenTechs", "", Ares::readBuffer)) {
+	if (pINI->ReadString(section, "Prerequisite.StolenTechs", "", Ares::readBuffer)) {
 		this->RequiredStolenTech.reset();
 
 		char* context = nullptr;
-		for(char *cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
+		for (char* cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
 			signed int idx = atoi(cur);
-			if(idx > -1 && idx < 32) {
+			if (idx > -1 && idx < 32) {
 				this->RequiredStolenTech.set(idx);
-			} else if(idx != -1) {
+			}
+			else if (idx != -1) {
 				Debug::INIParseFailed(section, "Prerequisite.StolenTechs", cur, "Expected a number between 0 and 31 inclusive");
 			}
 		}
@@ -220,32 +227,35 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->EMP_Modifier.Read(exINI, section, "EMP.Modifier");
 	this->EMP_Sparkles.Read(exINI, section, "EMP.Sparkles");
 
-	if(pINI->ReadString(section, "EMP.Threshold", "inair", Ares::readBuffer)) {
-		if(_strcmpi(Ares::readBuffer, "inair") == 0) {
+	if (pINI->ReadString(section, "EMP.Threshold", "inair", Ares::readBuffer)) {
+		if (_strcmpi(Ares::readBuffer, "inair") == 0) {
 			this->EMP_Threshold = -1;
-		} else if((_strcmpi(Ares::readBuffer, "yes") == 0) || (_strcmpi(Ares::readBuffer, "true") == 0)) {
+		}
+		else if ((_strcmpi(Ares::readBuffer, "yes") == 0) || (_strcmpi(Ares::readBuffer, "true") == 0)) {
 			this->EMP_Threshold = 1;
-		} else if((_strcmpi(Ares::readBuffer, "no") == 0) || (_strcmpi(Ares::readBuffer, "false") == 0)) {
+		}
+		else if ((_strcmpi(Ares::readBuffer, "no") == 0) || (_strcmpi(Ares::readBuffer, "false") == 0)) {
 			this->EMP_Threshold = 0;
-		} else {
+		}
+		else {
 			this->EMP_Threshold = pINI->ReadInteger(section, "EMP.Threshold", this->EMP_Threshold);
 		}
 	}
 
-	if(pINI->ReadString(section, "VeteranAbilities", "", Ares::readBuffer)) {
+	if (pINI->ReadString(section, "VeteranAbilities", "", Ares::readBuffer)) {
 		char* context = nullptr;
-		for(char *cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
-			if(!_strcmpi(cur, "empimmune")) {
+		for (char* cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
+			if (!_strcmpi(cur, "empimmune")) {
 				this->VeteranAbilityEMPIMMUNE = true;
 				this->EliteAbilityEMPIMMUNE = true;
 			}
 		}
 	}
 
-	if(pINI->ReadString(section, "EliteAbilities", "", Ares::readBuffer)) {
+	if (pINI->ReadString(section, "EliteAbilities", "", Ares::readBuffer)) {
 		char* context = nullptr;
-		for(char *cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
-			if(!_strcmpi(cur, "empimmune")) {
+		for (char* cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
+			if (!_strcmpi(cur, "empimmune")) {
 				this->EliteAbilityEMPIMMUNE = true;
 			}
 		}
@@ -297,7 +307,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	// #1208
 	this->PassengerTurret.Read(exINI, section, "PassengerTurret");
-	
+
 	// #617 powered units
 	this->PoweredBy.Read(exINI, section, "PoweredBy");
 
@@ -324,7 +334,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->GattlingCyclic.Read(exINI, section, "Gattling.Cycle");
 
 	// #245 custom missiles
-	if(auto pAircraftType = specific_cast<AircraftTypeClass*>(pThis)) {
+	if (auto pAircraftType = specific_cast<AircraftTypeClass*>(pThis)) {
 		this->IsCustomMissile.Read(exINI, section, "Missile.Custom");
 		this->CustomMissileData.Read(exINI, section, "Missile");
 		this->CustomMissileData.GetEx()->Type = pAircraftType;
@@ -434,6 +444,14 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->NoManualUnload.Read(exINI, section, "NoManualUnload");
 	this->NoManualFire.Read(exINI, section, "NoManualFire");
+
+	this->Deploy_Cursor.Read(exINI, section, "Cursor.Deploy");
+	this->NoDeploy_Cursor.Read(exINI, section, "Cursor.NoDeploy");
+	this->Enter_Cursor.Read(exINI, section, "Cursor.Enter");
+	this->NoEnter_Cursor.Read(exINI, section, "Cursor.NoEnter");
+	this->Move_Cursor.Read(exINI, section, "Cursor.Move");
+	this->NoMove_Cursor.Read(exINI, section, "Cursor.NoMove");
+
 	//this->NoManualEnter.Read(exINI, section, "NoManualEnter");
 
 	// quick fix - remove after the rest of weapon selector code is done
@@ -536,7 +554,7 @@ const char* TechnoTypeExt::ExtData::GetSelectionGroupID() const
 
 const char* TechnoTypeExt::GetSelectionGroupID(ObjectTypeClass* pType)
 {
-	if(auto pExt = TechnoTypeExt::ExtMap.Find(static_cast<TechnoTypeClass*>(pType))) {
+	if (auto pExt = TechnoTypeExt::ExtMap.Find(static_cast<TechnoTypeClass*>(pType))) {
 		return pExt->GetSelectionGroupID();
 	}
 
@@ -556,29 +574,32 @@ bool TechnoTypeExt::ExtData::CameoIsElite(HouseClass const* const pHouse) const
 	auto const pType = this->OwnerObject();
 	auto const pExt = TechnoTypeExt::ExtMap.Find(pType);
 
-	if(!pType->AltCameo && !pExt->AltCameoPCX.Exists()) {
+	if (!pType->AltCameo && !pExt->AltCameoPCX.Exists()) {
 		return false;
 	}
 
-	switch(pType->WhatAmI()) {
+	switch (pType->WhatAmI()) {
 	case AbstractType::InfantryType:
-		if(pHouse->BarracksInfiltrated && !pType->Naval && pType->Trainable) {
+		if (pHouse->BarracksInfiltrated && !pType->Naval && pType->Trainable) {
 			return true;
-		} else {
+		}
+		else {
 			return pCountry->VeteranInfantry.FindItemIndex(static_cast<InfantryTypeClass*>(pType)) != -1;
 		}
 	case AbstractType::UnitType:
-		if(pHouse->WarFactoryInfiltrated && !pType->Naval && pType->Trainable) {
+		if (pHouse->WarFactoryInfiltrated && !pType->Naval && pType->Trainable) {
 			return true;
-		} else {
+		}
+		else {
 			return pCountry->VeteranUnits.FindItemIndex(static_cast<UnitTypeClass*>(pType)) != -1;
 		}
 	case AbstractType::AircraftType:
 		return pCountry->VeteranAircraft.FindItemIndex(static_cast<AircraftTypeClass*>(pType)) != -1;
 	case AbstractType::BuildingType:
-		if(auto const pItem = pType->UndeploysInto) {
+		if (auto const pItem = pType->UndeploysInto) {
 			return pCountry->VeteranUnits.FindItemIndex(static_cast<UnitTypeClass*>(pItem)) != -1;
-		} else {
+		}
+		else {
 			auto const pData = HouseTypeExt::ExtMap.Find(pCountry);
 			return pData->VeteranBuildings.Contains(static_cast<BuildingTypeClass*>(pType));
 		}
@@ -595,35 +616,37 @@ bool TechnoTypeExt::ExtData::CanBeBuiltAt(
 		|| this->BuiltAt.Contains(pFactoryType);
 }
 
-bool TechnoTypeExt::ExtData::CarryallCanLift(UnitClass * Target) {
-	if(Target->ParasiteEatingMe) {
+bool TechnoTypeExt::ExtData::CarryallCanLift(UnitClass* Target) {
+
+	if (Target->ParasiteEatingMe)
 		return false;
-	}
+
 	auto TargetData = TechnoTypeExt::ExtMap.Find(Target->Type);
-	UnitTypeClass *TargetType = Target->Type;
+	UnitTypeClass* TargetType = Target->Type;
 	bool canCarry = !TargetType->Organic && !TargetType->NonVehicle;
-	if(TargetData->CarryallAllowed.isset()) {
+
+	if (TargetData->CarryallAllowed.isset())
 		canCarry = !!TargetData->CarryallAllowed;
-	}
-	if(!canCarry) {
+
+	if (!canCarry)
 		return false;
-	}
-	if(this->CarryallSizeLimit.isset()) {
+
+	if (this->CarryallSizeLimit.isset()) {
 		int maxSize = this->CarryallSizeLimit;
-		if(maxSize != -1) {
-			return maxSize >= static_cast<TechnoTypeClass *>(Target->Type)->Size;
+		if (maxSize != -1) {
+			return maxSize >= static_cast<TechnoTypeClass*>(Target->Type)->Size;
 		}
 	}
-	return true;
 
+	return true;
 }
 
 bool TechnoTypeExt::ExtData::IsGenericPrerequisite() const
 {
-	if(this->GenericPrerequisite.empty()) {
+	if (this->GenericPrerequisite.empty()) {
 		bool isGeneric = false;
-		for(auto const& Prereq : GenericPrerequisite::Array) {
-			if(Prereq->Alternates.FindItemIndex(this->OwnerObject()) != -1) {
+		for (auto const& Prereq : GenericPrerequisite::Array) {
+			if (Prereq->Alternates.FindItemIndex(this->OwnerObject()) != -1) {
 				isGeneric = true;
 				break;
 			}
@@ -634,12 +657,36 @@ bool TechnoTypeExt::ExtData::IsGenericPrerequisite() const
 	return this->GenericPrerequisite;
 }
 
+MouseCursorType TechnoTypeExt::GetCursorByWeapon(TechnoClass* pTech, int nWeaponIdx, bool bOutOfrange)
+{
+	if (auto pWeaponS = pTech->GetWeapon(nWeaponIdx))
+	{
+		if (pWeaponS->WeaponType)
+		{
+			auto pWeaponTypeExt = WeaponTypeExt::ExtMap.Find(pWeaponS->WeaponType);
+
+			return (MouseCursorType)(bOutOfrange ? pWeaponTypeExt->OutOfRange_Cursor.Get() : pWeaponTypeExt->Attack_Cursor.Get());
+		}
+	}
+
+	return (MouseCursorType)(20 + (int)bOutOfrange);
+}
+
+
 // =============================
 // load / save
 
 template <typename T>
 void TechnoTypeExt::ExtData::Serialize(T& Stm) {
 	Stm
+		//
+		.Process(this->Deploy_Cursor)
+		.Process(this->NoDeploy_Cursor)
+		.Process(this->Enter_Cursor)
+		.Process(this->NoEnter_Cursor)
+		.Process(this->Move_Cursor)
+		.Process(this->NoMove_Cursor)
+		//
 		.Process(this->Survivors_Pilots)
 		.Process(this->Survivors_PilotChance)
 		.Process(this->Survivors_PassengerChance)
@@ -790,12 +837,12 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->NoManualEnter);
 }
 
-void TechnoTypeExt::ExtData::LoadFromStream(AresStreamReader &Stm) {
+void TechnoTypeExt::ExtData::LoadFromStream(AresStreamReader& Stm) {
 	Extension<TechnoTypeClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void TechnoTypeExt::ExtData::SaveToStream(AresStreamWriter &Stm) {
+void TechnoTypeExt::ExtData::SaveToStream(AresStreamWriter& Stm) {
 	Extension<TechnoTypeClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
 }
@@ -863,7 +910,7 @@ DEFINE_HOOK(716123, TechnoTypeClass_LoadFromINI, 5)
 DEFINE_HOOK(679CAF, RulesClass_LoadAfterTypeData_CompleteInitialization, 5) {
 	//GET(CCINIClass*, pINI, ESI);
 
-	for(auto const& pType : *BuildingTypeClass::Array) {
+	for (auto const& pType : *BuildingTypeClass::Array) {
 		auto const pExt = BuildingTypeExt::ExtMap.Find(pType);
 		pExt->CompleteInitialization();
 	}

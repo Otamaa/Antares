@@ -26,7 +26,7 @@ void RulesExt::LoadFromINIFile(RulesClass *pThis, CCINIClass *pINI) {
 void RulesExt::LoadBeforeTypeData(RulesClass *pThis, CCINIClass *pINI) {
 	GenericPrerequisite::LoadFromINIList(pINI);
 	ArmorType::LoadFromINIList(pINI);
-
+	CursorType::LoadFromINIList(pINI);
 	SideExt::ExtMap.LoadAllFromINI(pINI);
 	HouseTypeExt::ExtMap.LoadAllFromINI(pINI);
 
@@ -141,7 +141,6 @@ void RulesExt::ExtData::LoadAfterTypeData(RulesClass *pThis, CCINIClass *pINI) {
 
 	pData->EngineerDamage.Read(exINI, "General", "EngineerDamage");
 	pData->EngineerAlwaysCaptureTech.Read(exINI, "General", "EngineerAlwaysCaptureTech");
-	pData->EngineerDamageCursor.Read(exINI, "General", "EngineerDamageCursor");
 
 	pData->EnemyWrench.Read(exINI, "General", "EnemyWrench");
 
@@ -160,8 +159,6 @@ void RulesExt::ExtData::LoadAfterTypeData(RulesClass *pThis, CCINIClass *pINI) {
 	pData->TogglePowerAllowed.Read(exINI, "General", "TogglePowerAllowed");
 	pData->TogglePowerDelay.Read(exINI, "General", "TogglePowerDelay");
 	pData->TogglePowerIQ.Read(exINI, "IQ", "TogglePower");
-	pData->TogglePowerCursor.Read(exINI, "General", "TogglePowerCursor");
-	pData->TogglePowerNoCursor.Read(exINI, "General", "TogglePowerNoCursor");
 
 	pData->FirestormActiveAnim.Read(exINI, "AudioVisual", "FirestormActiveAnim");
 	pData->FirestormIdleAnim.Read(exINI, "AudioVisual", "FirestormIdleAnim");
@@ -198,13 +195,10 @@ void RulesExt::ExtData::Serialize(T& Stm) {
 		.Process(this->ElectricDeath)
 		.Process(this->EngineerDamage)
 		.Process(this->EngineerAlwaysCaptureTech)
-		.Process(this->EngineerDamageCursor)
 		.Process(this->MultiEngineer)
 		.Process(this->TogglePowerAllowed)
 		.Process(this->TogglePowerDelay)
 		.Process(this->TogglePowerIQ)
-		.Process(this->TogglePowerCursor)
-		.Process(this->TogglePowerNoCursor)
 		.Process(this->CanMakeStuffUp)
 		.Process(this->Tiberium_DamageEnabled)
 		.Process(this->Tiberium_HealEnabled)

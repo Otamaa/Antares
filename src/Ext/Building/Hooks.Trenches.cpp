@@ -118,7 +118,7 @@ DEFINE_HOOK(441F2C, BuildingClass_Destroy_KickOutOfRubble, 5) {
 }
 
 // #666: Trench Traversal - check if traversal is possible & cursor display
-DEFINE_HOOK(44725F, BuildingClass_GetCursorOverObject_TargetABuilding, 5)
+DEFINE_HOOK(44725F, BuildingClass_GetActionOnObject_TargetABuilding, 5)
 {
 	GET(BuildingClass *, pThis, ESI);
 	GET(TechnoClass *, T, EBP);
@@ -137,7 +137,7 @@ DEFINE_HOOK(44725F, BuildingClass_GetCursorOverObject_TargetABuilding, 5)
 	return 0;
 }
 
-DEFINE_HOOK(443414, BuildingClass_ClickedAction, 6)
+DEFINE_HOOK(443414, BuildingClass_ActionOnObject, 6)
 {
 	GET(enum class Action, Action, EAX);
 	GET(BuildingClass *, pThis, ECX);

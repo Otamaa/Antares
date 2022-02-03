@@ -813,7 +813,7 @@ DEFINE_HOOK(5203F7, InfantryClass_UpdateVehicleThief_Hijack, 5)
 	return finalize ? Stop : GoOn;
 }
 
-DEFINE_HOOK(51E7BF, InfantryClass_GetCursorOverObject_CanCapture, 6)
+DEFINE_HOOK(51E7BF, InfantryClass_GetActionOnObject_CanCapture, 6)
 {
 	GET(InfantryClass *, pSelected, EDI);
 	GET(ObjectClass *, pTarget, ESI);
@@ -823,21 +823,26 @@ DEFINE_HOOK(51E7BF, InfantryClass_GetCursorOverObject_CanCapture, 6)
 		DontCapture = 0x51E85A, // the game will assume this is not a VehicleThief and will check for other cursors normally
 		Select = 0x51E7EF, // select target instead of ordering this
 		DontMindMe = 0, // the game will check if this is a VehicleThief
-	} DoWhat = DontMindMe;
+	};
 
 	if(TechnoClass* pTechno = generic_cast<TechnoClass*>(pTarget)) {
 		if(pTechno->GetTechnoType()->IsTrain) {
-			DoWhat = Select;
+			return Select;
 		} else {
 			TechnoExt::ExtData* pExt = TechnoExt::ExtMap.Find(pSelected);
 			TechnoTypeExt::ExtData* pTypeExt = TechnoTypeExt::ExtMap.Find(pSelected->Type);
 			if(pSelected->Type->VehicleThief || pTypeExt->CanDrive) {
-				DoWhat = (pExt->GetActionHijack(pTechno) != AresAction::None ? Capture : DontCapture);
+				if((pExt->GetActionHijack(pTechno) != AresAction::None))
+				{ 
+					CursorType::Insert(96,Action::Capture,false);
+					return Capture;
+				}
+				return DontCapture;
 			}
 		}
 	}
 
-	return DoWhat;
+	return DontMindMe;
 }
 
 // change all the special things infantry do, like vehicle thief, infiltration,
@@ -1128,7 +1133,7 @@ DEFINE_HOOK(741206, UnitClass_GetFireError, 6)
 }
 
 // bug #1290: carryall size limit
-DEFINE_HOOK(417D75, AircraftClass_GetCursorOverObject_CanTote, 5)
+DEFINE_HOOK(417D75, AircraftClass_GetActionOnObject_CanTote, 5)
 {
 	GET(AircraftClass *, pCarryall, ESI);
 	GET(UnitClass *, pTarget, EDI);
@@ -2006,7 +2011,18 @@ DEFINE_HOOK(41949F, AircraftClass_ReceivedRadioCommand_SpecificPassengers, 6)
 	return allowed ? Allowed : Disallowed;
 }
 
-DEFINE_HOOK(740031, UnitClass_GetCursorOverObject_NoManualUnload, 6)
+//
+DEFINE_HOOK(417DD2 ,AircraftClass_GetActionOnObject_NoManualUnload, 6)
+{
+	GET(AircraftClass const* const, pThis, ESI);
+
+	auto const pType = pThis->GetTechnoType();
+	auto const pExt = TechnoTypeExt::ExtMap.Find(pType);
+
+	return pExt->NoManualUnload ? 0x417DF4u : 0u;
+}
+//
+DEFINE_HOOK(740031, UnitClass_GetActionOnObject_NoManualUnload, 6)
 {
 	GET(UnitClass const* const, pThis, ESI);
 

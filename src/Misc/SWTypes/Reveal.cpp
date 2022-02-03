@@ -33,12 +33,12 @@ void SW_Reveal::Initialize(SWTypeExt::ExtData *pData, SuperWeaponTypeClass *pSW)
 	pData->EVA_Ready = VoxClass::FindIndex("EVA_PsychicRevealReady");
 
 	pData->SW_AITargetingType = SuperWeaponAITargetingMode::ParaDrop;
-	pData->SW_Cursor = MouseCursor::GetCursor(MouseCursorType::PsychicReveal);
+	pData->SW_Cursor = int(MouseCursorType::PsychicReveal);
 }
 
 void SW_Reveal::LoadFromINI(SWTypeExt::ExtData* pData, SuperWeaponTypeClass* pSW, CCINIClass* pINI)
 {
-	pSW->Action = (GetRange(pData).WidthOrRange < 0.0) ? Action::None : Actions::SuperWeaponAllowed;
+	pSW->Action = (GetRange(pData).WidthOrRange < 0.0) ? Action::None : CursorType::SuperWeaponAllowed;
 }
 
 bool SW_Reveal::Activate(SuperClass* const pThis, const CellStruct &Coords, bool const IsPlayer)

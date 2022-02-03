@@ -33,7 +33,7 @@
 // skip the check for UnitRepair, as it does not play well with UnitReload and
 // Factory=AircraftType at all. in fact, it's prohibited, and thus docking to
 // other structures was never allowed.
-DEFINE_HOOK(417E16, AircraftClass_GetCursorOverObject_Dock, 6)
+DEFINE_HOOK(417E16, AircraftClass_GetActionOnObject_Dock, 6)
 {
 	// target is known to be a building
 	GET(AircraftClass* const, pThis, ESI);

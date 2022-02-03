@@ -61,7 +61,7 @@ void SW_NuclearMissile::Initialize(SWTypeExt::ExtData *pData, SuperWeaponTypeCla
 	pData->EVA_Activated = VoxClass::FindIndex("EVA_NuclearMissileLaunched");
 
 	pData->SW_AITargetingType = SuperWeaponAITargetingMode::Nuke;
-	pData->SW_Cursor = MouseCursor::GetCursor(MouseCursorType::Nuke);
+	pData->SW_Cursor = int(MouseCursorType::Nuke);
 }
 
 void SW_NuclearMissile::LoadFromINI(SWTypeExt::ExtData *pData, SuperWeaponTypeClass *pSW, CCINIClass *pINI)

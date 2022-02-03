@@ -23,6 +23,7 @@
 #include "Enum/ArmorTypes.h"
 #include "Enum/Prerequisites.h"
 #include "Enum/RadTypes.h"
+#include "Enum/CursorTypes.h"
 
 #include "Misc/SWTypes.h"
 
@@ -215,7 +216,8 @@ auto MassActions = MassAction<
 	GenericPrerequisite,
 	RadType,
 	NewSWType, // other classes
-	SWStateMachine
+	SWStateMachine,
+	CursorType
 >();
 
 DEFINE_HOOK(7258D0, AnnounceInvalidPointer, 6)

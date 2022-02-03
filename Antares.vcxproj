@@ -159,6 +159,7 @@
     <ClInclude Include="src\Commands\MapSnapshot.h" />
     <ClInclude Include="src\Commands\TogglePower.h" />
     <ClInclude Include="src\Enum\ArmorTypes.h" />
+    <ClInclude Include="src\Enum\CursorTypes.h" />
     <ClInclude Include="src\Enum\Prerequisites.h" />
     <ClInclude Include="src\Enum\RadTypes.h" />
     <ClInclude Include="src\Enum\_Enumerator.hpp" />
@@ -249,6 +250,7 @@
     <ClCompile Include="src\Ares.GlobalControls.cpp" />
     <ClCompile Include="src\Ares.UISettings.cpp" />
     <ClCompile Include="src\Enum\ArmorTypes.cpp" />
+    <ClCompile Include="src\Enum\CursorTypes.cpp" />
     <ClCompile Include="src\Enum\Prerequisites.cpp" />
     <ClCompile Include="src\Enum\RadTypes.cpp" />
     <ClCompile Include="src\Ext\Abstract\Body.cpp" />
@@ -266,6 +268,7 @@
     <ClCompile Include="src\Ext\Building\Hooks.Prism.cpp" />
     <ClCompile Include="src\Ext\Building\Hooks.Sensor.cpp" />
     <ClCompile Include="src\Ext\Building\Hooks.Trenches.cpp" />
+    <ClCompile Include="src\Ext\Building\Hooks.Tunnel.cpp" />
     <ClCompile Include="src\Ext\Building\PrismForward.cpp" />
     <ClCompile Include="src\Ext\BulletType\Body.cpp" />
     <ClCompile Include="src\Ext\BulletType\Hooks.cpp" />
@@ -316,6 +319,7 @@
     <ClCompile Include="src\Ext\Techno\Hooks.Firing.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.HunterSeeker.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Insignia.cpp" />
+    <ClCompile Include="src\Ext\Techno\Hooks.Mechanical.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Prerequisites.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Sight.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Spotlights.cpp" />

@@ -6,6 +6,7 @@
 #include "../_Container.hpp"
 #include "../../Utilities/Constructs.h"
 #include "../../Utilities/Template.h"
+#include <Enum/CursorTypes.h>
 
 //ifdef DEBUGBUILD
 #include "../../Misc/Debug.h"
@@ -27,15 +28,12 @@ public:
 	public:
 		Valueable<AnimTypeClass* >ElectricDeath;
 		Valueable<double> EngineerDamage;
-		Valueable<bool> EngineerAlwaysCaptureTech;
-		Valueable<MouseCursor> EngineerDamageCursor;
+		Valueable<bool> EngineerAlwaysCaptureTech;	
 		bool MultiEngineer[3];
 
 		Valueable<bool> TogglePowerAllowed;
 		Valueable<int> TogglePowerDelay;
 		Valueable<int> TogglePowerIQ;
-		Valueable<MouseCursor> TogglePowerCursor;
-		Valueable<MouseCursor> TogglePowerNoCursor;
 
 		Valueable<bool> CanMakeStuffUp;
 
@@ -105,9 +103,6 @@ public:
 			ElectricDeath(nullptr),
 			EngineerDamage(0.0),
 			EngineerAlwaysCaptureTech(true),
-			EngineerDamageCursor(MouseCursor::GetCursor(MouseCursorType::Detonate)),
-			TogglePowerCursor(MouseCursor::GetCursor(MouseCursorType::Power)),
-			TogglePowerNoCursor(MouseCursor::GetCursor(MouseCursorType::Disallowed)),
 			TogglePowerAllowed(false),
 			TogglePowerDelay(45),
 			TogglePowerIQ(-1),

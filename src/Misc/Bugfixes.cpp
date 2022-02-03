@@ -32,6 +32,8 @@
 
 #include "../Utilities/TemplateDef.h"
 
+#include <Enum/CursorTypes.h>
+
 #include <cstdlib>
 #include <array>
 
@@ -660,6 +662,8 @@ DEFINE_HOOK(52BA78, _YR_GameInit_Pre, 5)
 	// animate the engineer damage cursor
 	MouseCursor::GetCursor(MouseCursorType::Detonate).Interval = 4;
 
+	CursorType::AddDefaults();
+
 	return 0;
 }
 
@@ -1228,10 +1232,8 @@ DEFINE_HOOK(69281E, DisplayClass_ChooseAction_TogglePower, A)
 
 	if(allowed) {
 		Action = Action::TogglePower;
-		Actions::Set(&RulesExt::Global()->TogglePowerCursor);
 	} else {
 		Action = Action::NoTogglePower;
-		Actions::Set(&RulesExt::Global()->TogglePowerNoCursor);
 	}
 
 	return 0x69289B;

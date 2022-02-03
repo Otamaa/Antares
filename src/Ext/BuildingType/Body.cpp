@@ -12,7 +12,7 @@ template<> const DWORD Extension<BuildingTypeClass>::Canary = 0x11111111;
 BuildingTypeExt::ExtContainer BuildingTypeExt::ExtMap;
 
 std::vector<std::string> BuildingTypeExt::ExtData::trenchKinds;
-const CellStruct BuildingTypeExt::FoundationEndMarker = {0x7FFF, 0x7FFF};
+const CellStruct BuildingTypeExt::FoundationEndMarker = { 0x7FFF, 0x7FFF };
 
 // =============================
 // member funcs
@@ -34,7 +34,7 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->PrismForwarding.LoadFromINIFile(pThis, pINI);
 
-	if(pThis->UnitRepair && pThis->Factory == AbstractType::AircraftType) {
+	if (pThis->UnitRepair && pThis->Factory == AbstractType::AircraftType) {
 		Debug::FatalErrorAndExit(
 			"BuildingType [%s] has both UnitRepair=yes and Factory=AircraftType.\n"
 			"This combination causes Internal Errors and other unwanted behaviour.", pID);
@@ -47,21 +47,22 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	// kept for backwards-compatibility with Ares <= 0.9
 	INI_EX exArt(pArtINI);
 	this->Solid_Height.Read(exArt, pArtID, "SolidHeight");
-	
+
 	// relocated the solid tag from artmd to rulesmd
 	this->Solid_Height.Read(exINI, pID, "SolidHeight");
 	this->Solid_Level.Read(exINI, pID, "SolidLevel");
 
-	if(this->IsCustom) {
+	if (this->IsCustom) {
 		//Reset
 		pThis->Foundation = BuildingTypeExt::CustomFoundation;
 		pThis->FoundationData = this->CustomData.data();
-	} else if(pArtINI) {
+	}
+	else if (pArtINI) {
 
 		char str[0x80];
 		str[0] = '\0';
 
-		if(pArtINI->ReadString(pArtID, "Foundation", "", str) && !_strcmpi(str, "Custom")) {
+		if (pArtINI->ReadString(pArtID, "Foundation", "", str) && !_strcmpi(str, "Custom")) {
 			//Custom Foundation!
 			this->IsCustom = true;
 			pThis->Foundation = BuildingTypeExt::CustomFoundation;
@@ -72,7 +73,7 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 			this->OutlineLength = pArtINI->ReadInteger(pArtID, "FoundationOutline.Length", 0);
 
 			// at len < 10, things will end very badly for weapons factories
-			if(this->OutlineLength < 10) {
+			if (this->OutlineLength < 10) {
 				this->OutlineLength = 10;
 			}
 
@@ -85,20 +86,20 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 			using Iter = std::vector<CellStruct>::iterator;
 
-			auto ParsePoint = [](Iter &cell, const char* str) -> void {
+			auto ParsePoint = [](Iter& cell, const char* str) -> void {
 				int x = 0, y = 0;
-				switch(sscanf_s(str, "%d,%d", &x, &y)) {
+				switch (sscanf_s(str, "%d,%d", &x, &y)) {
 				case 0:
 					x = 0;
 					// fallthrough
 				case 1:
 					y = 0;
 				}
-				*cell++ = CellStruct{static_cast<short>(x), static_cast<short>(y)};
+				*cell++ = CellStruct{ static_cast<short>(x), static_cast<short>(y) };
 			};
 
 			auto CellLess = [](const CellStruct& lhs, const CellStruct& rhs) {
-				if(lhs.Y != rhs.Y) {
+				if (lhs.Y != rhs.Y) {
 					return lhs.Y < rhs.Y;
 				}
 				return lhs.X < lhs.X;
@@ -108,11 +109,12 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 			auto itData = this->CustomData.begin();
 			char key[0x20];
 
-			for(int i = 0; i < this->CustomWidth * this->CustomHeight; ++i) {
+			for (int i = 0; i < this->CustomWidth * this->CustomHeight; ++i) {
 				_snprintf_s(key, _TRUNCATE, "Foundation.%d", i);
-				if(pArtINI->ReadString(pArtID, key, "", str)) {
+				if (pArtINI->ReadString(pArtID, key, "", str)) {
 					ParsePoint(itData, str);
-				} else {
+				}
+				else {
 					break;
 				}
 			}
@@ -124,11 +126,12 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 			this->CustomData.erase(itData + 1, this->CustomData.end());
 
 			auto itOutline = this->OutlineData.begin();
-			for(int i = 0; i < this->OutlineLength; ++i) {
+			for (int i = 0; i < this->OutlineLength; ++i) {
 				_snprintf_s(key, _TRUNCATE, "FoundationOutline.%d", i);
-				if(pArtINI->ReadString(pArtID, key, "", str)) {
+				if (pArtINI->ReadString(pArtID, key, "", str)) {
 					ParsePoint(itOutline, str);
-				} else {
+				}
+				else {
 					//Set end vector
 					// can't break, some stupid functions access fixed offsets without checking if that offset is within the valid range
 					*itOutline++ = FoundationEndMarker;
@@ -148,7 +151,7 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->UCFatalRate.Read(exINI, pID, "UC.FatalRate");
 	this->UCDamageMultiplier.Read(exINI, pID, "UC.DamageMultiplier");
 	this->BunkerRaidable.Read(exINI, pID, "Bunker.Raidable");
-	if(pINI->ReadString(pID, "IsTrench", "", Ares::readBuffer)) {
+	if (pINI->ReadString(pID, "IsTrench", "", Ares::readBuffer)) {
 		/*  Find the name in the list of kinds; if the list is empty, distance is 0, if the item isn't in
 			the list, the index is the current list's size(); if the returned iterator is beyond the list,
 			add the name to the list, which makes the previously calculated index (th distance) valid.
@@ -160,15 +163,15 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 		*/
 		auto it = std::find(trenchKinds.begin(), trenchKinds.end(), Ares::readBuffer);
 		this->IsTrench = std::distance(trenchKinds.begin(), it);
-		if(it == trenchKinds.end()) {
+		if (it == trenchKinds.end()) {
 			trenchKinds.push_back(Ares::readBuffer);
 		}
 	}
 
 	this->LightningRod_Modifier.Read(exINI, pID, "LightningRod.Modifier");
 
-//	this->LegacyRadarEffect = pINI->ReadBool(pID, "SpyEffect.LegacyRadar", this->LegacyRadarEffect);
-//	this->DisplayProduction = pINI->ReadBool(pID, "SpyEffect.DisplayProduction", this->DisplayProduction);
+	//	this->LegacyRadarEffect = pINI->ReadBool(pID, "SpyEffect.LegacyRadar", this->LegacyRadarEffect);
+	//	this->DisplayProduction = pINI->ReadBool(pID, "SpyEffect.DisplayProduction", this->DisplayProduction);
 
 	this->RubbleDestroyed.Read(exINI, pID, "Rubble.Destroyed");
 	this->RubbleIntact.Read(exINI, pID, "Rubble.Intact");
@@ -181,7 +184,7 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->RubbleDestroyedRemove.Read(exINI, pID, "Rubble.Destroyed.Remove");
 	this->RubbleIntactRemove.Read(exINI, pID, "Rubble.Intact.Remove");
 
-	if(this->RubbleDestroyed) {
+	if (this->RubbleDestroyed) {
 		this->RubbleDestroyed->Capturable = false;
 		this->RubbleDestroyed->TogglePower = false;
 		this->RubbleDestroyed->Unsellable = true;
@@ -201,7 +204,7 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->StolenMoneyPercentage.Read(exINI, pID, "SpyEffect.StolenMoneyPercentage");
 	this->UnReverseEngineer.Read(exINI, pID, "SpyEffect.UndoReverseEngineer");
 
-	if(this->StolenTechIndex >= 32) {
+	if (this->StolenTechIndex >= 32) {
 		Debug::Log(Debug::Severity::Error, "BuildingType %s has a SpyEffect.StolenTechIndex of %d. The value has to be less than 32.\n", pID, this->StolenTechIndex.Get());
 		Debug::RegisterParserError();
 		this->StolenTechIndex = -1;
@@ -209,7 +212,7 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	// #218 Specific Occupiers
 	this->AllowedOccupiers.Read(exINI, pID, "CanBeOccupiedBy");
-	if(!this->AllowedOccupiers.empty()) {
+	if (!this->AllowedOccupiers.empty()) {
 		// having a specific occupier list implies that this building is supposed to be occupiable
 		pThis->CanBeOccupied = true;
 	}
@@ -245,6 +248,8 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->ImmuneToSaboteurs.Read(exINI, pID, "ImmuneToSaboteurs");
 
+	this->Spy_Cursor.Read(exINI, pID, "Cursor.Spy");
+	this->EngineerRepairable.Read(exINI, pID, "EngineerRepairable");
 	//this->AIBuildCounts.Read(exINI, pID, "AIBuildCounts");
 	//this->AIExtraCounts.Read(exINI, pID, "AIExtraCounts");
 
@@ -255,14 +260,14 @@ void BuildingTypeExt::ExtData::CompleteInitialization() {
 	auto const pThis = this->OwnerObject();
 
 	// enforce same foundations for rubble/intact building pairs
-	if(this->RubbleDestroyed &&
+	if (this->RubbleDestroyed &&
 		!BuildingTypeExt::IsFoundationEqual(pThis, this->RubbleDestroyed))
 	{
 		Debug::FatalErrorAndExit(
 			"BuildingType %s and its %s %s don't have the same foundation.",
 			pThis->ID, "Rubble.Destroyed", this->RubbleDestroyed->ID);
 	}
-	if(this->RubbleIntact &&
+	if (this->RubbleIntact &&
 		!BuildingTypeExt::IsFoundationEqual(pThis, this->RubbleIntact))
 	{
 		Debug::FatalErrorAndExit(
@@ -280,12 +285,12 @@ bool BuildingTypeExt::IsFoundationEqual(
 	BuildingTypeClass const* const pType2)
 {
 	// both types must be set and must have same foundation id
-	if(!pType1 || !pType2 || pType1->Foundation != pType2->Foundation) {
+	if (!pType1 || !pType2 || pType1->Foundation != pType2->Foundation) {
 		return false;
 	}
 
 	// non-custom foundations need no special handling
-	if(pType1->Foundation != BuildingTypeExt::CustomFoundation) {
+	if (pType1->Foundation != BuildingTypeExt::CustomFoundation) {
 		return true;
 	}
 
@@ -323,7 +328,7 @@ bool BuildingTypeExt::IsSabotagable(BuildingTypeClass const* const pType)
 void BuildingTypeExt::ExtData::UpdateFoundationRadarShape() {
 	this->FoundationRadarShape.Clear();
 
-	if(this->IsCustom) {
+	if (this->IsCustom) {
 		auto pType = this->OwnerObject();
 		auto pRadar = RadarClass::Global();
 
@@ -335,7 +340,7 @@ void BuildingTypeExt::ExtData::UpdateFoundationRadarShape() {
 			double dblLength = length * factor + 0.5;
 			double minLength = (length == 1) ? 1.0 : 2.0;
 
-			if(dblLength < minLength) {
+			if (dblLength < minLength) {
 				dblLength = minLength;
 			}
 
@@ -353,20 +358,20 @@ void BuildingTypeExt::ExtData::UpdateFoundationRadarShape() {
 		// wider for each line drawn. the start and end values
 		// are special-cased to not draw the pixels outside the
 		// foundation.
-		for(int i=0; i<rows; ++i) {
+		for (int i = 0; i < rows; ++i) {
 			int start = -i;
-			if(i >= pixelsY) {
+			if (i >= pixelsY) {
 				start = i - 2 * pixelsY + 2;
 			}
 
 			int end = i;
-			if(i >= pixelsX) {
+			if (i >= pixelsX) {
 				end = 2 * pixelsX - i - 2;
 			}
 
 			// fill the line
-			for(int j=start; j<=end; ++j) {
-				Point2D pixel = {j, i};
+			for (int j = start; j <= end; ++j) {
+				Point2D pixel = { j, i };
 				this->FoundationRadarShape.AddItem(pixel);
 			}
 		}
@@ -378,7 +383,7 @@ void BuildingTypeExt::ExtData::UpdateBuildupFrames()
 {
 	auto const pThis = this->OwnerObject();
 
-	if(auto const pShp = pThis->Buildup) {
+	if (auto const pShp = pThis->Buildup) {
 		auto const frames = pThis->Gate ?
 			pThis->GateStages + 1 : pShp->Frames / 2;
 
@@ -397,13 +402,13 @@ bool BuildingTypeExt::ExtData::IsLinkable() {
 	return this->Firewall_Is || (this->IsTrench > -1);
 }
 
-bool BuildingTypeExt::ExtData::CanBeOccupiedBy(InfantryClass *whom) {
+bool BuildingTypeExt::ExtData::CanBeOccupiedBy(InfantryClass* whom) {
 	// if CanBeOccupiedBy isn't empty, we have to check if this soldier is allowed in
 	return this->AllowedOccupiers.empty() || this->AllowedOccupiers.Contains(whom->Type);
 }
 
 bool BuildingTypeExt::ExtData::IsAcademy() const {
-	if(this->Academy.empty()) {
+	if (this->Academy.empty()) {
 		this->Academy = this->AcademyInfantry > 0.0
 			|| this->AcademyAircraft > 0.0
 			|| this->AcademyVehicle > 0.0
@@ -420,9 +425,10 @@ size_t BuildingTypeExt::ExtData::GetSuperWeaponCount() const {
 int BuildingTypeExt::ExtData::GetSuperWeaponIndex(const size_t index) const {
 	const auto pThis = this->OwnerObject();
 
-	if(index < 2) {
+	if (index < 2) {
 		return !index ? pThis->SuperWeapon : pThis->SuperWeapon2;
-	} else if(index - 2 < this->SuperWeapons.size()) {
+	}
+	else if (index - 2 < this->SuperWeapons.size()) {
 		return this->SuperWeapons[index - 2];
 	}
 
@@ -432,9 +438,9 @@ int BuildingTypeExt::ExtData::GetSuperWeaponIndex(const size_t index) const {
 int BuildingTypeExt::ExtData::GetSuperWeaponIndex(const size_t index, HouseClass* pHouse) const {
 	auto idxSW = this->GetSuperWeaponIndex(index);
 
-	if(auto pSuper = pHouse->Supers.GetItemOrDefault(idxSW)) {
+	if (auto pSuper = pHouse->Supers.GetItemOrDefault(idxSW)) {
 		auto pExt = SWTypeExt::ExtMap.Find(pSuper->Type);
-		if(!pExt->IsAvailable(pHouse)) {
+		if (!pExt->IsAvailable(pHouse)) {
 			return -1;
 		}
 	}
@@ -448,6 +454,10 @@ int BuildingTypeExt::ExtData::GetSuperWeaponIndex(const size_t index, HouseClass
 template <typename T>
 void BuildingTypeExt::ExtData::Serialize(T& Stm) {
 	Stm
+		//
+		.Process(this->Spy_Cursor)
+		.Process(this->EngineerRepairable)
+		//
 		.Process(this->Solid_Height)
 		.Process(this->Solid_Level)
 		.Process(this->IsCustom)
@@ -516,12 +526,12 @@ void BuildingTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->BuildupTime);
 }
 
-void BuildingTypeExt::ExtData::LoadFromStream(AresStreamReader &Stm) {
+void BuildingTypeExt::ExtData::LoadFromStream(AresStreamReader& Stm) {
 	Extension<BuildingTypeClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void BuildingTypeExt::ExtData::SaveToStream(AresStreamWriter &Stm) {
+void BuildingTypeExt::ExtData::SaveToStream(AresStreamWriter& Stm) {
 	Extension<BuildingTypeClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
 }
@@ -530,11 +540,12 @@ bool BuildingTypeExt::ExtContainer::Load(BuildingTypeClass* pThis, IStream* pStm
 	BuildingTypeExt::ExtData* pData = this->LoadKey(pThis, pStm);
 
 	// if there's custom data, assign it
-	if(pData->IsCustom && pData->CustomWidth > 0 && pData->CustomHeight > 0) {
+	if (pData->IsCustom && pData->CustomWidth > 0 && pData->CustomHeight > 0) {
 		pThis->Foundation = BuildingTypeExt::CustomFoundation;
 		pThis->FoundationData = pData->CustomData.data();
 		pThis->FoundationOutside = pData->OutlineData.data();
-	} else {
+	}
+	else {
 		pData->CustomData.clear();
 		pData->OutlineData.clear();
 	}

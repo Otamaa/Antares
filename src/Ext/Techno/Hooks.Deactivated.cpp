@@ -9,16 +9,39 @@
 #include <InfantryClass.h>
 #include <UnitClass.h>
 #include <VocClass.h>
+#include <Ext/WeaponType/Body.h>
+#include <BombClass.h>
+#include <HouseClass.h>
 
 static bool IsDeactivated(TechnoClass * pThis) {
 	return TechnoExt::ExtMap.Find(pThis)->IsDeactivated();
 };
 
-static Action GetAction(TechnoClass * pThis, ObjectClass *pThat = nullptr) {
+static Action GetAction(TechnoClass * pThis, ObjectClass *pThat = nullptr) 
+{
+	auto const& nObjectVect = *ObjectClass::CurrentObjects();
+
+	if(pThis == pThat && nObjectVect.Count == 1)
+	{
+		if (auto pBomb = pThis->AttachedBomb)
+		{
+				auto const& pWeapon = WeaponTypeExt::BombExt[pBomb];
+				auto pOwner = pBomb->OwnerHouse;
+
+				if (pOwner && pOwner->IsPlayerControl())
+				{
+					auto nDeath = pWeapon->Ivan_CanDetonateDeathBomb.Get(RulesClass::Instance()->CanDetonateDeathBomb);
+					auto nTime = pWeapon->Ivan_CanDetonateTimeBomb.Get(RulesClass::Instance()->CanDetonateTimeBomb);
+
+					if (pBomb->Type == BombType::DeathBomb ?  nDeath:nTime )
+						return Action::Detonate;
+				}
+		}
+	}
 	return TechnoExt::ExtMap.Find(pThis)->GetDeactivatedAction(pThat);
 };
 
-DEFINE_HOOK(447548, BuildingClass_GetCursorOverCell_Deactivated, 6)
+DEFINE_HOOK(447548, BuildingClass_GetActionOnCell_Deactivated, 6)
 {
 	GET(BuildingClass *, pThis, ESI);
 	if(IsDeactivated(pThis)) {
@@ -28,7 +51,7 @@ DEFINE_HOOK(447548, BuildingClass_GetCursorOverCell_Deactivated, 6)
 	return 0;
 }
 
-DEFINE_HOOK(447218, BuildingClass_GetCursorOverObject_Deactivated, 6)
+DEFINE_HOOK(447218, BuildingClass_GetActionOnObject_Deactivated, 6)
 {
 	GET(BuildingClass *, pThis, ESI);
 	GET_STACK(ObjectClass *, pThat, 0x1C);
@@ -39,7 +62,7 @@ DEFINE_HOOK(447218, BuildingClass_GetCursorOverObject_Deactivated, 6)
 	return 0;
 }
 
-DEFINE_HOOK(7404B9, UnitClass_GetCursorOverCell_Deactivated, 6)
+DEFINE_HOOK(7404B9, UnitClass_GetActionOnCell_Deactivated, 6)
 {
 	GET(UnitClass *, pThis, ESI);
 	if(IsDeactivated(pThis)) {
@@ -49,7 +72,7 @@ DEFINE_HOOK(7404B9, UnitClass_GetCursorOverCell_Deactivated, 6)
 	return 0;
 }
 
-DEFINE_HOOK(73FD5A, UnitClass_GetCursorOverObject_Deactivated, 5)
+DEFINE_HOOK(73FD5A, UnitClass_GetActionOnObject_Deactivated, 5)
 {
 	GET(UnitClass *, pThis, ECX);
 	GET_STACK(ObjectClass *, pThat, 0x20);
@@ -60,7 +83,7 @@ DEFINE_HOOK(73FD5A, UnitClass_GetCursorOverObject_Deactivated, 5)
 	return 0;
 }
 
-DEFINE_HOOK(51F808, InfantryClass_GetCursorOverCell_Deactivated, 6)
+DEFINE_HOOK(51F808, InfantryClass_GetActionOnCell_Deactivated, 6)
 {
 	GET(InfantryClass *, pThis, EDI);
 	if(IsDeactivated(pThis)) {
@@ -70,7 +93,7 @@ DEFINE_HOOK(51F808, InfantryClass_GetCursorOverCell_Deactivated, 6)
 	return 0;
 }
 
-DEFINE_HOOK(51E440, InfantryClass_GetCursorOverObject_Deactivated, 8)
+DEFINE_HOOK(51E440, InfantryClass_GetActionOnObject_Deactivated, 8)
 {
 	GET(InfantryClass *, pThis, EDI);
 	GET_STACK(ObjectClass *, pThat, 0x3C);
@@ -81,7 +104,7 @@ DEFINE_HOOK(51E440, InfantryClass_GetCursorOverObject_Deactivated, 8)
 	return 0;
 }
 
-DEFINE_HOOK(417F83, AircraftClass_GetCursorOverCell_Deactivated, 6)
+DEFINE_HOOK(417F83, AircraftClass_GetActionOnCell_Deactivated, 6)
 {
 	GET(AircraftClass *, pThis, ESI);
 	if(IsDeactivated(pThis)) {
@@ -91,7 +114,7 @@ DEFINE_HOOK(417F83, AircraftClass_GetCursorOverCell_Deactivated, 6)
 	return 0;
 }
 
-DEFINE_HOOK(417CCB, AircraftClass_GetCursorOverObject_Deactivated, 5)
+DEFINE_HOOK(417CCB, AircraftClass_GetActionOnObject_Deactivated, 5)
 {
 	GET(AircraftClass *, pThis, ECX);
 	GET_STACK(ObjectClass *, pThat, 0x20);
@@ -102,7 +125,7 @@ DEFINE_HOOK(417CCB, AircraftClass_GetCursorOverObject_Deactivated, 5)
 	return 0;
 }
 
-DEFINE_HOOK(4D74EC, FootClass_ClickedAction_Deactivated, 6)
+DEFINE_HOOK(4D74EC, FootClass_ActionOnObject_Deactivated, 6)
 {
 	GET(FootClass *, pThis, ESI);
 	return (IsDeactivated(pThis))
@@ -113,7 +136,7 @@ DEFINE_HOOK(4D74EC, FootClass_ClickedAction_Deactivated, 6)
 
 // another hook is at 443414 and shares the EIP with a trench enter handler
 
-DEFINE_HOOK(4D7D58, FootClass_140_Deactivated, 6)
+DEFINE_HOOK(4D7D58, FootClass_ActionOnCell_Deactivated, 6)
 {
 	GET(FootClass *, pThis, ESI);
 	return (IsDeactivated(pThis))
@@ -122,7 +145,7 @@ DEFINE_HOOK(4D7D58, FootClass_140_Deactivated, 6)
 	;
 }
 
-DEFINE_HOOK(4436F7, BuildingClass_140_Deactivated, 5)
+DEFINE_HOOK(4436F7, BuildingClass_ActionOnCell_Deactivated, 5)
 {
 	GET(BuildingClass *, pThis, ECX);
 	return (IsDeactivated(pThis))

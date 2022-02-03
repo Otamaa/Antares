@@ -10,6 +10,8 @@
 #include "../../Utilities/Constructs.h"
 #include "../../Utilities/Template.h"
 
+#include <Enum/CursorTypes.h>
+
 class BombClass;
 class BulletClass;
 class EBolt;
@@ -99,8 +101,15 @@ public:
 
 		Valueable<int> Ammo;
 
+		ValueableIdx<CursorType> Attack_Cursor;
+		ValueableIdx<CursorType> OutOfRange_Cursor;
+
 		ExtData(WeaponTypeClass* OwnerObject) : Extension<WeaponTypeClass>(OwnerObject),
 			Weapon_Loaded(false),
+			//
+			Attack_Cursor(20),
+			OutOfRange_Cursor(21),
+			//
 			Beam_Color(),
 			Beam_Duration(15),
 			Beam_Amplitude(40.0),

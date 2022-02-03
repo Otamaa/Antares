@@ -87,7 +87,7 @@ DEFINE_HOOK(6F523C, TechnoClass_DrawExtras_IvanBombImage, 5)
 
 // 6FCBAD, 6
 // custom ivan bomb disarm 1
-DEFINE_HOOK(6FCBAD, TechnoClass_GetObjectActivityState_IvanBomb, 6)
+DEFINE_HOOK(6FCBAD, TechnoClass_CanFire_IvanBomb, 6)
 {
 	GET(TechnoClass *, Target, EBP);
 	GET(WarheadTypeClass *, Warhead, EDI);
@@ -103,7 +103,7 @@ DEFINE_HOOK(6FCBAD, TechnoClass_GetObjectActivityState_IvanBomb, 6)
 }
 
 // 51E488, 5
-DEFINE_HOOK(51E488, InfantryClass_GetCursorOverObject2, 5)
+DEFINE_HOOK(51E488, InfantryClass_GetActionOnObject2, 5)
 {
 	GET(TechnoClass *, Target, ESI);
 	BombClass *Bomb = Target->AttachedBomb;
@@ -170,7 +170,7 @@ DEFINE_HOOK(6FA4C6, TechnoClass_Update_ZeroOutTarget, 5)
 	return (T->WhatAmI() == AbstractType::Aircraft) ? 0x6FA4D1 : 0;
 }
 
-DEFINE_HOOK(46934D, IvanBombs_Spread, 6)
+DEFINE_HOOK(46934D, BulletClass_DetonateAt_IvanBombs, 6)
 {
 	GET(BulletClass *, pBullet, ESI);
 
@@ -211,6 +211,7 @@ DEFINE_HOOK(46934D, IvanBombs_Spread, 6)
 }
 
 // deglobalized manual detonation settings
+/*
 DEFINE_HOOK(6FFFB1, TechnoClass_GetCursorOverObject_IvanBombs, 8)
 {
 	GET(TechnoClass*, pThis, EDI);
@@ -221,6 +222,18 @@ DEFINE_HOOK(6FFFB1, TechnoClass_GetCursorOverObject_IvanBombs, 8)
 		? pExt->Ivan_CanDetonateTimeBomb.Get(RulesClass::Instance->CanDetonateTimeBomb)
 		: pExt->Ivan_CanDetonateDeathBomb.Get(RulesClass::Instance->CanDetonateDeathBomb);
 	return canDetonate ? 0x6FFFCC : 0x700006;
+}*/
+
+/*
+6FFEC0 = TechnoClass_GetActionOnObject_IvanBombsA, 5
+6FFF9E = TechnoClass_GetActionOnObject_IvanBombsB, 8
+
+7388EB = UnitClass_ActionOnObject_IvanBombs, 6
+*/
+
+DEFINE_HOOK(51F1D8, InfantryClass_ActionOnObject_IvanBombs, 6)
+{
+	return 0x51F1EA;
 }
 
 // #896027: do not announce pointers as expired to bombs

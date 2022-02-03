@@ -172,8 +172,8 @@ public:
 		Valueable<bool> SW_RadarEvent;
 		Valueable<bool> SW_ShowCameo;
 		Valueable<bool> SW_Unstoppable;
-		Valueable<MouseCursor> SW_Cursor;
-		Valueable<MouseCursor> SW_NoCursor;
+		ValueableIdx<CursorType> SW_Cursor;
+		ValueableIdx<CursorType> SW_NoCursor;
 		AresFixedString<0x19> SW_PostDependent;
 		Valueable<SuperWeaponAITargetingMode> SW_AITargetingType;
 		Nullable<double> SW_ChargeToDrainRatio;

@@ -8,6 +8,7 @@
 #include "../../Utilities/Constructs.h"
 #include "../../Utilities/Enums.h"
 #include "../../Utilities/Template.h"
+#include <Enum/CursorTypes.h>
 
 #include <vector>
 
@@ -215,8 +216,15 @@ public:
 		ValueableVector<int> AIExtraCounts;
 
 		Nullable<double> BuildupTime;
+		//ValueableIdx::ReadCursor(&a2, v4, "Cursor.Spy");
+		NullableIdx<CursorType> Spy_Cursor;
+		Nullable<bool> EngineerRepairable;
 
 		ExtData(BuildingTypeClass* OwnerObject) : Extension<BuildingTypeClass>(OwnerObject),
+			//
+			Spy_Cursor(),
+			EngineerRepairable(),
+			//
 			Solid_Height(0),
 			Solid_Level(1),
 			IsCustom(false),

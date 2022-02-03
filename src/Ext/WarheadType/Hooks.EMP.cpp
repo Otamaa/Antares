@@ -47,7 +47,7 @@ DEFINE_HOOK(44A04C, BuildingClass_Unload_CopyEMPDuration, 6) {
 	return 0;
 }
 
-DEFINE_HOOK(51E3B0, InfantryClass_GetCursorOverObject_EMP, 7) {
+DEFINE_HOOK(51E3B0, InfantryClass_GetActionOnObject_EMP, 7) {
 	GET(InfantryClass *, pInfantry, ECX);
 	GET_STACK(TechnoClass *, pTarget, 0x4);
 

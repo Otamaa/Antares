@@ -6,7 +6,7 @@
 #include <BuildingClass.h>
 #include <HouseClass.h>
 
-DEFINE_HOOK(7004AD, TechnoClass_GetCursorOverObject_Saboteur, 6)
+DEFINE_HOOK(7004AD, TechnoClass_GetActionOnObject_Saboteur, 6)
 {
 	// this is known to be InfantryClass, and Infiltrate is yes
 	GET(InfantryClass const* const, pThis, ESI);
@@ -31,7 +31,7 @@ DEFINE_HOOK(7004AD, TechnoClass_GetCursorOverObject_Saboteur, 6)
 	return infiltratable ? 0x700531u : 0x700536u;
 }
 
-DEFINE_HOOK(51EE6B, InfantryClass_GetCursorOverObject_Saboteur, 6)
+DEFINE_HOOK(51EE6B, InfantryClass_GetActionOnObject_Saboteur, 6)
 {
 	GET(InfantryClass const* const, pThis, EDI);
 	GET(ObjectClass const* const, pObject, ESI);
@@ -50,8 +50,19 @@ DEFINE_HOOK(51EE6B, InfantryClass_GetCursorOverObject_Saboteur, 6)
 			infiltratable = (!agent && !saboteur && pObjectType->Capturable)
 				|| (agent && pObjectType->Spyable)
 				|| (saboteur && BuildingTypeExt::IsSabotagable(pObjectType));
+
+			// this mostlikely incorrect 
+			// the check is updated to differentiate between spy and sabotage 
+			// yeah , iam just lazy atm -Otamaa
+			if(infiltratable)
+			{
+				auto const& pBuildingTypeExt = BuildingTypeExt::ExtMap.Find(pObjectType);
+				CursorType::Insert(pBuildingTypeExt->Spy_Cursor.Get(93), Action::Capture , false);
+			}
+
 		}
 	}
+
 
 	return infiltratable ? 0x51EEEDu : 0x51F04Eu;
 }

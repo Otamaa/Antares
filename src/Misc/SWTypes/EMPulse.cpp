@@ -22,8 +22,8 @@ void SW_EMPulse::Initialize(SWTypeExt::ExtData* pData, SuperWeaponTypeClass* pSW
 	pData->EMPulse_TargetSelf = false;
 
 	pData->SW_AITargetingType = SuperWeaponAITargetingMode::None;
-	pData->SW_Cursor = MouseCursor::GetCursor(MouseCursorType::Attack);
-	pData->SW_NoCursor = MouseCursor::GetCursor(MouseCursorType::AttackOutOfRange);
+	pData->SW_Cursor = int(MouseCursorType::Attack);
+	pData->SW_NoCursor = int(MouseCursorType::AttackOutOfRange);
 }
 
 void SW_EMPulse::LoadFromINI(SWTypeExt::ExtData* pData, SuperWeaponTypeClass* pSW, CCINIClass* pINI)
@@ -42,7 +42,7 @@ void SW_EMPulse::LoadFromINI(SWTypeExt::ExtData* pData, SuperWeaponTypeClass* pS
 	pData->EMPulse_PulseBall.Read(exINI, section, "EMPulse.PulseBall");
 	pData->EMPulse_Cannons.Read(exINI, section, "EMPulse.Cannons");
 
-	pSW->Action = pData->EMPulse_TargetSelf ? Action::None : Actions::SuperWeaponAllowed;
+	pSW->Action = pData->EMPulse_TargetSelf ? Action::None : CursorType::SuperWeaponAllowed;
 }
 
 bool SW_EMPulse::Activate(SuperClass* pThis, const CellStruct &Coords, bool IsPlayer)

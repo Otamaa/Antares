@@ -8,6 +8,7 @@
 #include "../../Utilities/Template.h"
 #include "../../Utilities/Constructs.h"
 #include "../../Misc/AttachEffect.h"
+#include <Enum/CursorTypes.h>
 
 #include <bitset>
 
@@ -29,7 +30,7 @@ public:
 	class ExtData final : public Extension<TechnoTypeClass>
 	{
 	public:
-		DynamicVectorClass<InfantryTypeClass *> Survivors_Pilots;
+		DynamicVectorClass<InfantryTypeClass*> Survivors_Pilots;
 		Promotable<int> Survivors_PilotChance;
 		Promotable<int> Survivors_PassengerChance;
 		// new on 28.09.09 for #631
@@ -72,13 +73,13 @@ public:
 		//DynamicVectorClass<WeaponStruct> Weapons;
 		//DynamicVectorClass<WeaponStruct> EliteWeapons;
 
-		Promotable<SHPStruct *> Insignia;
+		Promotable<SHPStruct*> Insignia;
 		Nullable<bool> Insignia_ShowEnemy;
 
 		Valueable<AnimTypeClass*> Parachute_Anim;
 
 		// new on 08.11.09 for #342 (Operator=)
-		InfantryTypeClass * Operator; //!< Saves a pointer to an InfantryType required to be a passenger of this unit in order for it to work. Defaults to NULL. \sa TechnoClass_Update_CheckOperators, bool IsAPromiscuousWhoreAndLetsAnyoneRideIt
+		InfantryTypeClass* Operator; //!< Saves a pointer to an InfantryType required to be a passenger of this unit in order for it to work. Defaults to NULL. \sa TechnoClass_Update_CheckOperators, bool IsAPromiscuousWhoreAndLetsAnyoneRideIt
 		bool IsAPromiscuousWhoreAndLetsAnyoneRideIt; //!< If this is true, Operator= is not checked, and the object will work with any passenger, provided there is one. \sa InfantryTypeClass * Operator
 
 		ValueableVector<TechnoTypeClass*> InitialPayload_Types;
@@ -129,7 +130,7 @@ public:
 		Valueable<bool> HijackerAllowed;
 		Valueable<bool> HijackerOneTime;
 
-		Valueable<UnitTypeClass *> WaterImage;
+		Valueable<UnitTypeClass*> WaterImage;
 
 		NullableIdx<VocClass> CloakSound;
 		NullableIdx<VocClass> DecloakSound;
@@ -162,15 +163,15 @@ public:
 
 		ValueableVector<BuildingTypeClass const*> BuiltAt;
 		Valueable<bool> Cloneable;
-		ValueableVector<BuildingTypeClass *> ClonedAt;
+		ValueableVector<BuildingTypeClass*> ClonedAt;
 
 		Nullable<bool> CarryallAllowed;
 		Nullable<int> CarryallSizeLimit;
 
 		Valueable<bool> ImmuneToAbduction; //680, 1362
 
-		ValueableVector<HouseTypeClass *> FactoryOwners;
-		ValueableVector<HouseTypeClass *> ForbiddenFactoryOwners;
+		ValueableVector<HouseTypeClass*> FactoryOwners;
+		ValueableVector<HouseTypeClass*> ForbiddenFactoryOwners;
 		Valueable<bool> FactoryOwners_HaveAllPlans;
 
 		Valueable<bool> GattlingCyclic;
@@ -261,7 +262,22 @@ public:
 		Valueable<bool> NoManualFire;
 		Valueable<bool> NoManualEnter;
 
+		ValueableIdx<CursorType> Deploy_Cursor;
+		ValueableIdx<CursorType> NoDeploy_Cursor;
+		ValueableIdx<CursorType> Enter_Cursor;
+		ValueableIdx<CursorType> NoEnter_Cursor;
+		ValueableIdx<CursorType> Move_Cursor;
+		ValueableIdx<CursorType> NoMove_Cursor;
+
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject),
+			//
+			Deploy_Cursor(27),
+			NoDeploy_Cursor(28),
+			Enter_Cursor(25),
+			NoEnter_Cursor(26),
+			Move_Cursor(18),
+			NoMove_Cursor(19),
+			//
 			Survivors_PilotChance(-1),
 			Survivors_PassengerChance(-1),
 			Survivors_PilotCount(-1),
@@ -374,18 +390,18 @@ public:
 		virtual void LoadFromINIFile(CCINIClass* pINI) override;
 		virtual void Initialize() override;
 
-		virtual void InvalidatePointer(void *ptr, bool bRemoved) override {
+		virtual void InvalidatePointer(void* ptr, bool bRemoved) override {
 		}
 
-		virtual void LoadFromStream(AresStreamReader &Stm) override;
+		virtual void LoadFromStream(AresStreamReader& Stm) override;
 
-		virtual void SaveToStream(AresStreamWriter &Stm) override;
+		virtual void SaveToStream(AresStreamWriter& Stm) override;
 
 		bool CameoIsElite(HouseClass const* pHouse) const;
 
 		bool CanBeBuiltAt(BuildingTypeClass const* pFactoryType) const;
 
-		bool CarryallCanLift(UnitClass * Target);
+		bool CarryallCanLift(UnitClass* Target);
 
 		const char* GetSelectionGroupID() const;
 
@@ -406,6 +422,8 @@ public:
 
 	static const char* GetSelectionGroupID(ObjectTypeClass* pType);
 	static bool HasSelectionGroupID(ObjectTypeClass* pType, const char* pID);
+
+	static MouseCursorType GetCursorByWeapon(TechnoClass* pTech, int nWeaponIdx, bool bOutOfrange = true);
 
 	//static void ReadWeapon(WeaponStruct *pWeapon, const char *prefix, const char *section, CCINIClass *pINI);
 };
