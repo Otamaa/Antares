@@ -163,7 +163,7 @@ DEFINE_HOOK(53C280, ScenarioClass_UpdateLighting, 5)
 {
 	auto lighting = SWTypeExt::GetLightingColor();
 
-	auto scen = ScenarioClass::Instance;
+	auto scen = ScenarioClass::Instance();
 	if(lighting.HasValue) {
 		// something changed the lighting
 		scen->AmbientTarget = lighting.Ambient;
@@ -380,14 +380,14 @@ DEFINE_HOOK(53A6CF, LightningStorm_Update, 7) {
 		return Legacy;
 	}
 
-	auto const coords = LightningStorm::Coords;
+	auto const coords = LightningStorm::Coords();
 
 	auto const pType = pSuper->Type;
 	auto const pExt = SWTypeExt::ExtMap.Find(pType);
 
 	// is inactive
 	if(!LightningStorm::Active || LightningStorm::TimeToEnd) {
-		auto deferment = LightningStorm::Deferment;
+		auto deferment = LightningStorm::Deferment();
 
 		// still counting down?
 		if(deferment > 0) {
@@ -414,7 +414,7 @@ DEFINE_HOOK(53A6CF, LightningStorm_Update, 7) {
 	}
 
 	// does this Lightning Storm go on?
-	auto const duration = LightningStorm::Duration;
+	auto const duration = LightningStorm::Duration();
 	if(duration != -1 && duration + LightningStorm::StartTime < currentFrame) {
 		// it's over already
 		LightningStorm::TimeToEnd = true;
@@ -481,7 +481,7 @@ DEFINE_HOOK(53A6CF, LightningStorm_Update, 7) {
 				RulesClass::Instance->LightningSeparation);
 			if(separation > 0) {
 				// assume success and disprove.
-				for(auto const& pCloud : *LightningStorm::CloudsPresent) {
+				for(auto const& pCloud : LightningStorm::CloudsPresent()) {
 					auto const cellCloud = pCloud->GetMapCoords();
 					auto const dist = std::abs(cellCloud.X - ret.X)
 						+ std::abs(cellCloud.Y - ret.Y);

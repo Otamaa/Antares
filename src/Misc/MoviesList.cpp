@@ -77,7 +77,7 @@ void MoviesList::LoadListFromINI()
 	}
 
 	// load unlocked state
-	if(auto const pRA2MD = CCINIClass::INI_RA2MD) {
+	if(auto const pRA2MD = &CCINIClass::INI_RA2MD()) {
 		for(auto& item : this->Array) {
 			auto& value = item.Unlocked;
 			value = pRA2MD->ReadBool("UnlockedMovies", item.Filename, value);
@@ -87,7 +87,7 @@ void MoviesList::LoadListFromINI()
 
 void MoviesList::WriteToINI() const
 {
-	if(auto const pINI = CCINIClass::INI_RA2MD) {
+	if(auto const pINI = &CCINIClass::INI_RA2MD()) {
 		for(auto& item : this->Array) {
 			// only write if unlocked, to not reveal movie names
 			if(auto const value = item.Unlockable && item.Unlocked) {

@@ -281,8 +281,7 @@ public:
 		if(!this->checked) {
 			this->checked = true;
 			if(this->filename) {
-				auto pPCX = PCX::Instance;
-				this->exists = (pPCX->GetSurface(this->filename) || pPCX->LoadFile(this->filename));
+				this->exists = (PCX::Instance->GetSurface(this->filename) || PCX::Instance->LoadFile(this->filename));
 			}
 		}
 		return this->exists;
@@ -386,12 +385,12 @@ class AresFixedString : public FixedString<Capacity> {
 public:
 	AresFixedString() = default;
 	explicit AresFixedString(nullptr_t) noexcept {};
-	explicit AresFixedString(const char* value) noexcept : FixedString(value) {}
+	explicit AresFixedString(const char* value) noexcept : FixedString<Capacity>(value) {}
 
-	using FixedString::operator=;
+	using FixedString<Capacity>::operator=;
 
 	bool Read(INIClass* pINI, const char* pSection, const char* pKey, const char* pDefault = "") {
-		if(pINI->ReadString(pSection, pKey, pDefault, Ares::readBuffer, FixedString::Size)) {
+		if(pINI->ReadString(pSection, pKey, pDefault, Ares::readBuffer, Capacity)) {
 			if(!INIClass::IsBlank(Ares::readBuffer)) {
 				*this = Ares::readBuffer;
 			} else {

@@ -9,7 +9,7 @@ INIClass::INISection* IniSectionIncludes::includedSection = nullptr;
 void IniSectionIncludes::CopySection(CCINIClass* ini, INIClass::INISection* source, const char* destName)
 {
 	//browse through section entries and copy them over to the new section
-	for(GenericNode* node = &source->Entries.First; node; node = node->Next)
+	for(GenericNode* node = *source->Entries.First(); node; node = node->Next())
 	{
 		if(*reinterpret_cast<unsigned int*>(node) == 0x7EB734) //type check via vtable address comparison... is there a better way?
 		{

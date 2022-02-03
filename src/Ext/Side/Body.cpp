@@ -370,7 +370,7 @@ void SideExt::UpdateGlobalFiles()
 		if(auto pPal = FileSystem::AllocatePalette(pExt->GraphicalTextPalette)) {
 			SideExt::GraphicalTextPalette.reset(pPal);
 
-			auto pConvert = GameCreate<ConvertClass>(pPal, FileSystem::TEMPERAT_PAL, DSurface::Primary, 1, false);
+			auto pConvert = GameCreate<ConvertClass>(*pPal, FileSystem::TEMPERAT_PAL(), DSurface::Primary(), 1, false);
 			SideExt::GraphicalTextConvert.reset(pConvert);
 		}
 	}
@@ -386,7 +386,7 @@ void SideExt::UpdateGlobalFiles()
 		if(auto pPal = FileSystem::AllocatePalette(pExt->DialogBackgroundPalette)) {
 			SideExt::DialogBackgroundPalette.reset(pPal);
 
-			auto pConvert = GameCreate<ConvertClass>(pPal, pPal, DSurface::Alternate, 1, false);
+			auto pConvert = GameCreate<ConvertClass>(*pPal, *pPal, DSurface::Alternate(), 1, false);
 			SideExt::DialogBackgroundConvert.reset(pConvert);
 		}
 	}

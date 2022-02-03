@@ -15,13 +15,13 @@ DEFINE_HOOK(51F628, InfantryClass_Guard_Doggie, 5)
 
 	// doggie sit down on tiberium handling
 	if(pThis->Type->Doggie && !pThis->Crawling && !pThis->Target && !pThis->Destination) {
-		if(!pThis->Facing.in_motion() && pThis->GetCell()->LandType == LandType::Tiberium) {
-			if(pThis->Facing.current().value8() == Direction::East) {
+		if(!pThis->PrimaryFacing.in_motion() && pThis->GetCell()->LandType == LandType::Tiberium) {
+			if(pThis->PrimaryFacing.current().value8() == Direction::E) {
 				// correct facing, sit down
-				pThis->PlayAnim(Sequence::Down);
+				pThis->PlayAnim(DoType::Down);
 			} else {
 				// turn to correct facing
-				DirStruct dir(3, Direction::East);
+				DirStruct dir((size_t)3, Direction::E);
 				pThis->Locomotor->Do_Turn(dir);
 			}
 		}
@@ -67,7 +67,7 @@ DEFINE_HOOK(5200C1, InfantryClass_UpdatePanic_Doggie, 6)
 		if(!pThis->Destination && !pThis->Locomotor->Is_Moving()) {
 			if(pThis->GetCell()->LandType == LandType::Tiberium) {
 				// is on tiberium. just lay down
-				pThis->PlayAnim(Sequence::Down);
+				pThis->PlayAnim(DoType::Down);
 			} else {
 				// search tiberium and abort current mission
 				pThis->MoveToTiberium(16, false);

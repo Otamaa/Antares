@@ -41,7 +41,7 @@ DEFINE_HOOK(438A00, BombClass_GetCurrentFrame, 6)
 	int frame = 0;
 
 	if(pSHP->Frames >= 2) {
-		if(pThis->DeathBomb == FALSE) {
+		if(pThis->Type == BombType::NormalBomb) {
 			// -1 so that last iteration has room to flicker. order is important
 			int delay = pData->Ivan_Delay.Get(RulesClass::Instance->IvanTimedDelay);
 			int lifetime = (Unsorted::CurrentFrame - pThis->PlantingFrame);
@@ -217,7 +217,7 @@ DEFINE_HOOK(6FFFB1, TechnoClass_GetCursorOverObject_IvanBombs, 8)
 	auto pBomb = pThis->AttachedBomb;
 	auto pExt = WeaponTypeExt::BombExt.get_or_default(pBomb);
 
-	bool canDetonate = (pBomb->IsDeathBomb() == FALSE)
+	bool canDetonate = (pBomb->GetBombType() == BombType::NormalBomb)
 		? pExt->Ivan_CanDetonateTimeBomb.Get(RulesClass::Instance->CanDetonateTimeBomb)
 		: pExt->Ivan_CanDetonateDeathBomb.Get(RulesClass::Instance->CanDetonateDeathBomb);
 	return canDetonate ? 0x6FFFCC : 0x700006;

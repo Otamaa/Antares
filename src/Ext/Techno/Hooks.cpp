@@ -240,15 +240,13 @@ DEFINE_HOOK(6F407D, TechnoClass_Init_1, 6)
 
 	auto const pFoot = abstract_cast<FootClass*>(pThis);
 
-	auto const CheckWeapon = [=, &pCapturer, &pParasite, &pTemporal](
+	auto const CheckWeapon = [pThis,pType,pFoot,&pData,&pCapturer, &pParasite, &pTemporal](
 		WeaponTypeClass* pWeapon, int idxWeapon, const char* pTagName)
 	{
-		constexpr auto const Note = "Constructing an instance of [%s]:\r\n"
-			"%s %s (slot %d) has no %s!";
-
 		if(!pWeapon->Projectile) {
 			Debug::FatalErrorAndExit(
-				Note, pType->ID, pTagName, pWeapon->ID, idxWeapon,
+				"Constructing an instance of [%s]:\r\n"
+				"%s %s (slot %d) has no %s!", pType->ID, pTagName, pWeapon->ID, idxWeapon,
 				"Projectile");
 		}
 
@@ -256,7 +254,8 @@ DEFINE_HOOK(6F407D, TechnoClass_Init_1, 6)
 
 		if(!pWarhead) {
 			Debug::FatalErrorAndExit(
-				Note, pType->ID, pTagName, pWeapon->ID, idxWeapon, "Warhead");
+				"Constructing an instance of [%s]:\r\n"
+				"%s %s (slot %d) has no %s!", pType->ID, pTagName, pWeapon->ID, idxWeapon, "Warhead");
 		}
 
 		if(pWarhead->MindControl && !pCapturer) {
@@ -640,7 +639,7 @@ DEFINE_HOOK(7101CF, FootClass_ImbueLocomotor, 7)
 DEFINE_HOOK(4DAA68, FootClass_Update_MoveSound, 6)
 {
 	GET(FootClass *, F, ESI);
-	if(F->unknown_bool_53C) {
+	if(F->__PlayingMovingSound) {
 		return 0x4DAAEE;
 	}
 	if(F->LocomotorSource) {
@@ -747,7 +746,7 @@ DEFINE_HOOK(7090A8, TechnoClass_SelectFiringVoice, 0) {
 
 	// generic attack voice
 	if(idxVoice < 0 && pType->VoiceAttack.Count) {
-		unsigned int idxRandom = Randomizer::Global()->Random();
+		unsigned int idxRandom = Random2Class::NonCriticalRandomNumber().Random();
 		idxVoice = pType->VoiceAttack.GetItem(idxRandom % pType->VoiceAttack.Count);
 	}
 
@@ -1273,7 +1272,7 @@ DEFINE_HOOK(70DEBA, TechnoClass_UpdateGattling_Cycle, 6)
 			pThis->GattlingValue = 0;
 			pThis->CurrentGattlingStage = 0;
 			pThis->Audio4.DTOR_1();
-			pThis->unknown_bool_4B8 = false;
+			pThis->GattlingAudioPlayed = false;
 		}
 	}
 
@@ -1812,7 +1811,7 @@ DEFINE_HOOK(6F525B, TechnoClass_DrawExtras_PowerOff, 5)
 
 			if(!MapClass::Instance->GetCellAt(cell)->IsShrouded()) {
 				CoordStruct crd;
-				pBld->GetPosition_2(&crd);
+				pBld->GetCenterCoord(&crd);
 
 				Point2D point;
 				TacticalClass::Instance->CoordsToClient(&crd, &point);

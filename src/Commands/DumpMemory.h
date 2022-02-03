@@ -45,7 +45,7 @@ public:
 
 		std::wstring filename = Debug::FullDump();
 
-		Debug::Log("Process memory dumped to %ls\n", filename);
+		Debug::Log("Process memory dumped to %ls\n", filename.c_str());
 
 		filename = L"Process memory dumped to " + filename;
 

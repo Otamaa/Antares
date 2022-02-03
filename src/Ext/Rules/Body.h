@@ -182,7 +182,7 @@ public:
 		return Data.get();
 	}
 
-	static DynamicVectorClass<CameoDataStruct> TabCameos[4];
+	static DynamicVectorClass<BuildType> TabCameos[4];
 
 	static void ClearCameos();
 

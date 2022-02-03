@@ -84,6 +84,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	}
 
 	INI_EX exINI(pINI);
+	const auto pINIArt = &CCINIClass::INI_Art();
 
 	// survivors
 	this->Survivors_Pilots.Reserve(SideClass::Array->Count);
@@ -196,11 +197,10 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 			}
 		}
 	}
-
+	
 	this->InitialPayload_Types.Read(exINI, section, "InitialPayload.Types");
 	this->InitialPayload_Nums.Read(exINI, section, "InitialPayload.Nums");
-
-	this->CameoPal.LoadFromINI(CCINIClass::INI_Art, pThis->ImageFile, "CameoPalette");
+	this->CameoPal.LoadFromINI(pINIArt, pThis->ImageFile, "CameoPalette");
 
 	if(pINI->ReadString(section, "Prerequisite.StolenTechs", "", Ares::readBuffer)) {
 		this->RequiredStolenTech.reset();
@@ -287,8 +287,8 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->Chronoshift_Allow.Read(exINI, section, "Chronoshift.Allow");
 	this->Chronoshift_IsVehicle.Read(exINI, section, "Chronoshift.IsVehicle");
 
-	this->CameoPCX.Read(CCINIClass::INI_Art, pThis->ImageFile, "CameoPCX");
-	this->AltCameoPCX.Read(CCINIClass::INI_Art, pThis->ImageFile, "AltCameoPCX");
+	this->CameoPCX.Read(pINIArt, pThis->ImageFile, "CameoPCX");
+	this->AltCameoPCX.Read(pINIArt, pThis->ImageFile, "AltCameoPCX");
 
 	this->CanBeReversed.Read(exINI, section, "CanBeReversed");
 

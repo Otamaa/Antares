@@ -5,13 +5,14 @@
 #include <HouseClass.h>
 #include <SpotlightClass.h>
 #include <TacticalClass.h>
+#include <FPSCounter.h>
 
 BuildingLightClass * TechnoExt::ActiveBuildingLight = nullptr;
 
 // just in case
 DEFINE_HOOK(420F40, Spotlights_UpdateFoo, 6)
 {
-	return Game::CurrentFrameRate >= Game::GetMinFrameRate() ? 0u : 0x421346u;
+	return FPSCounter::CurrentFrameRate() >= Detail::GetMinFrameRate() ? 0u : 0x421346u;
 }
 
 // bugfix #182: Spotlights cause an IE
@@ -108,11 +109,11 @@ DEFINE_HOOK(436459, BuildingLightClass_Update, 6)
 			Facing = Owner->BarrelFacing.current();
 			break;
 		case TechnoTypeExt::SpotlightAttachment::Turret:
-			Facing = Owner->TurretFacing.current();
+			Facing = Owner->SecondaryFacing.current();
 			break;
 		case TechnoTypeExt::SpotlightAttachment::Body:
 		default:
-			Facing = Owner->Facing.current();
+			Facing = Owner->PrimaryFacing.current();
 		}
 
 		static const double Facing2Rad = (2 * 3.14) / 0xFFFF;
@@ -120,8 +121,8 @@ DEFINE_HOOK(436459, BuildingLightClass_Update, 6)
 		Loc.Y -= static_cast<int>(pTypeData->Spot_Distance * Math::cos(Angle));
 		Loc.X += static_cast<int>(pTypeData->Spot_Distance * Math::sin(Angle));
 
-		BL->field_B8 = Loc;
-		BL->field_C4 = Loc;
+		BL->Coord1 = Loc;
+		BL->Coord2 = Loc;
 //		double zer0 = 0.0;
 		__asm { fldz }
 	} else {

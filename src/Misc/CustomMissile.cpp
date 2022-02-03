@@ -135,7 +135,7 @@ DEFINE_HOOK(663218, RocketLocomotionClass_Explode_CustomMissile2, 5)
 
 			if(pBullet) {
 				pBullet->SetWeaponType(pWeapon);
-				pBullet->Remove();
+				pBullet->Limbo();
 				pBullet->Detonate(coords);
 				pBullet->UnInit();
 			}

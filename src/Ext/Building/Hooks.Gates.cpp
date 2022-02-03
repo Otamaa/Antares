@@ -39,7 +39,7 @@ DEFINE_HOOK(47C8AB, CellClass_CanThisExistHere_GateOnWall, 6)
 
 		if(OverlayTypeClass * ToOverlay = PlacingObject->ToOverlay) {
 			if(ToOverlay->ArrayIndex == idxOverlay) {
-				if(pCell->Powerup >= 0x10) {
+				if(pCell->OverlayData >= 0x10) {
 					Status = Adequate;
 				}
 			}

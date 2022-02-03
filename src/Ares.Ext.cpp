@@ -181,7 +181,7 @@ private:
 	// recurse with the remaining types
 	template <typename T, typename... TArgs, typename TType, typename... TTypes>
 	__forceinline bool process(DummyTypes<TType, TTypes...>, TArgs... args) {
-		if(!T::Process<TType>(args...)) {
+		if(!T::template Process<TType>(args...)) {
 			return false;
 		}
 		return process<T>(DummyTypes<TTypes...>(), args...);

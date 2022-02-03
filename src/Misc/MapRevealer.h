@@ -54,7 +54,7 @@ public:
 	}
 
 	static bool AffectsHouse(HouseClass* const pHouse) {
-		auto const Player = HouseClass::Player;
+		auto const Player = HouseClass::Player();
 
 		if(pHouse == Player) {
 			return true;
@@ -69,7 +69,7 @@ public:
 	}
 
 	static bool RequiresExtraChecks() {
-		auto const Session = SessionClass::Instance;
+		auto const Session = &SessionClass::Instance();
 		using namespace Helpers::Alex;
 		return is_any_of(Session->GameMode, GameMode::LAN, GameMode::Internet)
 			&& Session->MPGameMode

@@ -45,3 +45,10 @@ DEFINE_HOOK(6D7847, TacticalClass_DrawPixelEffects_Details, 5)
 	auto const details = RulesExt::DetailsCurrentlyEnabled();
 	return details ? 0x6D7858u : 0x6D7BF2u;
 }
+
+// Ares 3.o -Otamaa
+DEFINE_HOOK(420F40, AlphaShapeClass_DrawAll_Details, 6)
+{
+	auto const details = RulesExt::DetailsCurrentlyEnabled();
+	return details ? 0x0u : 0x421346u;
+}

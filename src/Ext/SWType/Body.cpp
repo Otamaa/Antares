@@ -262,7 +262,7 @@ bool SWTypeExt::ExtData::IsAvailable(HouseClass* pHouse) const {
 	}
 
 	// allow only certain houses, disallow forbidden houses
-	const auto OwnerBits = 1u << pHouse->Type->ArrayIndex;
+	const auto OwnerBits = (1u << pHouse->Type->ArrayIndex);
 	if(!(this->SW_RequiredHouses & OwnerBits) || (this->SW_ForbiddenHouses & OwnerBits)) {
 		return false;
 	}
@@ -278,7 +278,8 @@ bool SWTypeExt::ExtData::IsAvailable(HouseClass* pHouse) const {
 	}
 
 	const auto& Neg = this->SW_NegBuildings;
-	if(std::any_of(Neg.begin(), Neg.end(), IsBuildingPresent)) {
+	// Added Aux.empty() check -Otamaa
+	if(!Aux.empty() && std::any_of(Neg.begin(), Neg.end(), IsBuildingPresent)) {
 		return false;
 	}
 
@@ -357,8 +358,9 @@ SuperWeaponAffectedHouse SWTypeExt::ExtData::GetRelation(HouseClass* pFirer, Hou
 	if(pFirer == pHouse) {
 		return SuperWeaponAffectedHouse::Owner;
 	}
-
-	if(pFirer->IsAlliedWith(pHouse)) {
+	
+	// Added Obeserver check -Otamaa
+	if(pFirer->IsAlliedWith(pHouse)|| pHouse->IsObserver() || pHouse->IsPlayerObserver()) {
 		// only friendly houses
 		return SuperWeaponAffectedHouse::Allies;
 	}
@@ -369,7 +371,8 @@ SuperWeaponAffectedHouse SWTypeExt::ExtData::GetRelation(HouseClass* pFirer, Hou
 
 bool SWTypeExt::ExtData::IsCellEligible(CellClass* pCell, SuperWeaponTarget allowed) {
 	if(allowed & SuperWeaponTarget::AllCells) {
-		if(pCell->LandType == LandType::Water) {
+		//checking only land type can broke bridge targeting , check it ! -Otamaa
+		if(pCell->LandType == LandType::Water && !pCell->ContainsBridge()) {
 			// check whether it supports water
 			return (allowed & SuperWeaponTarget::Water) != SuperWeaponTarget::None;
 		} else {
@@ -525,7 +528,7 @@ bool SWTypeExt::Launch(SuperClass* pThis, NewSWType* pSW, const CellStruct &Coor
 				// auto-firing might happen while the player still selects a target.
 				// PostClick SWs do have a different type index, so they need to be
 				// special cased, but they can't auto-fire anyhow.
-				if(pThis->Owner == HouseClass::Player) {
+				if(pThis->Owner == HouseClass::Player()) {
 					if(idxThis == Unsorted::CurrentSWType || (flags & SuperWeaponFlags::PostClick)) {
 						Unsorted::CurrentSWType = -1;
 					}
@@ -613,11 +616,11 @@ void SWTypeExt::ClearChronoAnim(SuperClass* pThis)
 	if(pThis->Animation) {
 		pThis->Animation->RemainingIterations = 0;
 		pThis->Animation = nullptr;
-		PointerExpiredNotification::NotifyInvalidAnim.Remove(pThis);
+		PointerExpiredNotification::NotifyInvalidAnim().Remove(pThis);
 	}
 
 	if(pThis->AnimationGotInvalid) {
-		PointerExpiredNotification::NotifyInvalidAnim.Remove(pThis);
+		PointerExpiredNotification::NotifyInvalidAnim().Remove(pThis);
 		pThis->AnimationGotInvalid = false;
 	}
 }
@@ -631,7 +634,7 @@ void SWTypeExt::CreateChronoAnim(SuperClass* const pThis, const CoordStruct &Coo
 			auto const pData = SWTypeExt::ExtMap.Find(pThis->Type);
 			pAnim->Invisible = !pData->IsAnimVisible(pThis->Owner);
 			pThis->Animation = pAnim;
-			PointerExpiredNotification::NotifyInvalidAnim.Add(pThis);
+			PointerExpiredNotification::NotifyInvalidAnim().Add(pThis);
 		}
 	}
 }
@@ -640,7 +643,7 @@ bool SWTypeExt::ChangeLighting(SuperWeaponTypeClass* pCustom) {
 	auto lighting = GetLightingColor(pCustom);
 
 	if(lighting.HasValue) {
-		auto scen = ScenarioClass::Instance;
+		auto scen = ScenarioClass::Instance();
 		scen->AmbientTarget = lighting.Ambient;
 		scen->RecalcLighting(lighting.Red, lighting.Green, lighting.Blue, 1);
 	}
@@ -649,7 +652,7 @@ bool SWTypeExt::ChangeLighting(SuperWeaponTypeClass* pCustom) {
 }
 
 LightingColor SWTypeExt::GetLightingColor(SuperWeaponTypeClass* pCustom) {
-	auto scen = ScenarioClass::Instance;
+	auto scen = ScenarioClass::Instance();
 	SuperWeaponTypeClass* pType = nullptr;
 
 	LightingColor ret;

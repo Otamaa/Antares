@@ -54,8 +54,8 @@ DEFINE_HOOK(70375B, TechnoClass_Uncloak_DecloakSound, 6)
 	GET(int, ptr, ESI);
 	TechnoClass* pThis = reinterpret_cast<TechnoClass*>(ptr - 0x9C);
 	auto pExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
-	int default = RulesExt::Global()->DecloakSound.Get(RulesClass::Instance->CloakSound);
-	R->ECX(pExt->DecloakSound.Get(default));
+	int nDefault = RulesExt::Global()->DecloakSound.Get(RulesClass::Instance->CloakSound);
+	R->ECX(pExt->DecloakSound.Get(nDefault));
 	return 0x703761;
 }
 

@@ -21,7 +21,7 @@ DEFINE_HOOK(468BE2, BulletClass_ShouldDetonate_Obstacle, 6)
 	auto const pTypeExt = BulletTypeExt::ExtMap.Find(pThis->Type);
 
 	if(AresTrajectoryHelper::SubjectToAnything(pThis->Type, pTypeExt)) {
-		auto const Map = MapClass::Instance;
+		auto const Map = MapClass::Instance();
 		auto const pCellSource = Map->GetCellAt(pThis->SourceCoords);
 		auto const pCellTarget = Map->GetCellAt(pThis->TargetCoords);
 		auto const pCellLast = Map->GetCellAt(pThis->LastMapCoords);
@@ -57,7 +57,7 @@ DEFINE_HOOK(46867F, BulletClass_SetMovement_Parachute, 5)
 //		Debug::Log("Bullet trajectory is (%lf, %lf, %lf)\n", *Trajectory);
 		Bullet->IsABomb = true;
 	} else {
-		result = Bullet->Put(*XYZ, 0);
+		result = Bullet->Unlimbo(*XYZ, 0);
 	}
 
 	R->EAX(result);
@@ -327,7 +327,7 @@ DEFINE_HOOK(468000, BulletClass_GetAnimFrame, 6)
 	if(pType->AnimLow || pType->AnimHigh) {
 		frame = pThis->AnimFrame;
 	} else if(pType->Rotates()) {
-		auto angle = Math::arctanfoo(-pThis->Velocity.Y, pThis->Velocity.X);
+		auto angle = Math::atan2(-pThis->Velocity.Y, pThis->Velocity.X);
 		DirStruct dir(angle);
 
 		auto ReverseFacing32 = *reinterpret_cast<int(*)[8]>(0x7F4890);

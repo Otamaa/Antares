@@ -656,10 +656,10 @@ bool EMPulse::enableEMPEffect(
 		pVictim->Deactivate();
 
 		if(selected) {
-			auto const feedback = Unsorted::MoveFeedback;
-			Unsorted::MoveFeedback = false;
+			auto const feedback = Unsorted::MoveFeedback();
+			Unsorted::MoveFeedback() = false;
 			pVictim->Select();
-			Unsorted::MoveFeedback = feedback;
+			Unsorted::MoveFeedback() = feedback;
 		}
 
 		if(abs == AbstractType::Building) {
@@ -805,10 +805,10 @@ bool EMPulse::EnableEMPEffect2(TechnoClass* const pVictim) {
 		pVictim->Deactivate();
 
 		if(selected) {
-			auto const feedback = Unsorted::MoveFeedback;
-			Unsorted::MoveFeedback = false;
+			auto const feedback = Unsorted::MoveFeedback();
+			Unsorted::MoveFeedback() = false;
 			pVictim->Select();
-			Unsorted::MoveFeedback = feedback;
+			Unsorted::MoveFeedback() = feedback;
 		}
 
 		if(abs == AbstractType::Building) {

@@ -133,7 +133,8 @@ DEFINE_HOOK(568997, MapClass_RemoveContentAt_Foundation_OccupyHeight, 5)
 }
 
 
-DEFINE_HOOK(4A8C77, MapClass_ProcessFoundation1_UnlimitBuffer, 5)
+//DEFINE_HOOK(4A8C77, MapClass_ProcessFoundation1_UnlimitBuffer, 5)
+DEFINE_HOOK(4A8C77, DisplayClass_ProcessFoundation1_UnlimitBuffer, 5)
 {
 	GET_STACK(CellStruct const*, Foundation, 0x18);
 	GET(DisplayClass *, Display, EBX);
@@ -153,7 +154,8 @@ DEFINE_HOOK(4A8C77, MapClass_ProcessFoundation1_UnlimitBuffer, 5)
 	return 0x4A8C9E;
 }
 
-DEFINE_HOOK(4A8DD7, MapClass_ProcessFoundation2_UnlimitBuffer, 5)
+//DEFINE_HOOK(4A8DD7, MapClass_ProcessFoundation2_UnlimitBuffer, 5)
+DEFINE_HOOK(4A8DD7, Display_ProcessFoundation2_UnlimitBuffer, 5)
 {
 	GET_STACK(CellStruct const*, Foundation, 0x18);
 	GET(DisplayClass *, Display, EBX);
@@ -171,4 +173,84 @@ DEFINE_HOOK(4A8DD7, MapClass_ProcessFoundation2_UnlimitBuffer, 5)
 	R->EAX<CellStruct *>(R->lea_Stack<CellStruct *>(0x18));
 
 	return 0x4A8DFE;
+}
+// Ares 3.0 add this for custom foundation -Otamaa
+// Hook offset-ed 
+DEFINE_HOOK_AGAIN(6D5579, sub_6D5030_CustomFoundation, 6)
+DEFINE_HOOK(6D5100, sub_6D5030_CustomFoundation, 5)
+{
+	//static constexpr reference<CellStruct*, 0x880964u> CursorSize{};
+	//static constexpr reference<CellStruct*, 0x880974u> CursorSizeSecond{};
+	auto nCursorSize = (R->Origin() == 0x6D5579) ? R->EDX<CellStruct*>() : R->EAX<CellStruct*>();
+	auto nReturn = (R->Origin() == 0x6D5579) ? 0x6D5589 : 0x6D5110;
+
+	constexpr auto nFoundation_Rect_Translated = [](CellStruct* a2)
+	{
+		if (!a2)
+			return RectangleStruct{ 0,0,0,0 };
+		/*
+		struct wCell
+		{
+			short width;
+			short height;
+		};*/
+
+		int min_x = 512;
+		int max_x = -512;
+		int min_y = 512;
+		int max_y = -512;
+		auto v3 = a2;
+
+		while (1)
+		{
+			auto p_X = v3->X;
+			if (v3->X == 0x7FFF && v3->Y == 0x7FFF)
+			{
+				break;
+			}
+			auto p_Y = v3->Y;
+			if (max_x <= p_X)
+			{
+				max_x = p_X;
+			}
+
+			if (min_x >= p_X)
+			{
+				min_x = p_X;
+			}
+
+			if (max_y <= p_Y)
+			{
+				max_y = v3->Y;
+			}
+
+			if (min_y >= p_Y)
+			{
+				min_y = v3->Y;
+			}
+			++v3;
+		}
+
+		return  RectangleStruct{ min_x ,min_y ,max_x,max_y };
+	};
+
+	auto nFoundation = nFoundation_Rect_Translated(nCursorSize);
+	
+	auto v5 = nFoundation.Y;
+
+	short v6 = 0;
+	if (nFoundation.Width - nFoundation.X >= 0)
+		v6 = (short)(nFoundation.Width - nFoundation.X);
+
+	short v7 = 0;
+	if (nFoundation.Height - v5 >= 0)
+		v7 = (short)(nFoundation.Height - v5);
+
+	CellStruct v9 = { v6 + 1 ,v7 + 1 };
+	CellStruct v11 = { (short)nFoundation.X ,(short)nFoundation.Y };
+
+	R->EAX(&v9);
+	R->Stack(STACK_OFFS(0x54, 0x40), v11);
+
+	return nReturn;
 }

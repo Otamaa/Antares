@@ -32,7 +32,7 @@ DEFINE_HOOK(4FEA60, HouseClass_AI_UnitProduction, 0)
 		return ret();
 	}
 
-	auto const pRules = RulesClass::Instance;
+	auto const pRules = RulesClass::Instance();
 
 	auto const AIDiff = static_cast<int>(pThis->GetAIDifficultyIndex());
 

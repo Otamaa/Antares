@@ -53,7 +53,7 @@ DEFINE_HOOK(5970EA, RMG_EnableDesert, 9)
 DEFINE_HOOK(596786, MapSeedClass_DialogFunc_SurpriseMe, 9)
 {
 	GET(HWND, hDlg, EBP);
-	Randomizer* pRand = Randomizer::Global();
+	Random2Class* pRand = &Random2Class::NonCriticalRandomNumber();
 	MapSeedClass* pMapSeed = MapSeedClass::Global();
 
 	// selects map terrain type from all the items in the combobox
@@ -186,7 +186,7 @@ DEFINE_HOOK(5A6998, MapSeedClass_Generate_PlaceUrbanFoots, 5)
 		return 0x5A6B96; // no possible items - nothing to do
 	}
 
-	int Index = Randomizer::Global()->RandomRanged(0, Length - 1);
+	auto Index = Random2Class::NonCriticalRandomNumber()(Length - 1);
 
 	GET(HouseClass *, Owner, EBP);
 	ObjectClass *Item = nullptr;

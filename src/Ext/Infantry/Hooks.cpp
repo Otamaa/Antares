@@ -10,19 +10,24 @@
 #include <HouseClass.h>
 #include <InputManagerClass.h>
 #include <VoxClass.h>
-
+#include <Misc/Actions.h>
+// Hook changed on 3.0 -Otamaa
 // #664: Advanced Rubble - reconstruction part: Check
-DEFINE_HOOK(51E63A, InfantryClass_GetCursorOverObject_EngineerOverFriendlyBuilding, 6) {
+
+//DEFINE_HOOK(51E63A, InfantryClass_GetCursorOverObject_EngineerOverFriendlyBuilding, 6)
+DEFINE_HOOK(51E635 ,nfantryClass_GetActionOnObject_EngineerOverFriendlyBuilding, 5)
+ {
 	GET(BuildingClass *, pTarget, ESI);
 	GET(InfantryClass *, pThis, EDI);
 
 	if(BuildingTypeExt::ExtData* pData = BuildingTypeExt::ExtMap.Find(pTarget->Type)) {
 		if((pData->RubbleIntact || pData->RubbleIntactRemove) && pTarget->Owner->IsAlliedWith(pThis)) {
-			return 0x51E659;
+			R->EAX(Action::GRepair);
+			return 0x51E458;
 		}
 	}
 
-	return 0;
+	return ((R->EAX<BYTE>() & 0x4000)!= 0 ) ? 0x51E63A:0x51E659;
 }
 
 // #664: Advanced Rubble - reconstruction part: Reconstruction
@@ -38,10 +43,10 @@ DEFINE_HOOK(519FAF, InfantryClass_UpdatePosition_EngineerRepairsFriendly, 6)
 	if(TargetTypeExtData->RubbleIntact || TargetTypeExtData->RubbleIntactRemove) {
 		do_normal_repair = false;
 		bool wasSelected = pThis->IsSelected;
-		pThis->Remove();
+		pThis->Limbo();
 		if(!TargetExtData->RubbleYell(true)) {
 			++Unsorted::IKnowWhatImDoing;
-			Target->Put(Target->Location, Target->Facing.current().value8());
+			Target->Unlimbo(Target->Location, Target->PrimaryFacing.current().value8());
 			--Unsorted::IKnowWhatImDoing;
 			VoxClass::Play("EVA_CannotDeployHere");
 		}

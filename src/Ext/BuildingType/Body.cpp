@@ -42,7 +42,7 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->Firewall_Is.Read(exINI, pID, "Firestorm.Wall");
 
-	CCINIClass* pArtINI = CCINIClass::INI_Art;
+	CCINIClass* pArtINI = &CCINIClass::INI_Art();
 
 	// kept for backwards-compatibility with Ares <= 0.9
 	INI_EX exArt(pArtINI);

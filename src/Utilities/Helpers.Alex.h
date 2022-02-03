@@ -70,11 +70,13 @@ namespace Helpers {
 				return _set.end();
 			}
 
+#pragma warning(push)
+#pragma warning(disable : 4834)
 			template <typename Func>
 			void for_each(Func&& action) const {
 				std::find_if_not(begin(), end(), action);
 			}
-
+#pragma warning(pop)
 			template <typename Func>
 			int for_each_count(Func&& action) const {
 				return std::distance(begin(), std::find_if_not(begin(), end(), action));
@@ -410,7 +412,7 @@ namespace Helpers {
 		template <typename FwdIt, typename Pred>
 		inline void selectionsort(FwdIt first, FwdIt last, Pred pred) {
 			// this is a special case of a full partial sort
-			selectionsort(first, last, last, pred)
+			selectionsort(first, last, last, pred);
 		}
 
 		template <typename FwdIt>

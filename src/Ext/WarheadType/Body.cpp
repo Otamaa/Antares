@@ -300,7 +300,7 @@ void WarheadTypeExt::applyOccupantDamage(BulletClass* const Bullet) {
 			// the occupants have been damaged, do not damage the building (the original target)
 			Bullet->Health = 0;
 			Bullet->DamageMultiplier = 0;
-			Bullet->Remove();
+			Bullet->Limbo();
 		}
 	}
 }
@@ -372,7 +372,7 @@ bool WarheadTypeExt::ExtData::applyKillDriver(
 		auto const maxKillHealth = Math::min(
 			pTargetTypeExt->ProtectedDriver_MinHealth.Get(
 				pTargetTypeExt->ProtectedDriver ? 0.0 : 1.0),
-			this->KillDriver_KillBelowPercent);
+			this->KillDriver_KillBelowPercent.Get());
 
 		// conditions: not protected and not a living being
 		if(!pTargetType->Natural && !pTargetType->Organic

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ScenarioClass.h>
 /*
  * This file contains the macro fu needed to make the 100 unit bug fixes work better
  * Don't get it? Don't touch it!
@@ -60,7 +61,7 @@ void GetTypeToProduce(HouseClass* pThis, int& ProducingTypeIndex) {
 	for(auto i = 0u; i < count; ++i) {
 		auto const TT = TType::Array->Items[static_cast<int>(i)];
 		int CurrentValue = Values[i];
-		if(CurrentValue <= 0 || !pThis->CanBuild(TT, false, false)
+		if(CurrentValue <= 0 || !(int)(pThis->CanBuild(TT, false, false))
 			|| TT->GetActualCost(pThis) > pThis->Available_Money())
 		{
 			continue;

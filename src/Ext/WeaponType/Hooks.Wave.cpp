@@ -105,7 +105,7 @@ DEFINE_HOOK(760F50, WaveClass_Update, 6)
 
 	switch(pThis->Type) {
 		case WaveType::Sonic:
-			pThis->Update_Wave();
+			pThis->WaveAI();
 			Intensity = pThis->WaveIntensity;
 			--Intensity;
 			pThis->WaveIntensity = Intensity;
@@ -126,7 +126,7 @@ DEFINE_HOOK(760F50, WaveClass_Update, 6)
 			}
 			break;
 		case WaveType::Magnetron:
-			pThis->Update_Wave();
+			pThis->WaveAI();
 			Intensity = pThis->WaveIntensity;
 			--Intensity;
 			pThis->WaveIntensity = Intensity;
@@ -231,18 +231,18 @@ DEFINE_HOOK(762C5C, WaveClass_Update_Wave, 6)
 	int weaponIdx = TechnoExt::ExtMap.Find(Firer)->idxSlot_Wave;
 
 	CoordStruct xyzSrc = Firer->GetFLH(weaponIdx, CoordStruct::Empty);
-	CoordStruct xyzTgt = Target->GetCoords__(); // not GetCoords() !
+	CoordStruct xyzTgt = Target->GetAltCoords(); // not GetCoords() !
 
 	bool reversed = pData->IsWaveReversedAgainst(Target);
 
 	if(Wave->Type == WaveType::Magnetron) {
 		reversed
-			? Wave->Draw_Magnetic(xyzTgt, xyzSrc)
-			: Wave->Draw_Magnetic(xyzSrc, xyzTgt);
+			? Wave->DrawMag(xyzTgt, xyzSrc)
+			: Wave->DrawMag(xyzSrc, xyzTgt);
 	} else {
 		reversed
-			? Wave->Draw_NonMagnetic(xyzTgt, xyzSrc)
-			: Wave->Draw_NonMagnetic(xyzSrc, xyzTgt);
+			? Wave->DrawNonMag(xyzTgt, xyzSrc)
+			: Wave->DrawNonMag(xyzSrc, xyzTgt);
 	}
 
 	return 0x762D57;

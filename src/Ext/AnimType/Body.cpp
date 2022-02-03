@@ -41,9 +41,7 @@ OwnerHouseKind AnimTypeExt::SetMakeInfOwner(AnimClass *pAnim, HouseClass *pInvok
 // =============================
 // container
 
-AnimTypeExt::ExtContainer::ExtContainer() : Container("AnimTypeClass") {
-}
-
+AnimTypeExt::ExtContainer::ExtContainer() : Container("AnimTypeClass") {}
 AnimTypeExt::ExtContainer::~ExtContainer() = default;
 
 // =============================

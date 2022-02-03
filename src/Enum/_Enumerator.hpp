@@ -10,6 +10,7 @@
 
 #include <ArrayClasses.h>
 #include <CCINIClass.h>
+#include <Utilities/Constructs.h>
 
 template <typename T> class Enumerable
 {
@@ -103,11 +104,7 @@ public:
 	static const char * GetMainSection();
 
 	Enumerable(const char* Title) {
-		this->Name[0] = 0;
-
-		if(Title) {
-			AresCRT::strCopy(this->Name, Title);
-		}
+		this->Name = Title;
 	}
 
 	virtual ~Enumerable() = default;
@@ -118,5 +115,5 @@ public:
 
 	virtual void SaveToStream(AresStreamWriter &Stm) = 0;
 
-	char Name[32];
+	AresFixedString<32> Name;
 };

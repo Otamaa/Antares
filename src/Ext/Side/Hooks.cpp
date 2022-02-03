@@ -492,7 +492,7 @@ DEFINE_HOOK(6C922C, ScoreDialog_Handle_ScoreThemeA, 5)
 	GET(int, elapsed, EDI);
 	GET(int, par, ESI);
 
-	auto pScen = ScenarioClass::Instance;
+	auto pScen = ScenarioClass::Instance();
 
 	int idxSide = pScen->PlayerSideIndex;
 	auto pSide = SideClass::Array->GetItemOrDefault(idxSide);
@@ -549,7 +549,7 @@ DEFINE_HOOK(683C70, sub_683AB0_LoadingScoreA, 7)
 
 				// get theme from the side
 				auto pSide = SideClass::Array->GetItemOrDefault(pType->SideIndex);
-				auto pRulesINI = CCINIClass::INI_Rules;
+				auto pRulesINI = CCINIClass::INI_Rules();
 				idxLoadingTheme = pRulesINI->ReadTheme(pSide->ID, "LoadingTheme", -2);
 
 				// ...then from the house

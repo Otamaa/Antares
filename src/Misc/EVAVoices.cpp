@@ -104,7 +104,7 @@ DEFINE_HOOK(7528E8, VoxClass_PlayEVASideSpecific, 5)
 DEFINE_HOOK(753380, VoxClass_GetFilename, 5)
 {
 	GET(VoxClass2* const, pThis, ECX);
-	auto const index = VoxClass::EVAIndex;
+	auto const index = VoxClass::EVAIndex();
 
 	const char* ret = "";
 	switch(index)

@@ -129,7 +129,7 @@ bool BuildingExt::ExtData::RubbleYell(bool beingRepaired) {
 			return true;
 		}
 
-		pBuilding->Remove(); // only takes it off the map
+		pBuilding->Limbo(); // only takes it off the map
 		pBuilding->DestroyNthAnim(BuildingAnimSlot::All);
 
 		if(!remove) {
@@ -144,7 +144,7 @@ bool BuildingExt::ExtData::RubbleYell(bool beingRepaired) {
 			} /* else Health = Strength*/
 
 			// The building is created?
-			if(!pNew->Put(pBuilding->Location, pBuilding->Facing.current().value8())) {
+			if(!pNew->Unlimbo(pBuilding->Location, pBuilding->PrimaryFacing.current().value8())) {
 				Debug::Log("Advanced Rubble: Failed to place normal state on map!\n");
 				GameDelete(pNew);
 				return false;
@@ -196,7 +196,7 @@ void BuildingExt::ExtData::KickOutOfRubble() {
 		for(NextObject obj(pCell->GetContent()); obj; ++obj) {
 			if(auto const pFoot = abstract_cast<FootClass*>(*obj)) {
 				auto const selected = pFoot->IsSelected;
-				if(pFoot->Remove()) {
+				if(pFoot->Limbo()) {
 					list.AddItem(Item(pFoot, selected));
 				}
 			}
@@ -416,13 +416,13 @@ void BuildingExt::buildLines(BuildingClass* theBuilding, CellStruct selectedCell
 					CoordStruct coordBuffer = CellClass::Cell2Coord(cellToBuildOn);
 
 					++Unsorted::IKnowWhatImDoing; // put the building there even if normal rules would deny - e.g. under units
-					bool Put = tempBuilding->Put(coordBuffer, 0);
+					bool Put = tempBuilding->Unlimbo(coordBuffer, 0);
 					--Unsorted::IKnowWhatImDoing;
 
 					if(Put) {
 						tempBuilding->QueueMission(Mission::Construction, false);
 						tempBuilding->DiscoveredBy(buildingOwner);
-						tempBuilding->unknown_bool_6DD = 1;
+						tempBuilding->IsReadyToCommence = 1;
 					} else {
 						GameDelete(tempBuilding);
 					}
@@ -678,7 +678,7 @@ bool BuildingExt::ExtData::InfiltratedBy(HouseClass *Enterer) {
 		if(evaForOwner || evaForEnterer) {
 			VoxClass::Play("EVA_BuildingInfiltrated");
 		}
-		MapClass::Instance->sub_657CE0();
+		MapClass::Instance->Map_AI();
 		MapClass::Instance->RedrawSidebar(2);
 		effectApplied = true;
 	}

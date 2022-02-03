@@ -67,18 +67,18 @@ void ArmorType::LoadForWarhead(CCINIClass *pINI, WarheadTypeClass* pWH)
 	const char *section = pWH->get_ID();
 
 	for(size_t i = 0; i < Array.size(); ++i) {
-		_snprintf_s(buffer, _TRUNCATE, "Versus.%s", Array[i]->Name);
+		_snprintf_s(buffer, _TRUNCATE, "Versus.%s", Array[i]->Name.data());
 		if(pINI->ReadString(section, buffer, "", ret)) {
 			pData->Verses[i].Parse(ret);
 		}
 
-		_snprintf_s(buffer, _TRUNCATE, "Versus.%s.ForceFire", Array[i]->Name);
+		_snprintf_s(buffer, _TRUNCATE, "Versus.%s.ForceFire", Array[i]->Name.data());
 		pData->Verses[i].ForceFire = pINI->ReadBool(section, buffer, pData->Verses[i].ForceFire);
 
-		_snprintf_s(buffer, _TRUNCATE, "Versus.%s.Retaliate", Array[i]->Name);
+		_snprintf_s(buffer, _TRUNCATE, "Versus.%s.Retaliate", Array[i]->Name.data());
 		pData->Verses[i].Retaliate = pINI->ReadBool(section, buffer, pData->Verses[i].Retaliate);
 
-		_snprintf_s(buffer, _TRUNCATE, "Versus.%s.PassiveAcquire", Array[i]->Name);
+		_snprintf_s(buffer, _TRUNCATE, "Versus.%s.PassiveAcquire", Array[i]->Name.data());
 		pData->Verses[i].PassiveAcquire = pINI->ReadBool(section, buffer, pData->Verses[i].PassiveAcquire);
 	}
 }

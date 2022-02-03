@@ -557,7 +557,7 @@ bool HouseExt::ExtData::CheckBasePlanSanity() {
 
 	auto AllIsWell = true;
 
-	auto const pRules = RulesClass::Instance;
+	auto const pRules = RulesClass::Instance();
 	auto const pType = pThis->Type;
 
 	auto const errorMsg = "AI House of country [%s] cannot build any object in "

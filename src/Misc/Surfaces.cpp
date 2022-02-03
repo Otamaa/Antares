@@ -123,7 +123,7 @@ DEFINE_HOOK(537BC0, Game_MakeScreenshot, 0)
 				ScreenShot->WriteBytes(&h, sizeof(h));
 				std::unique_ptr<WORD[]> pixelData(new WORD[arrayLen]);
 				WORD *pixels = pixelData.get();
-				int pitch = Surface->SurfDesc->lPitch;
+				int pitch = Surface->VideoSurfaceDescription->lPitch;
 				for(int r = 0; r < height; ++r) {
 					memcpy(pixels, reinterpret_cast<void *>(buffer), width * 2);
 					pixels += width;
@@ -179,7 +179,7 @@ DEFINE_HOOK(4F4583, GScreenClass_DrawOnTop_TheDarkSideOfTheMoon, 6)
 
 	if(Ares::bFPSCounter) {
 		wchar_t buffer[0x100];
-		swprintf_s(buffer, L"FPS: %-4u Avg: %.2f", FPSCounter::CurrentFrameRate, FPSCounter::GetAverageFrameRate());
+		swprintf_s(buffer, L"FPS: %-4u Avg: %.2f", FPSCounter::CurrentFrameRate(), FPSCounter::GetAverageFrameRate());
 
 		DrawText(buffer, offset, COLOR_WHITE);
 	}
@@ -203,7 +203,7 @@ DEFINE_HOOK(437CCC, BSurface_DrawSHPFrame1_Buffer, 8)
 	REF_STACK(unsigned char const*, pBuffer, STACK_OFFS(0x7C, 0x6C));
 
 	auto const width = static_cast<size_t>(Math::clamp(
-		bounds.Width, 0, std::numeric_limits<short>::max()));
+		bounds.Width, 0, (int)std::numeric_limits<short>::max()));
 
 	// buffer overrun is now not as forgiving as it was before
 	auto& Buffer = AresSurfaces::ShpCompression1Buffer;

@@ -107,7 +107,7 @@ void WriteLog(const TechnoClass* it, int idx, DWORD checksum, FILE * F) {
 	}
 
 	fprintf(F, "; Facing: %d; Facing2: %d; Target: %s (%d; %d,%d)",
-		it->Facing.current().value8(), it->TurretFacing.current().value8(), targetID, targetIndex, targetCrd.X, targetCrd.Y);
+		it->PrimaryFacing.current().value8(), it->SecondaryFacing.current().value8(), targetID, targetIndex, targetCrd.X, targetCrd.Y);
 }
 
 template<>
@@ -263,21 +263,21 @@ bool LogFrame(const char * LogFilename, NetworkEvent *OffendingEvent = nullptr) 
 		}
 
 		fprintf(LogFile, "\nTypes\n");
-		HouseLogger(InfantryClass::Array, LogFile, "Infantry");
-		HouseLogger(UnitClass::Array, LogFile, "Units");
-		HouseLogger(AircraftClass::Array, LogFile, "Aircraft");
-		HouseLogger(BuildingClass::Array, LogFile, "Buildings");
+		HouseLogger(InfantryClass::Array(), LogFile, "Infantry");
+		HouseLogger(UnitClass::Array(), LogFile, "Units");
+		HouseLogger(AircraftClass::Array(), LogFile, "Aircraft");
+		HouseLogger(BuildingClass::Array(), LogFile, "Buildings");
 
 		fprintf(LogFile, "\nChecksums\n");
-		VectorLogger(HouseClass::Array, LogFile, "Houses");
-		VectorLogger(InfantryClass::Array, LogFile, "Infantry");
-		VectorLogger(UnitClass::Array, LogFile, "Units");
-		VectorLogger(AircraftClass::Array, LogFile, "Aircraft");
-		VectorLogger(BuildingClass::Array, LogFile, "Buildings");
+		VectorLogger(HouseClass::Array(), LogFile, "Houses");
+		VectorLogger(InfantryClass::Array(), LogFile, "Infantry");
+		VectorLogger(UnitClass::Array(), LogFile, "Units");
+		VectorLogger(AircraftClass::Array(), LogFile, "Aircraft");
+		VectorLogger(BuildingClass::Array(), LogFile, "Buildings");
 
 		fprintf(LogFile, "\n");
-		VectorLogger(ObjectClass::CurrentObjects, LogFile, "Current Objects");
-		VectorLogger(ObjectClass::Logics, LogFile, "Logics");
+		VectorLogger(ObjectClass::CurrentObjects(), LogFile, "Current Objects");
+		VectorLogger(ObjectClass::Logics(), LogFile, "Logics");
 
 		fprintf(LogFile, "\nChecksums for Map Layers\n");
 		for(auto ixL = 0; ixL < 5; ++ixL) {
@@ -286,11 +286,11 @@ bool LogFrame(const char * LogFilename, NetworkEvent *OffendingEvent = nullptr) 
 		}
 
 		fprintf(LogFile, "\nChecksums for Logics\n");
-		VectorLogger(ObjectClass::Logics, LogFile);
+		VectorLogger(ObjectClass::Logics(), LogFile);
 		
 		fprintf(LogFile, "\nChecksums for Abstracts\n");
-		VectorLogger(AbstractClass::Array0, LogFile, "Abstracts");
-		VectorLogger(AbstractTypeClass::Array, LogFile, "AbstractTypes");
+		VectorLogger(AbstractClass::Array(), LogFile, "Abstracts");
+		VectorLogger(AbstractTypeClass::Array(), LogFile, "AbstractTypes");
 
 		fclose(LogFile);
 		return true;

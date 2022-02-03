@@ -57,18 +57,20 @@ DEFINE_HOOK(42513F, AnimClass_Expired_ScorchFlamer, 7)
 	};
 
 	if(pType->Flamer) {
+
 		// always create at least one small fire
-		SpawnAnim(RulesClass::Instance->SmallFire, 64);
+		if (auto pSmallFire = SpawnAnim(RulesClass::Instance->SmallFire, 64))
+			pSmallFire->Owner = pThis->Owner;
 
 		// 50% to create another small fire
-		if(ScenarioClass::Instance->Random.RandomRanged(0, 99) < 50) {
-			SpawnAnim(RulesClass::Instance->SmallFire, 160);
-		}
+		if(ScenarioClass::Instance->Random.RandomRanged(0, 99) < 50)
+			if (auto pSmallFire2 = SpawnAnim(RulesClass::Instance->SmallFire, 160))
+					pSmallFire2->Owner = pThis->Owner;
 
 		// 50% chance to create a large fire
-		if(ScenarioClass::Instance->Random.RandomRanged(0, 99) < 50) {
-			SpawnAnim(RulesClass::Instance->LargeFire, 112);
-		}
+		if(ScenarioClass::Instance->Random.RandomRanged(0, 99) < 50)
+			if(auto pLargeFire = SpawnAnim(RulesClass::Instance->LargeFire, 112))
+				pLargeFire->Owner = pThis->Owner;
 
 	} else if(pType->Scorch) {
 		// creates a SmallFire anim that is attached to the same object
@@ -84,7 +86,8 @@ DEFINE_HOOK(42513F, AnimClass_Expired_ScorchFlamer, 7)
 				if(auto pAnim = SpawnAnim(RulesClass::Instance->SmallFire, 0)) {
 					if(pThis->OwnerObject) {
 						pAnim->SetOwnerObject(pThis->OwnerObject);
-					}
+					}else
+						pAnim->Owner = pThis->Owner;
 				}
 			}
 		}

@@ -22,7 +22,7 @@ DEFINE_HOOK(6E1780, TActionClass_PlayAudioAtRandomWP, 6)
 	int buffer[MaxWaypoints];
 	DynamicVectorClass<int> eligible(MaxWaypoints, buffer);
 
-	auto const pScen = ScenarioClass::Instance;
+	auto const pScen = ScenarioClass::Instance();
 
 	for(auto ix = 0; ix < MaxWaypoints; ++ix) {
 		if(pScen->IsDefinedWaypoint(ix)) {

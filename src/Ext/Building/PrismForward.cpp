@@ -91,14 +91,14 @@ int BuildingExt::cPrismForwarding::AcquireSlaves_SingleStage(BuildingExt::cPrism
 	};
 
 	CoordStruct MyPosition, curPosition;
-	TargetTower->GetOwner()->GetPosition_2(&MyPosition);
+	TargetTower->GetOwner()->GetCenterCoord(&MyPosition);
 
 	//first, find eligible towers
 	std::vector<PrismTargetData> EligibleTowers;
 	for(auto const& SlaveTower : *BuildingClass::Array) {
 		auto const pSlaveData = BuildingExt::ExtMap.Find(SlaveTower);
 		if(this->ValidateSupportTower(TargetTower, &pSlaveData->PrismForwarding)) {
-			SlaveTower->GetPosition_2(&curPosition);
+			SlaveTower->GetCenterCoord(&curPosition);
 			int Distance = static_cast<int>(MyPosition.DistanceFrom(curPosition));
 			PrismTargetData pd = {&pSlaveData->PrismForwarding, Distance};
 			EligibleTowers.push_back(pd);
@@ -183,8 +183,8 @@ bool BuildingExt::cPrismForwarding::ValidateSupportTower(BuildingExt::cPrismForw
 					{
 						//ownership/alliance rules satisfied
 						CoordStruct MyPosition, curPosition;
-						TargetTower->GetPosition_2(&MyPosition);
-						SlaveTower->GetPosition_2(&curPosition);
+						TargetTower->GetCenterCoord(&MyPosition);
+						SlaveTower->GetCenterCoord(&curPosition);
 						auto const Distance = static_cast<int>(MyPosition.DistanceFrom(curPosition));
 						int SupportRange = 0;
 						int idxSupport = -1;

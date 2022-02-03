@@ -243,7 +243,7 @@ DEFINE_HOOK(687C16, INIClass_ReadScenario_ValidateThings, 6)
 	// #1000
 	if(auto const AresGeneral = RulesExt::Global()) {
 		if(AresGeneral->CanMakeStuffUp) {
-			Randomizer *r = &ScenarioClass::Instance->Random;
+			Random2Class *r = &ScenarioClass::Instance->Random;
 			if(RulesClass* StockGeneral = RulesClass::Global()) { // well, the modder *said* we can make stuff up, so...
 
 				StockGeneral->VeteranRatio = r->RandomRanged(1, 500) / 100.0;

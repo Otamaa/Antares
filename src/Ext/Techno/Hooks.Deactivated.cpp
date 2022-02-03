@@ -262,7 +262,7 @@ DEFINE_HOOK(70FC90, TechnoClass_Deactivate, 6)
 	GET(TechnoClass* const, pThis, ECX);
 
 	// don't deactivate when inside/on the linked building
-	if(pThis->unknown_bool_418) {
+	if(pThis->IsTethered) {
 		auto const pLink = pThis->GetNthLink(0);
 
 		if(pLink && pThis->GetCell()->GetBuilding() == pLink) {

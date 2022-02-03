@@ -30,7 +30,7 @@ DEFINE_HOOK(420A71, AlphaShapeClass_CTOR_Anims, 5)
 {
 	GET(AlphaShapeClass*, pThis, ESI);
 	if(pThis->AttachedTo->WhatAmI() == AnimClass::AbsID) {
-		PointerExpiredNotification::NotifyInvalidAnim.Add(pThis);
+		PointerExpiredNotification::NotifyInvalidAnim().Add(pThis);
 	}
 	return 0;
 }
@@ -45,7 +45,7 @@ DEFINE_HOOK(421730, AlphaShapeClass_SDDTOR, 8)
 DEFINE_HOOK(421798, AlphaShapeClass_SDDTOR_Anims, 6)
 {
 	GET(AlphaShapeClass*, pThis, ESI);
-	PointerExpiredNotification::NotifyInvalidAnim.Remove(pThis);
+	PointerExpiredNotification::NotifyInvalidAnim().Remove(pThis);
 	return 0;
 }
 
@@ -71,8 +71,8 @@ void UpdateAlphaShape(ObjectClass* pSource) {
 	}
 
 	CoordStruct XYZ;
-
-	RectangleStruct *ScreenArea = &TacticalClass::Instance->VisibleArea;
+	auto area = TacticalClass::Instance->VisibleArea();
+	RectangleStruct *ScreenArea = &area;
 	Point2D off = {ScreenArea->X - (pImage->Width / 2), ScreenArea->Y - (pImage->Height / 2)};
 	Point2D xy;
 
@@ -257,7 +257,8 @@ DEFINE_HOOK(71944E, TeleportLocomotionClass_ILocomotion_Process, 6)
 		if(auto pImage = pType->AlphaImage) {
 			Point2D xy;
 			TacticalClass::Instance->CoordsToClient(XYZ, &xy);
-			RectangleStruct* ScreenArea = &TacticalClass::Instance->VisibleArea;
+			auto area = TacticalClass::Instance->VisibleArea();
+			RectangleStruct* ScreenArea = &area;
 			Point2D off = {ScreenArea->X - (pImage->Width / 2), ScreenArea->Y - (pImage->Height / 2)};
 			xy += off;
 			RectangleStruct Dirty =

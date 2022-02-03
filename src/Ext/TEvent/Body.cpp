@@ -45,7 +45,7 @@ TechnoTypeClass* TEventExt::ExtData::GetTechnoType()
 */
 bool TEventExt::ExtData::TechTypeExists()
 {
-	int count = this->OwnerObject()->arg;
+	int count = this->OwnerObject()->Value;
 	TechnoTypeClass* pType = this->GetTechnoType();
 
 	if(!pType) {

@@ -332,7 +332,7 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 			}
 
 			if(done) {
-				pLink->vt_entry_484(0, 1);
+				pLink->EnterIdleMode(false, 1);
 				pLink->ForceMission(Mission::Guard);
 				pLink->ProceedToNextPlanningWaypoint();
 

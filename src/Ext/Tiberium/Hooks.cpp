@@ -23,17 +23,17 @@ DEFINE_HOOK(489270, CellChainReact, 5)
 	TiberiumClass* pTib = TiberiumClass::Array->GetItemOrDefault(idxTib);
 	OverlayTypeClass* pOverlay = OverlayTypeClass::Array->GetItemOrDefault(pCell->OverlayTypeIndex);
 
-	if(pTib && pOverlay && pOverlay->ChainReaction && pCell->Powerup > 1) {
+	if(pTib && pOverlay && pOverlay->ChainReaction && pCell->OverlayData > 1) {
 		CoordStruct crd = pCell->GetCoords();
 
-		if(ScenarioClass::Instance->Random.RandomRanged(0, 99) < reactChanceMultiplier * pCell->Powerup) {
-			bool wasFullGrown = (pCell->Powerup >= 11);
+		if(ScenarioClass::Instance->Random.RandomRanged(0, 99) < reactChanceMultiplier * pCell->OverlayData) {
+			bool wasFullGrown = (pCell->OverlayData >= 11);
 
-			unsigned char delta = pCell->Powerup / 2;
+			unsigned char delta = pCell->OverlayData / 2;
 			int damage = pTib->Power * delta;
 
 			// remove some of the tiberium
-			pCell->Powerup -= delta;
+			pCell->OverlayData -= delta;
 			pCell->MarkForRedraw();
 
 			// get the warhead
@@ -53,7 +53,7 @@ DEFINE_HOOK(489270, CellChainReact, 5)
 				for(size_t i = 0; i<8; ++i) {
 					auto pNeighbour = pCell->GetNeighbourCell(i);
 
-					if(pCell->GetContainedTiberiumIndex() != -1 && pNeighbour->Powerup > 2) {
+					if(pCell->GetContainedTiberiumIndex() != -1 && pNeighbour->OverlayData > 2) {
 						if(ScenarioClass::Instance->Random.RandomRanged(0, 99) < spreadChance) {
 							int delay = ScenarioClass::Instance->Random.RandomRanged(minDelay, maxDelay);
 							crd = pNeighbour->GetCoords();

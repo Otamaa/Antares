@@ -46,7 +46,7 @@ DEFINE_HOOK(43E7B0, BuildingClass_DrawVisible, 5)
 	// show building or house state
 	if(pThis->IsSelected && (bAllied || bReveal)) {
 		Point2D loc = {pLocation->X - 10, pLocation->Y + 10};
-		pThis->DrawExtraInfo(&loc, pLocation, pBounds);
+		pThis->DrawExtraInfo(loc, pLocation, pBounds);
 	}
 
 	// display production cameo

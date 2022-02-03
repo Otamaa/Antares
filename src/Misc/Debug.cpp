@@ -200,7 +200,7 @@ std::wstring Debug::FullDump(std::wstring destinationFolder) {
 void Debug::FreeMouse() {
 //	static bool freed = false;
 //	if(!freed) {
-		Game::sub_53E6B0();
+		Game::StreamerThreadFlush();
 
 		MouseClass::Instance->UpdateCursor(MouseCursorType::Default, false);
 		WWMouseClass::Instance->ReleaseMouse();

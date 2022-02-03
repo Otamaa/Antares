@@ -28,9 +28,7 @@ void AbstractExt::ExtData::SaveToStream(AresStreamWriter &Stm) {
 // =============================
 // container
 
-AbstractExt::ExtContainer::ExtContainer() : Container("AbstractClass") {
-}
-
+AbstractExt::ExtContainer::ExtContainer() : Container("AbstractClass") {}
 AbstractExt::ExtContainer::~ExtContainer() = default;
 
 // =============================

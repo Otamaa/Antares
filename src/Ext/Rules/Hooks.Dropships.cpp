@@ -49,7 +49,7 @@ DEFINE_HOOK(4B99A2, DropshipLoadout_WriteUnit, 0)
 
 	auto Color = ColorScheme::Find(Available ? "Green" : "Red", 1);
 
-	auto pSurface = DSurface::Hidden;
+	auto pSurface = DSurface::Hidden();
 	RectangleStruct pSurfaceRect;
 	pSurface->GetRect(&pSurfaceRect);
 

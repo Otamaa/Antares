@@ -187,7 +187,8 @@ DEFINE_HOOK(4064A0, VocClass_AddSample, 0) // Complete rewrite of VocClass::AddS
 		// return false
 		R->EAX(0);
 	} else {
-		if(*reinterpret_cast<int*>(0x87E2A0)) { // I dunno
+		bool AutoEventSet = *reinterpret_cast<int*>(0x87E2A0);
+		if(AutoEventSet) { // I dunno
 			while(*pSampleName == '$' || *pSampleName == '#') {
 				++pSampleName;
 			}

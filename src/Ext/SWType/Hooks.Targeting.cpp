@@ -552,8 +552,8 @@ private:
 
 		if(it != buildings.end()) {
 			auto pBld = *it;
-			auto Offset = CellStruct{pBld->Type->GetFoundationWidth() / 2,
-				pBld->Type->GetFoundationHeight(false) / 2};
+			auto Offset = CellStruct{(short)(pBld->Type->GetFoundationWidth() / 2),
+				(short)(pBld->Type->GetFoundationHeight(false) / 2)};
 			return pBld->GetCell()->MapCoords + Offset;
 		}
 

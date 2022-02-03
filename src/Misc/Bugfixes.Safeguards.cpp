@@ -1,4 +1,6 @@
 #include <IsometricTileTypeClass.h>
+#include <TriggerTypeClass.h>
+#include <HouseTypeClass.h>
 
 #include "Debug.h"
 #include "../Ares.h"
@@ -18,4 +20,34 @@ DEFINE_HOOK(547043, IsometricTileTypeClass_ReadFromFile, 6)
 		}
 	}
 	return 0;
+}
+
+// Ares 3.o -Otamaa
+DEFINE_HOOK(41088D, AbstractTypeClass_CTOR_IDTooLong, 6)
+{
+	GET(const char*, ID, EAX);
+
+	if (strlen(ID) > 25)
+		Debug::FatalErrorAndExit("Tried to create a type with ID '%s' which is longer than the maximum length of 24 .", ID);
+
+	return 0;
+}
+
+DEFINE_HOOK(7272B5, TriggerTypeClass_LoadFromINI_House, 6)
+{
+	GET(int const, index, EBX);
+	GET(TriggerTypeClass* const, pTrig, EBP);
+	GET(const char*, pHouse, ESI);
+
+	if (index < 0)
+	{
+		Debug::FatalError("TriggerType '%s' refers to a house named '%s', which does not exist. In case no house is needed, use '<none>' explicitly.", pTrig->ID, pHouse);
+		R->EDX<HouseTypeClass*>(nullptr);
+	}
+	else
+	{
+		R->EDX(HouseTypeClass::Find(pHouse));
+	}
+
+	return 0x7272C1;
 }

@@ -264,7 +264,7 @@ bool WeaponTypeExt::ExtData::conductAbduction(BulletClass * Bullet) {
 		Target->SetOwningHouse(Attacker->Owner);
 	}
 
-	if(!Target->Remove()) {
+	if(!Target->Limbo()) {
 		Debug::Log(Debug::Severity::Warning, "Abduction: Target unit %p (%s) could not be removed.\n", Target, Target->get_ID());
 	}
 	Target->OnBridge = false;
@@ -302,7 +302,7 @@ bool WeaponTypeExt::ExtData::conductAbduction(BulletClass * Bullet) {
 	// ..and neuter the bullet, since it's not supposed to hurt the prisoner after the abduction
 	Bullet->Health = 0;
 	Bullet->DamageMultiplier = 0;
-	Bullet->Remove();
+	Bullet->Limbo();
 
 	return true;
 }

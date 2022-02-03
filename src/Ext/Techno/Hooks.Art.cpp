@@ -207,7 +207,7 @@ DEFINE_HOOK(73C613, UnitClass_DrawSHP_FacingsA, 7) {
 	// 2^highest is the frame count, 3 means 8 frames
 	if(highest >= 3 && !pThis->IsDisguised()) {
 		auto offset = 1u << (highest - 3);
-		ret = TranslateFixedPoint(16, highest, static_cast<WORD>(pThis->Facing.current().value()), offset);
+		ret = TranslateFixedPoint(16, highest, static_cast<WORD>(pThis->PrimaryFacing.current().value()), offset);
 	}
 
 	R->EBX(ret);

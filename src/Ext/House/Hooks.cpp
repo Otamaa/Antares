@@ -232,7 +232,7 @@ DEFINE_HOOK(4F8B08, HouseClass_Update_DamageDelay, 6)
 		auto const pExt = HouseExt::ExtMap.Find(pThis);
 		auto const degrades = pExt->Degrades.Get(type_degrades);
 
-		auto const pRules = RulesClass::Instance;
+		auto const pRules = RulesClass::Instance();
 		pThis->DamageDelayTimer.Start(static_cast<int>(pRules->DamageDelay * 900));
 
 		// damage is only applied conditionally

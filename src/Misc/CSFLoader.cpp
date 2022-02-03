@@ -27,7 +27,7 @@ void CSFLoader::LoadAdditionalCSF(const char *pFileName, bool ignoreLanguage)
 					++CSFCount;
 					StringTable::ReadFile(pFileName); //must be modified to do the rest ;)
 
-					std::sort(StringTable::Labels, StringTable::Labels + StringTable::LabelCount,
+					std::sort(StringTable::Labels(), StringTable::Labels() + StringTable::LabelCount(),
 						[](const CSFLabel& lhs, const CSFLabel& rhs)
 					{
 						return _strcmpi(lhs.Name, rhs.Name) < 0;
@@ -153,7 +153,7 @@ DEFINE_HOOK(734A5F, CSF_AddOrOverrideLabel, 5)
 //0x734A97
 DEFINE_HOOK(734A97, CSF_SetIndex, 6)
 {
-	R->EDX(StringTable::Labels);
+	R->EDX(StringTable::Labels());
 
 	if(CSFLoader::CSFCount > 0) {
 		R->ECX(CSFLoader::NextValueIndex);

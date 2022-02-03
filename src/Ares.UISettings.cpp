@@ -143,8 +143,8 @@ void Ares::UISettings::Load(CCINIClass *pINI) {
 	auto const section2 = "Colors";
 
 	auto const ParseColorInt = [pINI](const char* section, const char* key, int defColor) -> int {
-		ColorStruct default(defColor & 0xFF, (defColor >> 8) & 0xFF, (defColor >> 16) & 0xFF);
-		auto const color = pINI->ReadColor(section, key, default);
+		ColorStruct ndefault(defColor & 0xFF, (defColor >> 8) & 0xFF, (defColor >> 16) & 0xFF);
+		auto const color = pINI->ReadColor(section, key, ndefault);
 		return color.R | color.G << 8 | color.B << 16;
 	};
 

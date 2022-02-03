@@ -143,14 +143,14 @@ bool TechnoExt::EjectSurvivor(FootClass *Survivor, CoordStruct loc, bool Select)
 	bool chuted = (loc.Z - floorZ > 2 * Unsorted::LevelHeight);
 	if(chuted) {
 		// HouseClass::CreateParadrop does this when building passengers for a paradrop... it might be a wise thing to mimic!
-		Survivor->Remove();
+		Survivor->Limbo();
 
 		if(!Survivor->SpawnParachuted(loc)) {
 			return false;
 		}
 	} else {
 		loc.Z = floorZ;
-		if(!Survivor->Put(loc, ScenarioClass::Instance->Random.RandomRanged(0, 7))) {
+		if(!Survivor->Unlimbo(loc, ScenarioClass::Instance->Random.RandomRanged(0, 7))) {
 			return false;
 		}
 	}
@@ -297,7 +297,7 @@ bool TechnoExt::SpawnVisceroid(CoordStruct &crd, ObjectTypeClass* pType, int cha
 				if(auto pVisc = pType->CreateObject(pHouse)) {
 					++Unsorted::IKnowWhatImDoing;
 					ret = true;
-					if(!pVisc->Put(crd, 0)) {
+					if(!pVisc->Unlimbo(crd, 0)) {
 						// opposed to TS, we clean up, though
 						// the mutex should make it happen.
 						pVisc->UnInit();
@@ -326,7 +326,7 @@ void TechnoExt::DecreaseAmmo(
 
 unsigned int TechnoExt::ExtData::AlphaFrame(const SHPStruct* Image) const {
 	int countFrames = Conversions::Int2Highest(Image->Frames);
-	DirStruct Facing = this->OwnerObject()->Facing.current();
+	DirStruct Facing = this->OwnerObject()->PrimaryFacing.current();
 	return (static_cast<DirStruct::unsigned_type>(Facing.value()) >> (16 - countFrames));
 }
 
@@ -527,7 +527,7 @@ bool TechnoExt::CreateWithDroppod(FootClass *Object, const CoordStruct& XYZ) {
 		Object->SetLocation(xyz);
 		Object->SetDestination(MyCell, 1);
 		Object->Locomotor->Move_To(XYZ);
-		Object->Facing.set(DirStruct());
+		Object->PrimaryFacing.set(DirStruct());
 		if(!Object->InLimbo) {
 			Object->See(0, 0);
 			Object->QueueMission(Mission::Guard, 0);
@@ -712,7 +712,7 @@ void TechnoExt::ExtData::CreateInitialPayload()
 					auto const pCell = pThis->GetCell();
 					pThis->UpdateThreatInCell(pCell);
 				} else {
-					pPayload->Remove();
+					pPayload->Limbo();
 
 					if(pBldType->InfantryAbsorb) {
 						pPayload->Absorbed = true;
@@ -736,7 +736,7 @@ void TechnoExt::ExtData::CreateInitialPayload()
 			} else {
 				auto const pPayload = static_cast<FootClass*>(pObject);
 				pPayload->SetLocation(pThis->Location);
-				pPayload->Remove();
+				pPayload->Limbo();
 
 				if(pType->OpenTopped) {
 					pThis->EnteredOpenTopped(pPayload);
@@ -744,7 +744,7 @@ void TechnoExt::ExtData::CreateInitialPayload()
 
 				pPayload->Transporter = pThis;
 
-				auto const old = std::exchange(VocClass::VoicesEnabled, false);
+				auto const old = std::exchange(VocClass::VoicesEnabled(), false);
 				pThis->AddPassenger(pPayload);
 				VocClass::VoicesEnabled = old;
 			}

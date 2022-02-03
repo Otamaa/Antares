@@ -5,6 +5,8 @@
 #include <StaticInits.cpp>
 #include <Unsorted.h>
 #include <GetCDClass.h>
+#include <Dbghelp.h>
+#include <tlhelp32.h>
 
 #include <new>
 
@@ -60,6 +62,7 @@ void __stdcall Ares::CmdLineParse(char** ppArgs, int nNumArgs)
 	bNoCD = false;
 	bNoLogo = false;
 	EMPulse::verbose = false;
+	DWORD_PTR processAffinityMask = 1; // limit to first processor
 
 	// > 1 because the exe path itself counts as an argument, too!
 	for(int i = 1; i < nNumArgs; i++) {
@@ -84,6 +87,13 @@ void __stdcall Ares::CmdLineParse(char** ppArgs, int nNumArgs)
 		} else if(_stricmp(pArg, "-EXCEPTION") == 0) {
 			ExceptionMode = ExceptionHandlerMode::NoRemove;
 		}
+		else if (CRT::_strnicmp(pArg, "-AFFINITY:", 0xAu))
+		{
+			auto nData = atoi(pArg + 0xAu);
+			if (nData < 0)
+				nData = 0;
+			processAffinityMask = nData;
+		}
 	}
 
 	if(Debug::bLog) {
@@ -92,6 +102,14 @@ void __stdcall Ares::CmdLineParse(char** ppArgs, int nNumArgs)
 	}
 
 	CheckProcessorFeatures();
+
+	if (processAffinityMask)
+	{
+		Debug::Log("Set Process Affinity: %lu (%x)\n", processAffinityMask, processAffinityMask);
+		auto const process = GetCurrentProcess();
+		SetProcessAffinityMask(process, processAffinityMask);
+	}
+
 	InitNoCDMode();
 }
 
@@ -100,15 +118,80 @@ void __stdcall Ares::PostGameInit()
 
 }
 
+// Author : Secsome@Phobos
+#pragma warning (disable : 4091)
+#pragma warning (disable : 4245)
+
+bool DetachFromDebugger()
+{
+	auto GetDebuggerProcessId = [](DWORD dwSelfProcessId) -> DWORD
+	{
+		DWORD dwParentProcessId = -1;
+		HANDLE hSnapshot = CreateToolhelp32Snapshot(2, 0);
+		PROCESSENTRY32 pe32;
+		pe32.dwSize = sizeof(PROCESSENTRY32);
+		Process32First(hSnapshot, &pe32);
+		do
+		{
+			if (pe32.th32ProcessID == dwSelfProcessId)
+			{
+				dwParentProcessId = pe32.th32ParentProcessID;
+				break;
+			}
+		} while (Process32Next(hSnapshot, &pe32));
+		CloseHandle(hSnapshot);
+		return dwParentProcessId;
+	};
+
+	HMODULE hModule = LoadLibrary("ntdll.dll");
+	if (hModule != NULL)
+	{
+		auto const NtRemoveProcessDebug =
+			(NTSTATUS(__stdcall*)(HANDLE, HANDLE))GetProcAddress(hModule, "NtRemoveProcessDebug");
+		auto const NtSetInformationDebugObject =
+			(NTSTATUS(__stdcall*)(HANDLE, ULONG, PVOID, ULONG, PULONG))GetProcAddress(hModule, "NtSetInformationDebugObject");
+		auto const NtQueryInformationProcess =
+			(NTSTATUS(__stdcall*)(HANDLE, ULONG, PVOID, ULONG, PULONG))GetProcAddress(hModule, "NtQueryInformationProcess");
+		auto const NtClose =
+			(NTSTATUS(__stdcall*)(HANDLE))GetProcAddress(hModule, "NtClose");
+
+		HANDLE hDebug;
+		HANDLE hCurrentProcess = GetCurrentProcess();
+		NTSTATUS status = NtQueryInformationProcess(hCurrentProcess, 30, &hDebug, sizeof(HANDLE), 0);
+		if (0 <= status)
+		{
+			ULONG killProcessOnExit = FALSE;
+			status = NtSetInformationDebugObject(
+				hDebug,
+				1,
+				&killProcessOnExit,
+				sizeof(ULONG),
+				NULL
+			);
+			if (0 <= status)
+			{
+				const auto pid = GetDebuggerProcessId(GetProcessId(hCurrentProcess));
+				status = NtRemoveProcessDebug(hCurrentProcess, hDebug);
+				if (0 <= status)
+				{
+					sprintf_s(Ares::readBuffer, "taskkill /F /PID %d", pid);
+					WinExec(Ares::readBuffer, SW_HIDE);
+					return true;
+				}
+			}
+			NtClose(hDebug);
+		}
+		FreeLibrary(hModule);
+	}
+
+	return false;
+}
+
 void __stdcall Ares::ExeRun()
 {
-	Unsorted::Savegame_Magic = SAVEGAME_MAGIC;
+	Game::Savegame_Magic = SAVEGAME_MAGIC;
 	Game::bVideoBackBuffer = false;
 	Game::bAllowVRAMSidebar = false;
-
-	auto const process = GetCurrentProcess();
-	DWORD_PTR const processAffinityMask = 1; // limit to first processor
-	SetProcessAffinityMask(process, processAffinityMask);
 
 #if _MSC_VER >= 1700
 	// install a new exception handler, if this version of Windows supports it
@@ -120,6 +203,28 @@ void __stdcall Ares::ExeRun()
 		}
 	}
 #endif
+
+	if (DetachFromDebugger())
+	{
+		MessageBoxW(NULL,
+			L"You can now attach a debugger.\n\n"
+
+			L"Press OK to continue YR execution.",
+			L"Debugger Notice", MB_OK);
+	}
+	else
+	{
+		MessageBoxW(NULL,
+			L"You can now attach a debugger.\n\n"
+
+			L"To attach a debugger find the YR process in Process Hacker "
+			L"/ Visual Studio processes window and detach debuggers from it, "
+			L"then you can attach your own debugger. After this you should "
+			L"terminate Syringe.exe because it won't automatically exit when YR is closed.\n\n"
+
+			L"Press OK to continue YR execution.",
+			L"Debugger Notice", MB_OK);
+	}
 }
 
 void __stdcall Ares::ExeTerminate()
@@ -217,10 +322,12 @@ bool __stdcall DllMain(HANDLE hInstance,DWORD dwReason,LPVOID v)
 {
 	switch(dwReason) {
 		case DLL_PROCESS_ATTACH:
+	{
 			Ares::hInstance = hInstance;
 //			Debug::LogFileOpen();
 //			Debug::Log("ATTACH\n");
 			Debug::LogFileRemove();
+	}
 			break;
 		case DLL_PROCESS_DETACH:
 //			Debug::Log("DETACH\n");
@@ -269,7 +376,8 @@ A_FINE_HOOK(55AFB3, Armageddon_Advance, 6)
 }
 */
 
-DEFINE_HOOK(7CD810, ExeRun, 9)
+// Hook Offsetted on 3.0 - Otamaa
+DEFINE_HOOK(7CD819, ExeRun, 5)
 {
 	Ares::ExeRun();
 	return 0;

@@ -54,12 +54,18 @@ DEFINE_HOOK(6CEF84, SuperWeaponTypeClass_GetCursorOverObject, 7)
 DEFINE_HOOK(653B3A, RadarClass_GetMouseAction_CustomSWAction, 5)
 {
 	int idxSWType = Unsorted::CurrentSWType;
+	enum 
+	{ 
+		CheckOtherCases = 0x653CA3, 
+		DrawMiniCursor = 0x653CC0, 
+		NothingToDo = 0, 
+		DifferentEventFlags = 0x653D6F 
+	};
 	if(idxSWType > -1) {
 		REF_STACK(const MouseEvent, EventFlags, 0x58);
 
-		if(EventFlags & (MouseEvent::RightDown | MouseEvent::RightUp)) {
-			return 0x653D6F;
-		}
+		if(EventFlags & (MouseEvent::RightDown | MouseEvent::RightUp))
+			return DifferentEventFlags;
 
 		SuperWeaponTypeClass *pThis = SuperWeaponTypeClass::Array->GetItem(idxSWType);
 		SWTypeExt::ExtData *pData = SWTypeExt::ExtMap.Find(pThis);
@@ -96,10 +102,12 @@ DEFINE_HOOK(653B3A, RadarClass_GetMouseAction_CustomSWAction, 5)
 				SWTypeExt::CurrentSWType = nullptr;
 				Actions::Set(&pData->SW_NoCursor, pData->SW_FireToShroud);
 			}
-			return 0x653CA3;
+			//check wheter to allow the action shown on minimap or not ! -Otamaa
+			return CheckOtherCases; //Cursor->MiniFrame == -1 ? CheckOtherCases : DrawMiniCursor;
 		}
 	}
-	return 0;
+
+	return NothingToDo;
 }
 
 DEFINE_HOOK(6AAEDF, SidebarClass_ProcessCameoClick_SuperWeapons, 6) {
@@ -202,10 +210,12 @@ DEFINE_HOOK(6CEE96, SuperWeaponTypeClass_GetTypeIndex, 5)
 
 // 4AC20C, 7
 // translates SW click to type
-DEFINE_HOOK(4AC20C, DisplayClass_LMBUp, 7)
+//DEFINE_HOOK(4AC20C, DisplayClass_LMBUp, 7)
+DEFINE_HOOK(4AC20C,DisplayClass_LeftMouseButtonUp, 7)
 {
-	auto Action = static_cast<enum class Action>(R->Stack32(0x9C));
-	if(Action < Actions::SuperWeaponDisallowed) {
+	GET_STACK(Action, nAction , 0x9C);
+
+	if(nAction < MouseCursorTypeClass::Actions::SuperWeaponDisallowed) {
 		// get the actual firing SW type instead of just the first type of the
 		// requested action. this allows clones to work for legacy SWs (the new
 		// ones use SW_*_CURSORs). we have to check that the action matches the
@@ -213,14 +223,14 @@ DEFINE_HOOK(4AC20C, DisplayClass_LMBUp, 7)
 		// action and we don't want to start a force shield even tough the UI
 		// says no.
 		auto pSW = SuperWeaponTypeClass::Array->GetItemOrDefault(Unsorted::CurrentSWType);
-		if(pSW && (pSW->Action != Action)) {
+		if(pSW && (pSW->Action != nAction)) {
 			pSW = nullptr;
 		}
 
 		R->EAX(pSW);
 		return pSW ? 0x4AC21C : 0x4AC294;
 	}
-	else if(Action == Actions::SuperWeaponDisallowed) {
+	else if(nAction == Actions::SuperWeaponDisallowed) {
 		R->EAX(0);
 		return 0x4AC294;
 	}

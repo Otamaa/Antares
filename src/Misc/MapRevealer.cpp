@@ -75,8 +75,8 @@ void MapRevealer::UpdateShroud(size_t start, size_t radius, bool fog) const {
 			auto const pCell = MapClass::Instance->GetCellAt(cell);
 
 			auto shroudedness = TacticalClass::Instance->GetOcclusion(cell, false);
-			if(pCell->Shroudedness != shroudedness) {
-				pCell->Shroudedness = static_cast<char>(shroudedness);
+			if(pCell->Visibility != shroudedness) {
+				pCell->Visibility = static_cast<char>(shroudedness);
 				pCell->VisibilityChanged = true;
 				TacticalClass::Instance->RegisterCellAsVisible(pCell);
 			}
@@ -90,13 +90,13 @@ void MapRevealer::Process0(CellClass* const pCell, bool unknown, bool fog, bool 
 	if(this->IsCellAllowed(pCell->MapCoords)) {
 		if(fog) {
 			if((pCell->Flags & 3) != 3 && pCell->CopyFlags & cf2_NoShadow) {
-				MouseClass::Instance->vt_entry_98(pCell->MapCoords, HouseClass::Player);
+				MouseClass::Instance->MapCellFoggedness(&pCell->MapCoords, HouseClass::Player);
 			}
 		} else {
 			if((pCell->CopyFlags & 0x18) != 0x18 || (pCell->Flags & 3) != 3) {
 				if(!unknown) {
 					if(add) {
-						MouseClass::Instance->vt_entry_94(pCell->MapCoords, HouseClass::Player, false);
+						MouseClass::Instance->RevealFogShroud(&pCell->MapCoords, HouseClass::Player, false);
 					} else {
 						pCell->Unshroud();
 					}
@@ -111,11 +111,11 @@ void MapRevealer::Process1(CellClass* const pCell, bool fog, bool add) const {
 
 	if(fog) {
 		if((pCell->Flags & 3) != 3 && pCell->CopyFlags & cf2_NoShadow) {
-			MouseClass::Instance->vt_entry_98(pCell->MapCoords, HouseClass::Player);
+			MouseClass::Instance->MapCellFoggedness(&pCell->MapCoords, HouseClass::Player);
 		}
 	} else {
 		if(this->IsCellAllowed(pCell->MapCoords)) {
-			MouseClass::Instance->vt_entry_94(pCell->MapCoords, HouseClass::Player, add);
+			MouseClass::Instance->RevealFogShroud(&pCell->MapCoords, HouseClass::Player, add);
 		}
 	}
 }

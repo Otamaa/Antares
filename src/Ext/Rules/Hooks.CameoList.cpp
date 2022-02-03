@@ -9,7 +9,7 @@
 #include <BuildingClass.h>
 #include <HouseClass.h>
 
-DynamicVectorClass<CameoDataStruct> RulesExt::TabCameos[4];
+DynamicVectorClass<BuildType> RulesExt::TabCameos[4];
 
 template <typename... Args>
 void DumpAndExit [[noreturn]] (const char* pMessage, Args... args) {
@@ -26,7 +26,7 @@ void RulesExt::ClearCameos() {
 	}
 }
 
-int IndexOfTab(TabDataStruct * tab) {
+int IndexOfTab(StripClass * tab) {
 	for(auto i = 0; i < 4; ++i) {
 		auto TestTab = &MouseClass::Instance->Tabs[i];
 		if(TestTab == tab) {
@@ -67,7 +67,7 @@ DEFINE_HOOK(6A61B1, SidebarClass_SetFactoryForObject, 0)
 		if(cameo.ItemIndex == ItemIndex && cameo.ItemType == ItemType) {
 			cameo.CurrentFactory = Factory;
 			auto &Tab = MouseClass::Instance->Tabs[TabIndex];
-			Tab.unknown_3C = 1;
+			Tab.NeedsRedraw = 1;
 			Tab.unknown_3D = 1;
 			MouseClass::Instance->RedrawSidebar(0);
 			return Found;
@@ -92,14 +92,14 @@ DEFINE_HOOK(6A63B7, SidebarClass_AddCameo_SkipSizeCheck, 0)
 		}
 	}
 
-	R->EDI<TabDataStruct *>(&MouseClass::Instance->Tabs[TabIndex]);
+	R->EDI<StripClass *>(&MouseClass::Instance->Tabs[TabIndex]);
 
 	return NewlyAdded;
 }
 
 DEFINE_HOOK(6A8710, TabCameoListClass_AddCameo_ReplaceItAll, 0)
 {
-	GET(TabDataStruct *, pTab, ECX);
+	GET(StripClass *, pTab, ECX);
 	GET_STACK(AbstractType, ItemType, 0x4);
 	GET_STACK(int, ItemIndex, 0x8);
 
@@ -109,7 +109,7 @@ DEFINE_HOOK(6A8710, TabCameoListClass_AddCameo_ReplaceItAll, 0)
 		DumpAndExit("Unsynchronized cameo counts @ %s: tab #%d, old %d, new %d\n", __FUNCTION__, TabIndex, pTab->CameoCount, cameos.Count);
 	}
 
-	CameoDataStruct newCameo(ItemIndex, ItemType);
+	BuildType newCameo(ItemIndex, ItemType);
 	if(ItemType == BuildingTypeClass::AbsID) {
 		newCameo.IsAlt = ObjectTypeClass::IsBuildCat5(ItemType, ItemIndex);
 	}
@@ -135,7 +135,7 @@ DEFINE_HOOK(6A8D1C, TabSidebarCameoClass_MouseMove_GetCameos1, 0)
 {
 	GET(int, CameoCount, EAX);
 
-	GET(TabDataStruct *, pTab, EBX);
+	GET(StripClass *, pTab, EBX);
 	auto TabIndex = IndexOfTab(pTab);
 	auto &cameos = RulesExt::TabCameos[TabIndex];
 	if(cameos.Count != CameoCount) {
@@ -146,7 +146,7 @@ DEFINE_HOOK(6A8D1C, TabSidebarCameoClass_MouseMove_GetCameos1, 0)
 		return 0x6A8D8B;
 	}
 
-	R->EDI<CameoDataStruct *>(cameos.Items);
+	R->EDI<BuildType *>(cameos.Items);
 
 	return 0x6A8D23;
 }
@@ -156,7 +156,7 @@ DEFINE_HOOK(6A8DB5, TabSidebarCameoClass_MouseMove_GetCameos2, 0)
 {
 	GET(int, CameoCount, EAX);
 
-	GET(TabDataStruct *, pTab, EBX);
+	GET(StripClass *, pTab, EBX);
 	auto TabIndex = IndexOfTab(pTab);
 	auto &cameos = RulesExt::TabCameos[TabIndex];
 	if(cameos.Count != CameoCount) {
@@ -177,7 +177,7 @@ DEFINE_HOOK(6A8DB5, TabSidebarCameoClass_MouseMove_GetCameos2, 0)
 // pointer #3
 DEFINE_HOOK(6A8F6C, TabSidebarCameoClass_MouseMove_GetCameos3, 0)
 {
-	GET(TabDataStruct *, pTab, ESI);
+	GET(StripClass *, pTab, ESI);
 	GET_STACK(int, unused, 0x20);
 
 	auto TabIndex = IndexOfTab(pTab);
@@ -479,7 +479,7 @@ DEFINE_HOOK(6ABBCB, TabCameoListClass_AbandonCameosFromFactory_GetPointer1, 0)
 {
 	GET(int, CameoCount, EAX);
 
-	GET(TabDataStruct *, pTab, ESI);
+	GET(StripClass *, pTab, ESI);
 	auto TabIndex = IndexOfTab(pTab);
 	auto &cameos = RulesExt::TabCameos[TabIndex];
 	if(CameoCount != cameos.Count) {
@@ -520,7 +520,7 @@ DEFINE_HOOK(6AA6EA, TabCameoListClass_RecheckCameos_Memcpy, 0)
 {
 	GET(int, CameoIndex, EAX);
 
-	GET(TabDataStruct *, pTab, EBP);
+	GET(StripClass *, pTab, EBP);
 	auto TabIndex = IndexOfTab(pTab);
 	auto &cameos = RulesExt::TabCameos[TabIndex];
 	if(CameoIndex >= cameos.Count) {
@@ -529,7 +529,7 @@ DEFINE_HOOK(6AA6EA, TabCameoListClass_RecheckCameos_Memcpy, 0)
 
 	auto ptr = &cameos.Items[CameoIndex];
 
-	R->ESI<CameoDataStruct *>(ptr);
+	R->ESI<BuildType *>(ptr);
 	R->EBX<int>(R->Stack<int>(0x30));
 	R->ECX<int>(0xD);
 
@@ -538,7 +538,7 @@ DEFINE_HOOK(6AA6EA, TabCameoListClass_RecheckCameos_Memcpy, 0)
 
 DEFINE_HOOK(6AA711, TabCameoListClass_RecheckCameos_FilterAllowedCameos, 0)
 {
-	GET(TabDataStruct *, pTab, EBP);
+	GET(StripClass *, pTab, EBP);
 	auto TabIndex = IndexOfTab(pTab);
 	auto &cameos = RulesExt::TabCameos[TabIndex];
 
@@ -547,7 +547,7 @@ DEFINE_HOOK(6AA711, TabCameoListClass_RecheckCameos_FilterAllowedCameos, 0)
 	}
 
 	GET_STACK(int, StripLength, 0x30);
-	GET_STACK(CameoDataStruct *, StripData, 0x1C);
+	GET_STACK(BuildType *, StripData, 0x1C);
 
 	for(auto ix = cameos.Count; ix > 0; --ix) {
 		auto &cameo = cameos[ix - 1];
@@ -557,7 +557,7 @@ DEFINE_HOOK(6AA711, TabCameoListClass_RecheckCameos_FilterAllowedCameos, 0)
 		if(TechnoType) {
 			auto Factory = TechnoType->FindFactory(true, false, false, HouseClass::Player);
 			if(Factory) {
-				KeepCameo = !!Factory->Owner->CanBuild(TechnoType, false, true);
+				KeepCameo = !!(int)(Factory->Owner->CanBuild(TechnoType, false, true));
 			}
 		} else {
 			auto &Supers = HouseClass::Player->Supers;
@@ -596,7 +596,7 @@ DEFINE_HOOK(6AA711, TabCameoListClass_RecheckCameos_FilterAllowedCameos, 0)
 			for(auto ixStrip = StripLength; ixStrip > 0; --ixStrip) {
 				auto &stripCameo = StripData[ixStrip - 1];
 				if(stripCameo == cameo) {
-					stripCameo = CameoDataStruct();
+					stripCameo = BuildType();
 				}
 			}
 
@@ -616,10 +616,10 @@ DEFINE_HOOK(6AAC10, TabCameoListClass_RecheckCameos_GetPointer, 0)
 {
 	R->Stack<int>(0x10, R->ECX<int>());
 
-	GET(TabDataStruct *, pTab, EBP);
+	GET(StripClass *, pTab, EBP);
 	auto TabIndex = IndexOfTab(pTab);
 	auto &cameos = RulesExt::TabCameos[TabIndex];
-	R->ECX<CameoDataStruct *>(cameos.Items);
+	R->ECX<BuildType *>(cameos.Items);
 
 	return 0x6AAC17;
 }
@@ -630,7 +630,7 @@ DEFINE_HOOK(6A7D4A, MouseClass_RecheckCameos_TrapAlignment, 6)
 
 	pTabData -= 0x3C;
 
-	auto pTab = reinterpret_cast<TabDataStruct *>(pTabData);
+	auto pTab = reinterpret_cast<StripClass *>(pTabData);
 	auto TabIndex = IndexOfTab(pTab);
 	auto &cameos = RulesExt::TabCameos[TabIndex];
 	if(cameos.Count != pTab->CameoCount) {
