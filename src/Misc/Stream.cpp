@@ -74,7 +74,7 @@ bool AresStreamReader::RegisterChange(void* newPtr) {
 
 	long oldPtr = 0;
 	if(this->Load(oldPtr)) {
-		if(SUCCEEDED(SwizzleManagerClass::Instance.Here_I_Am(oldPtr, newPtr))) {
+		if(SUCCEEDED(SwizzleManagerClass::Instance().Here_I_Am(oldPtr, newPtr))) {
 			return true;
 		}
 

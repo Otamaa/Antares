@@ -326,7 +326,7 @@ void SW_ParaDrop::SendPDPlane(HouseClass* pOwner, CellClass* pTarget, AircraftTy
 	auto const spawn_crd = CellClass::Cell2Coord(spawn_cell);
 
 	++Unsorted::IKnowWhatImDoing;
-	auto const bSpawned = pPlane->Put(spawn_crd, Direction::North);
+	auto const bSpawned = pPlane->Unlimbo(spawn_crd, Direction::N);
 	--Unsorted::IKnowWhatImDoing;
 
 	if(!bSpawned) {
@@ -342,7 +342,7 @@ void SW_ParaDrop::SendPDPlane(HouseClass* pOwner, CellClass* pTarget, AircraftTy
 		if(abs == AbstractType::UnitType || abs == AbstractType::InfantryType) {
 			for(int k = 0; k < Nums[i]; ++k) {
 				auto const pNew = pType->CreateObject(pOwner);
-				pNew->Remove();
+				pNew->Limbo();
 				pPlane->Passengers.AddPassenger(static_cast<FootClass*>(pNew));
 			}
 		}

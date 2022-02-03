@@ -293,7 +293,7 @@ void ChronoWarpStateMachine::Update()
 
 		// remove all buildings from the map at once
 		for(auto const& item : buildings) {
-			item.building->Remove();
+			item.building->Limbo();
 			item.building->ActuallyPlacedOnMap = false;
 		}
 
@@ -316,7 +316,7 @@ void ChronoWarpStateMachine::Update()
 					auto const pNewCell = MapClass::Instance->GetCellAt(cellNew);
 					auto const coordsNew = pNewCell->GetCoordsWithBridge();
 
-					if(pBld->Put(coordsNew, Direction::North)) {
+					if(pBld->Unlimbo(coordsNew, Direction::N)) {
 						success = true;
 						break;
 					}
@@ -326,7 +326,7 @@ void ChronoWarpStateMachine::Update()
 			if(!success) {
 				// put it back where it was
 				++Unsorted::IKnowWhatImDoing;
-				pBld->Put(item.origin, Direction::North);
+				pBld->Unlimbo(item.origin, Direction::N);
 				pBld->Place(false);
 				--Unsorted::IKnowWhatImDoing;
 			}

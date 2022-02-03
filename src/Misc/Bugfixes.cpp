@@ -1311,7 +1311,7 @@ DEFINE_HOOK(449FF8, BuildingClass_Mi_Selling_PutMcv, 7)
 
 	// set the override for putting, not just for creation as WW did
 	++Unsorted::IKnowWhatImDoing;
-	auto const ret = pUnit->Put(Crd, facing);
+	auto const ret = pUnit->Unlimbo(Crd, facing);
 	--Unsorted::IKnowWhatImDoing;
 
 	// should never happen, but if anything breaks, it's here

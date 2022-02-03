@@ -132,11 +132,11 @@ void UnitDeliveryStateMachine::PlaceUnits()
 
 			// place and set up
 			auto XYZ = pCell->GetCoordsWithBridge();
-			if(Item->Put(XYZ, (MapClass::GetCellIndex(pCell->MapCoords) & 7u))) {
+			if(Item->Unlimbo(XYZ, (MapClass::GetCellIndex(pCell->MapCoords) & 7u))) {
 				if(ItemBuilding) {
 					if(pData->SW_DeliverBuildups) {
 						ItemBuilding->DiscoveredBy(this->Super->Owner);
-						ItemBuilding->unknown_bool_6DD = 1;
+						ItemBuilding->IsReadyToCommence = 1;
 					}
 				} else if(pType->BalloonHover || pType->JumpJet) {
 					Item->Scatter(CoordStruct::Empty, true, false);

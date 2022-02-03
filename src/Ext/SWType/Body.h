@@ -35,31 +35,6 @@ struct AITargetingModeInfo {
 	SuperWeaponAffectedHouse House;
 };
 
-struct SWRange {
-	SWRange(float widthOrRange = -1.0f, int height = -1) : WidthOrRange(widthOrRange), Height(height) {}
-	SWRange(int widthOrRange, int height = -1) : WidthOrRange(static_cast<float>(widthOrRange)), Height(height) {}
-
-	float range() const {
-		return this->WidthOrRange;
-	}
-
-	int width() const {
-		return static_cast<int>(this->WidthOrRange);
-	}
-
-	int height() const {
-		return this->Height;
-	}
-
-	bool empty() const {
-		return this->WidthOrRange < 0.0
-			&& this->Height < 0;
-	}
-
-	float WidthOrRange;
-	int Height;
-};
-
 struct LightingColor {
 	int Red, Green, Blue, Ambient;
 	bool HasValue;

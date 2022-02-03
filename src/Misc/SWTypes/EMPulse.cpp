@@ -90,7 +90,7 @@ bool SW_EMPulse::Activate(SuperClass* pThis, const CellStruct &Coords, bool IsPl
 
 				if(auto pBullet = pExt->CreateBullet(pBld, pBld, pWeapon)) {
 					pBullet->SetWeaponType(pWeapon);
-					pBullet->Remove();
+					pBullet->Limbo();
 					pBullet->Detonate(BuildingExt::GetCenterCoords(pBld));
 					pBullet->Release();
 				}

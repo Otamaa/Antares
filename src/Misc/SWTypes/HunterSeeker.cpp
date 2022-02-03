@@ -105,7 +105,7 @@ bool SW_HunterSeeker::Activate(SuperClass* pThis, const CellStruct &Coords, bool
 			// put it on the map and let it go
 			CoordStruct crd = CellClass::Cell2Coord(cell);
 
-			if(pHunter->Put(crd, 64)) {
+			if(pHunter->Unlimbo(crd, 64)) {
 				pHunter->Locomotor->Acquire_Hunter_Seeker_Target();
 				pHunter->QueueMission(Mission::Attack, false);
 				pHunter->NextMission();

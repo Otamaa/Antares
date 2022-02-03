@@ -55,7 +55,7 @@ bool SW_Reveal::Activate(SuperClass* const pThis, const CellStruct &Coords, bool
 
 				if(range.WidthOrRange < 0.0) {
 					// reveal all cells without hundred thousands function calls
-					auto const Map = MapClass::Instance;
+					auto const Map = MapClass::Instance();
 					Map->CellIteratorReset();
 					while(auto const pCell = Map->CellIteratorNext()) {
 						if(revealer.IsCellAvailable(pCell->MapCoords) && revealer.IsCellAllowed(pCell->MapCoords)) {

@@ -67,7 +67,7 @@ bool SW_SonarPulse::Activate(SuperClass* const pThis, const CellStruct &Coords, 
 
 		auto const pExt = TechnoExt::ExtMap.Find(pTechno);
 		auto const delay = Math::max(
-			pExt->CloakSkipTimer.GetTimeLeft(), pData->Sonar_Delay);
+			pExt->CloakSkipTimer.GetTimeLeft(), pData->Sonar_Delay.Get());
 		pExt->CloakSkipTimer.Start(delay);
 
 		// actually detect this

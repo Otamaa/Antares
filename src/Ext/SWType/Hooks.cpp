@@ -215,7 +215,7 @@ DEFINE_HOOK(4AC20C,DisplayClass_LeftMouseButtonUp, 7)
 {
 	GET_STACK(Action, nAction , 0x9C);
 
-	if(nAction < MouseCursorTypeClass::Actions::SuperWeaponDisallowed) {
+	if(nAction < Actions::SuperWeaponDisallowed) {
 		// get the actual firing SW type instead of just the first type of the
 		// requested action. this allows clones to work for legacy SWs (the new
 		// ones use SW_*_CURSORs). we have to check that the action matches the

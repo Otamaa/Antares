@@ -71,11 +71,11 @@ DEFINE_HOOK(5BDC8C, Actions_PrepareCursor, 7)
 	MouseCursor* pCursor;
 
 	unsigned int CursorIndex = R->EAX();
-	if(CursorIndex > MouseCursor::CursorCount) {
+	if(CursorIndex > MouseCursor::DefaultCursorsCount) {
 		//don't try this at home
 		pCursor = reinterpret_cast<MouseCursor*>(CursorIndex);
 	} else {
-		pCursor = &MouseCursor::First[CursorIndex];
+		pCursor = &MouseCursor::DefaultCursors[CursorIndex];
 	}
 
 	Actions::TempCursor = pCursor; //setting temp cursor for use in Actions_SetCursor!

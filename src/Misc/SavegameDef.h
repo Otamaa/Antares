@@ -430,8 +430,8 @@ namespace Savegame {
 	};
 
 	template <>
-	struct Savegame::AresStreamObject<CameoDataStruct> {
-		bool ReadFromStream(AresStreamReader &Stm, CameoDataStruct &Value, bool RegisterForChange) const {
+	struct Savegame::AresStreamObject<BuildType> {
+		bool ReadFromStream(AresStreamReader &Stm, BuildType&Value, bool RegisterForChange) const {
 			if(!Stm.Load(Value)) {
 				return false;
 			}
@@ -443,7 +443,7 @@ namespace Savegame {
 			return true;
 		}
 
-		bool WriteToStream(AresStreamWriter &Stm, const CameoDataStruct &Value) const {
+		bool WriteToStream(AresStreamWriter &Stm, const BuildType&Value) const {
 			Stm.Save(Value);
 			return true;
 		}
