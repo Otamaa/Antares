@@ -15,19 +15,22 @@
 // #664: Advanced Rubble - reconstruction part: Check
 
 //DEFINE_HOOK(51E63A, InfantryClass_GetCursorOverObject_EngineerOverFriendlyBuilding, 6)
-DEFINE_HOOK(51E635 ,nfantryClass_GetActionOnObject_EngineerOverFriendlyBuilding, 5)
+DEFINE_HOOK(51E635 ,InfantryClass_GetActionOnObject_EngineerOverFriendlyBuilding, 5)
  {
+	enum { DontRepair = 0x51E63A, DoRepair = 0x51E659, SkipAll = 0x51E458 };
+
 	GET(BuildingClass *, pTarget, ESI);
 	GET(InfantryClass *, pThis, EDI);
 
 	if(BuildingTypeExt::ExtData* pData = BuildingTypeExt::ExtMap.Find(pTarget->Type)) {
 		if((pData->RubbleIntact || pData->RubbleIntactRemove) && pTarget->Owner->IsAlliedWith(pThis)) {
+			//ares insert custom cursor here -Otamaa
 			R->EAX(Action::GRepair);
-			return 0x51E458;
+			return SkipAll;
 		}
 	}
 
-	return ((R->EAX<BYTE>() & 0x4000)!= 0 ) ? 0x51E63A:0x51E659;
+	return ((R->AH() & 0x40) != 0) ? DontRepair : DoRepair;
 }
 
 // #664: Advanced Rubble - reconstruction part: Reconstruction
