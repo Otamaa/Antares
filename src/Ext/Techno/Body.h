@@ -89,6 +89,8 @@ public:
 		SuperClass* SuperWeapon; // the super weapon somehow attached to this (not provided by this)
 		AbstractClass* SuperTarget; // the attached super weapon's target (if any)
 
+		bool SupressLostEva;
+
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject),
 			idxSlot_Wave(0),
 			idxSlot_Beam(0),
@@ -120,7 +122,8 @@ public:
 			Crate_FirepowerMultiplier(1.0),
 			Crate_ArmorMultiplier(1.0),
 			Crate_SpeedMultiplier(1.0),
-			Crate_Cloakable(false)
+			Crate_Cloakable(false),
+			SupressLostEva(false)
 		{ }
 
 		virtual ~ExtData() {

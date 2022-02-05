@@ -88,6 +88,7 @@ public:
 		Valueable<bool> SuppressDeathWeapon_Vehicles;
 		Valueable<bool> SuppressDeathWeapon_Infantry;
 		ValueableVector<TechnoTypeClass*> SuppressDeathWeapon;
+		Valueable<bool> Supress_LostEva;
 
 		ExtData(WarheadTypeClass* OwnerObject) : Extension<WarheadTypeClass>(OwnerObject),
 			MindControl_Permanent(false),
@@ -108,7 +109,8 @@ public:
 			PreventScatter(false),
 			CellSpread_MaxAffect(-1),
 			DamageAirThreshold(0),
-			AttachedEffect(OwnerObject)
+			AttachedEffect(OwnerObject),
+			Supress_LostEva(false)
 		{
 			VersesData vs;
 			for(int i = 0; i < 11; ++i) {

@@ -1359,7 +1359,10 @@ void TechnoExt::ExtData::Serialize(T& Stm) {
 		.Process(this->AltOccupation)
 		.Process(this->PayloadCreated)
 		.Process(this->SuperWeapon)
-		.Process(this->SuperTarget);
+		.Process(this->SuperTarget)
+		//
+		.Process(this->SupressLostEva)
+		;
 }
 
 void TechnoExt::ExtData::LoadFromStream(AresStreamReader &Stm) {

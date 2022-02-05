@@ -4,6 +4,7 @@
 #include "../Techno/Body.h"
 #include "../TechnoType/Body.h"
 #include "../../Misc/Network.h"
+#include <Ext/House/Body.h>
 
 #include <SpecificStructures.h>
 #include <ScenarioClass.h>
@@ -23,7 +24,7 @@
 
 DEFINE_HOOK(44D8A1, BuildingClass_UnloadPassengers_Unload, 6)
 {
-	GET(BuildingClass *, B, EBP);
+	GET(BuildingClass*, B, EBP);
 
 	BuildingExt::KickOutHospitalArmory(B);
 	return 0;
@@ -53,9 +54,9 @@ DEFINE_HOOK(43BA48, BuildingClass_CTOR_VeteranBuildings, 6)
 	GET(BuildingClass*, pThis, ESI);
 	GET(BuildingTypeClass*, pType, EAX);
 
-	if(auto pOwner = pThis->Owner) {
-		if(auto pExt = HouseTypeExt::ExtMap.Find(pOwner->Type)) {
-			if(pExt->VeteranBuildings.Contains(pType)) {
+	if (auto pOwner = pThis->Owner) {
+		if (auto pExt = HouseTypeExt::ExtMap.Find(pOwner->Type)) {
+			if (pExt->VeteranBuildings.Contains(pType)) {
 				pThis->Veterancy.SetVeteran(true);
 			}
 		}
@@ -71,9 +72,10 @@ DEFINE_HOOK(44D755, BuildingClass_GetPipFillLevel_Tiberium, 6)
 	GET(BuildingTypeClass*, pType, ESI);
 
 	double amount = 0.0;
-	if(pType->Storage > 0) {
+	if (pType->Storage > 0) {
 		amount = pThis->Tiberium.GetTotalAmount() / pType->Storage;
-	} else {
+	}
+	else {
 		amount = pThis->Owner->GetStoragePercentage();
 	}
 
@@ -89,8 +91,8 @@ DEFINE_HOOK(709B4E, TechnoClass_DrawPipscale_SkipSkipTiberium, 6)
 	GET(TechnoClass*, pThis, EBP);
 
 	bool showTiberium = true;
-	if(auto pType = specific_cast<BuildingTypeClass*>(pThis->GetTechnoType())) {
-		if((pType->Refinery || pType->ResourceDestination) && pType->Storage > 0) {
+	if (auto pType = specific_cast<BuildingTypeClass*>(pThis->GetTechnoType())) {
+		if ((pType->Refinery || pType->ResourceDestination) && pType->Storage > 0) {
 			// show only if this refinery uses storage. otherwise, the original
 			// refineries would show an unused tiberium pip scale
 			auto pExt = TechnoTypeExt::ExtMap.Find(pType);
@@ -149,21 +151,21 @@ DEFINE_HOOK(44840B, BuildingClass_ChangeOwnership_Tech, 6)
 	GET(BuildingClass*, pThis, ESI);
 	GET(HouseClass*, pNewOwner, EBX);
 
-	if(pThis->Owner != pNewOwner) {
+	if (pThis->Owner != pNewOwner) {
 		const auto pExt = BuildingTypeExt::ExtMap.Find(pThis->Type);
 
 		auto PrintMessage = [](const CSFText& text) {
-			if(!text.empty()) {
+			if (!text.empty()) {
 				auto color = HouseClass::Player->ColorSchemeIndex;
 				MessageListClass::Instance->PrintMessage(text, RulesClass::Instance->MessageDelay, color);
 			}
 		};
 
-		if(pThis->Owner->ControlledByPlayer()) {
+		if (pThis->Owner->ControlledByPlayer()) {
 			VoxClass::PlayIndex(pExt->LostEvaEvent);
 			PrintMessage(pExt->MessageLost);
 		}
-		if(pNewOwner->ControlledByPlayer()) {
+		if (pNewOwner->ControlledByPlayer()) {
 			VoxClass::PlayIndex(pThis->Type->CaptureEvaEvent);
 			PrintMessage(pExt->MessageCapture);
 		}
@@ -180,7 +182,7 @@ DEFINE_HOOK(4409F4, BuildingClass_Put_ProduceCash, 6)
 
 	auto pExt = BuildingExt::ExtMap.Find(pToUpgrade);
 
-	if(auto delay = pThis->Type->ProduceCashDelay) {
+	if (auto delay = pThis->Type->ProduceCashDelay) {
 		pExt->CashUpgradeTimers[pToUpgrade->UpgradeLevel - 1].Start(delay);
 	}
 
@@ -193,10 +195,10 @@ DEFINE_HOOK(43FD2C, BuildingClass_Update_ProduceCash, 6)
 	auto pExt = BuildingExt::ExtMap.Find(pThis);
 
 	auto Process = [](BuildingClass* pBld, BuildingTypeClass* pType, TimerStruct& timer) {
-		if(timer.GetTimeLeft() == 1) {
+		if (timer.GetTimeLeft() == 1) {
 			timer.Start(pType->ProduceCashDelay);
 
-			if(!pBld->Owner->Type->MultiplayPassive && pBld->IsPowerOnline()) {
+			if (!pBld->Owner->Type->MultiplayPassive && pBld->IsPowerOnline()) {
 				pBld->Owner->TransactMoney(pType->ProduceCashAmount);
 			}
 		}
@@ -204,8 +206,8 @@ DEFINE_HOOK(43FD2C, BuildingClass_Update_ProduceCash, 6)
 
 	Process(pThis, pThis->Type, pThis->CashProductionTimer);
 
-	for(size_t i = 0; i < 3; ++i) {
-		if(const auto& pUpgrade = pThis->Upgrades[i]) {
+	for (size_t i = 0; i < 3; ++i) {
+		if (const auto& pUpgrade = pThis->Upgrades[i]) {
 			Process(pThis, pUpgrade, pExt->CashUpgradeTimers[i]);
 		}
 	}
@@ -220,7 +222,7 @@ DEFINE_HOOK(4482BD, BuildingClass_ChangeOwnership_ProduceCash, 6)
 	auto pExt = BuildingExt::ExtMap.Find(pThis);
 
 	auto Process = [](HouseClass* pOwner, BuildingTypeClass* pType, TimerStruct& timer) {
-		if(pType->ProduceCashStartup) {
+		if (pType->ProduceCashStartup) {
 			pOwner->TransactMoney(pType->ProduceCashStartup);
 			timer.Start(pType->ProduceCashDelay);
 		}
@@ -228,8 +230,8 @@ DEFINE_HOOK(4482BD, BuildingClass_ChangeOwnership_ProduceCash, 6)
 
 	Process(pNewOwner, pThis->Type, pThis->CashProductionTimer);
 
-	for(size_t i = 0; i < 3; ++i) {
-		if(const auto& pUpgrade = pThis->Upgrades[i]) {
+	for (size_t i = 0; i < 3; ++i) {
+		if (const auto& pUpgrade = pThis->Upgrades[i]) {
 			Process(pNewOwner, pUpgrade, pExt->CashUpgradeTimers[i]);
 		}
 	}
@@ -278,8 +280,8 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 	// update all dockers, check if there's
 	// at least one needing more attention
 	bool keep_reloading = false;
-	for(auto i = 0; i < pThis->RadioLinks.Capacity; ++i) {
-		if(auto const pLink = pThis->GetNthLink(i)) {
+	for (auto i = 0; i < pThis->RadioLinks.Capacity; ++i) {
+		if (auto const pLink = pThis->GetNthLink(i)) {
 
 			auto const SendCommand = [=](RadioCommand command) {
 				auto const response = pThis->SendCommand(command, pLink);
@@ -291,10 +293,10 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 			auto done = SendCommand(RadioCommand::QueryReadiness)
 				&& pLink->Health == pLinkType->Strength;
 
-			if(!done) {
+			if (!done) {
 				// check if docked
 				auto const miss = pLink->GetCurrentMission();
-				if(miss == Mission::Enter 
+				if (miss == Mission::Enter
 					|| !SendCommand(RadioCommand::QueryMoving))
 				{
 					continue;
@@ -303,14 +305,14 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 				keep_reloading = true;
 
 				// make the unit sleep first
-				if(miss != Mission::Sleep) {
+				if (miss != Mission::Sleep) {
 					pLink->QueueMission(Mission::Sleep, false);
 					continue;
 				}
 
 				// check whether the timer completed
 				auto const last_timer = pExt->DockReloadTimers[i];
-				if(last_timer > Unsorted::CurrentFrame) {
+				if (last_timer > Unsorted::CurrentFrame) {
 					continue;
 				}
 
@@ -322,7 +324,7 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 				pExt->DockReloadTimers[i] = Unsorted::CurrentFrame + frames;
 
 				// only reload if the timer was not outdated
-				if(last_timer != Unsorted::CurrentFrame) {
+				if (last_timer != Unsorted::CurrentFrame) {
 					continue;
 				}
 
@@ -331,7 +333,7 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 					&& !SendCommand(RadioCommand::RequestRepair);
 			}
 
-			if(done) {
+			if (done) {
 				pLink->EnterIdleMode(false, 1);
 				pLink->ForceMission(Mission::Guard);
 				pLink->ProceedToNextPlanningWaypoint();
@@ -341,10 +343,11 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 		}
 	}
 
-	if(keep_reloading) {
+	if (keep_reloading) {
 		// update each frame
 		R->EAX(1);
-	} else {
+	}
+	else {
 		pThis->QueueMission(Mission::Guard, false);
 		R->EAX(3);
 	}
@@ -353,10 +356,26 @@ DEFINE_HOOK(44C844, BuildingClass_MissionRepair_Reload, 6)
 }
 
 //51E4ED = InfantryClass_GetActionOnObject_EngineerRepairable, 6
-DEFINE_HOOK(51FA82 ,InfantryClass_GetActionOnCell_EngineerRepairable, 6)
+DEFINE_HOOK(51FA82, InfantryClass_GetActionOnCell_EngineerRepairable, 6)
 {
 	GET(BuildingTypeClass*, pBuildingType, EBP);
 	auto const& pTypeExt = BuildingTypeExt::ExtMap.Find(pBuildingType);
 	R->EAX(pTypeExt->EngineerRepairable.Get(pBuildingType->Repairable));
 	return 0x51FA88;
+}
+
+DEFINE_HOOK(449518, BuildingClass_IsSellable_FirestormWall, 6)
+{
+	enum
+	{
+		CannotDemolish = 0x449536,
+		CheckHouseActiveFirestorm = 0x449522,
+		Demolish = 0x449532
+	};
+
+	GET(BuildingClass*, pThis, ESI);
+
+	auto pBldExt = BuildingTypeExt::ExtMap.Find(pThis->Type);
+
+	return pBldExt->Firewall_Is ? CheckHouseActiveFirestorm : CannotDemolish;
 }

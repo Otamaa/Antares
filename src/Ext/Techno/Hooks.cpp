@@ -1504,8 +1504,10 @@ DEFINE_HOOK(4D98C0, FootClass_Destroyed, A) {
 		&& pThis->Owner->ControlledByPlayer())
 	{
 		auto pExt = TechnoTypeExt::ExtMap.Find(pType);
+		auto pTechExt = TechnoExt::ExtMap.Find(pThis);
 		int idx = pExt->EVA_UnitLost;
-		if(idx != -1) {
+
+		if(idx != -1 && !pTechExt->SupressLostEva) {
 			CellStruct cell = pThis->GetMapCoords();
 			RadarEventClass::Create(RadarEventType::UnitLost, cell);
 			VoxClass::PlayIndex(idx, -1, -1);

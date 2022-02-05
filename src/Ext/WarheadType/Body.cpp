@@ -113,6 +113,8 @@ void WarheadTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->SuppressDeathWeapon_Vehicles.Read(exINI, section, "DeathWeapon.SuppressVehicles");
 	this->SuppressDeathWeapon_Infantry.Read(exINI, section, "DeathWeapon.SuppressInfantry");
 	this->SuppressDeathWeapon.Read(exINI, section, "DeathWeapon.Suppress");
+
+	this->Supress_LostEva.Read(exINI, section, "UnitLost.Suppress");
 };
 
 /*!
@@ -558,7 +560,12 @@ void WarheadTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->DamageAirThreshold)
 		.Process(this->SuppressDeathWeapon_Vehicles)
 		.Process(this->SuppressDeathWeapon_Infantry)
-		.Process(this->SuppressDeathWeapon);
+		.Process(this->SuppressDeathWeapon)
+		
+		//
+		.Process(this->Supress_LostEva)
+		
+		;
 }
 
 void WarheadTypeExt::ExtData::LoadFromStream(AresStreamReader &Stm) {
