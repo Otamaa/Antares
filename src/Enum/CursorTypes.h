@@ -43,8 +43,12 @@ public:
 	static const Action SuperWeaponAllowed = static_cast<Action>(0x7F);
 	static const Action SuperWeaponDisallowed = static_cast<Action>(0x7E);
 	static MouseCursor* TempCursor;
-	// i want to use std::map<> , but it missing .contains() because i use std:c++ 17 atm ! - Otamaa
-	static AresMap<Action, int> ActionCursor_Map;
+
+	static bool IsMapcontains(Action other) {
+		return ActionCursor_Map.find(other) != ActionCursor_Map.end();
+	}
+
+	static std::map<Action, int> ActionCursor_Map;
 
 	static void Clear() {} //do nothing 
 	static void CleanUp() 

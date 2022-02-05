@@ -8,7 +8,7 @@
 #include <Ext/BuildingType/Body.h>
 
 Enumerable<CursorType>::container_t Enumerable<CursorType>::Array;
-AresMap<Action, int> CursorType::ActionCursor_Map;
+std::map<Action, int> CursorType::ActionCursor_Map;
 MouseCursor* CursorType::TempCursor;
 
 const char* Enumerable<CursorType>::GetMainSection()
@@ -509,7 +509,7 @@ DEFINE_HOOK(4AB35A, DisplayClass_SetAction_CustomCursor, 6)
 		SetAttackCursorOrRetAction(nAction);
 	}
 
-	if (CursorType::ActionCursor_Map.contains(nAction))
+	if (CursorType::IsMapcontains(nAction))
 		nType = (MouseCursorType)CursorType::ActionCursor_Map[nAction];
 
 	//if default cursor is still present 
