@@ -97,6 +97,40 @@ DEFINE_HOOK(7384BD, UnitClass_ReceiveDamage_OreMinerUnderAttack, 6)
 	return !pData->Malicious ? 0x738535u : 0u;
 }
 
+//
+
+DEFINE_HOOK(442974, BuildingClass_ReceiveDamage_Malicious, 6)
+{
+	GET(BuildingClass*, pBuilding, ESI);
+	GET_STACK(WarheadTypeClass*, pWarhead, 0xA8);
+
+	WarheadTypeExt::Malicious_WH = pWarhead;
+	pBuilding->BuildingUnderAttack();
+	WarheadTypeExt::Malicious_WH = nullptr;
+
+	return 0x442980;
+}
+
+DEFINE_HOOK(44266B, BuildingClass_ReceiveDamage_Destroyed, 6)
+{
+	GET(BuildingClass*, pBuilding, ESI);
+	GET(TechnoClass*, pDestroyer, EBP);
+
+	pBuilding->Destroyed(pDestroyer);
+	return 0;
+}
+
+DEFINE_HOOK(4F94A5, HouseClass_BuildingUnderAttack, 6)
+{
+	if (auto pWarhead = WarheadTypeExt::Malicious_WH)
+		if (auto pData = WarheadTypeExt::ExtMap.Find(pWarhead))
+			if (!pData->Malicious)
+				return 0x4F95D4;
+
+	return 0;
+}
+
+/*
 DEFINE_HOOK(4F94A5, HouseClass_BuildingUnderAttack, 6)
 {
 	GET_STACK(DWORD, Caller, 0x14);
@@ -110,7 +144,7 @@ DEFINE_HOOK(4F94A5, HouseClass_BuildingUnderAttack, 6)
 		}
 	}
 	return 0;
-}
+}*/
 
 DEFINE_HOOK(702669, TechnoClass_ReceiveDamage_SuppressDeathWeapon, 9)
 {

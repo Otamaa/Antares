@@ -32,7 +32,7 @@ WarheadTypeExt::ExtContainer WarheadTypeExt::ExtMap;
 AresMap<IonBlastClass*, const WarheadTypeExt::ExtData*> WarheadTypeExt::IonExt;
 
 WarheadTypeClass * WarheadTypeExt::Temporal_WH = nullptr;
-
+WarheadTypeClass* WarheadTypeExt::Malicious_WH = nullptr;
 WarheadTypeClass * WarheadTypeExt::EMP_WH = nullptr;
 
 void WarheadTypeExt::ExtData::Initialize() {
@@ -574,6 +574,7 @@ void WarheadTypeExt::ExtData::SaveToStream(AresStreamWriter &Stm) {
 bool WarheadTypeExt::LoadGlobals(AresStreamReader& Stm) {
 	return Stm
 		.Process(Temporal_WH)
+		.Process(Malicious_WH)
 		.Process(EMP_WH)
 		.Process(IonExt)
 		.Success();
@@ -582,6 +583,7 @@ bool WarheadTypeExt::LoadGlobals(AresStreamReader& Stm) {
 bool WarheadTypeExt::SaveGlobals(AresStreamWriter& Stm) {
 	return Stm
 		.Process(Temporal_WH)
+		.Process(Malicious_WH)
 		.Process(EMP_WH)
 		.Process(IonExt)
 		.Success();
@@ -590,13 +592,14 @@ bool WarheadTypeExt::SaveGlobals(AresStreamWriter& Stm) {
 // =============================
 // container
 
-WarheadTypeExt::ExtContainer::ExtContainer() : Container("WarheadTypeClass") {
-}
-
+WarheadTypeExt::ExtContainer::ExtContainer() : Container("WarheadTypeClass") {}
 WarheadTypeExt::ExtContainer::~ExtContainer() = default;
 
-void WarheadTypeExt::ExtContainer::InvalidatePointer(void* ptr, bool bRemoved) {
+void WarheadTypeExt::ExtContainer::InvalidatePointer(void* ptr, bool bRemoved)
+{
 	AnnounceInvalidPointer(WarheadTypeExt::Temporal_WH, ptr);
+	AnnounceInvalidPointer(WarheadTypeExt::EMP_WH, ptr);
+	AnnounceInvalidPointer(WarheadTypeExt::Malicious_WH, ptr);
 }
 
 // =============================

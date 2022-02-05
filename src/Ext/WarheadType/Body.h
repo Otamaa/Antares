@@ -165,7 +165,7 @@ public:
 	static bool SaveGlobals(AresStreamWriter& Stm);
 
 	static WarheadTypeClass *Temporal_WH;
-
+	static WarheadTypeClass *Malicious_WH;
 	static WarheadTypeClass *EMP_WH;
 
 	static AresMap<IonBlastClass*, const WarheadTypeExt::ExtData*> IonExt;
