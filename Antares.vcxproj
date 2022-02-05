@@ -261,6 +261,7 @@
     <ClCompile Include="src\Ext\BuildingType\PrismForward.cpp" />
     <ClCompile Include="src\Ext\Building\Body.cpp" />
     <ClCompile Include="src\Ext\Building\Hooks.cpp" />
+    <ClCompile Include="src\Ext\BuildingType\Hooks.DockUnload.cpp" />
     <ClCompile Include="src\Ext\Building\Hooks.Firewall.cpp" />
     <ClCompile Include="src\Ext\Building\Hooks.Foundation.cpp" />
     <ClCompile Include="src\Ext\Building\Hooks.Gates.cpp" />

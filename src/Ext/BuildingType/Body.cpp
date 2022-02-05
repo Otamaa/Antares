@@ -254,6 +254,9 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	//this->AIExtraCounts.Read(exINI, pID, "AIExtraCounts");
 
 	//this->BuildupTime.Read(exINI, pID, "BuildupTime");
+
+	this->DockUnload_Facing.Read(exArt, pArtID, "DockUnloadCell");
+	this->DockUnload_Cell.Read(exArt, pArtID, "DockUnloadFacing");
 }
 
 void BuildingTypeExt::ExtData::CompleteInitialization() {
@@ -455,6 +458,8 @@ template <typename T>
 void BuildingTypeExt::ExtData::Serialize(T& Stm) {
 	Stm
 		//
+		.Process(this->DockUnload_Facing)
+		.Process(this->DockUnload_Cell)
 		.Process(this->Spy_Cursor)
 		.Process(this->EngineerRepairable)
 		//

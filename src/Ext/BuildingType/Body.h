@@ -220,8 +220,13 @@ public:
 		NullableIdx<CursorType> Spy_Cursor;
 		Nullable<bool> EngineerRepairable;
 
+		Nullable<int> DockUnload_Facing;
+		Nullable<CellStruct> DockUnload_Cell;
+
 		ExtData(BuildingTypeClass* OwnerObject) : Extension<BuildingTypeClass>(OwnerObject),
 			//
+			DockUnload_Facing(),
+			DockUnload_Cell(),
 			Spy_Cursor(),
 			EngineerRepairable(),
 			//

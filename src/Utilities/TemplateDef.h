@@ -59,10 +59,10 @@ namespace detail {
 
 	template <>
 	inline bool read<BYTE>(BYTE& value, INI_EX& parser, const char* pSection, const char* pKey, bool allocate) {
-		int buffer;
-		if(parser.ReadInteger(pSection, pKey, &buffer)) {
+		BYTE buffer;
+		if(parser.ReadBytes(pSection, pKey, &buffer)) {
 			if(buffer <= 255 && buffer >= 0) {
-				value = static_cast<BYTE>(buffer); // shut up shut up shut up C4244
+				value = (buffer);
 				return true;
 			} else {
 				Debug::INIParseFailed(pSection, pKey, parser.value(), "Expected a valid number between 0 and 255 inclusive.");
@@ -75,9 +75,9 @@ namespace detail {
 
 	template <>
 	inline bool read<float>(float& value, INI_EX& parser, const char* pSection, const char* pKey, bool allocate) {
-		double buffer;
-		if(parser.ReadDouble(pSection, pKey, &buffer)) {
-			value = static_cast<float>(buffer);
+		float buffer;
+		if(parser.ReadFloat(pSection, pKey, &buffer)) {
+			value = buffer;
 			return true;
 		} else if(!parser.empty()) {
 			Debug::INIParseFailed(pSection, pKey, parser.value(), "Expected a valid floating point number");
@@ -105,6 +105,65 @@ namespace detail {
 			return true;
 		} else if(!parser.empty()) {
 			Debug::INIParseFailed(pSection, pKey, parser.value(), "Expected a valid R,G,B color");
+		}
+		return false;
+	}
+
+	template <>
+	inline bool read<Point2D>(Point2D& value, INI_EX& parser, const char* pSection, const char* pKey, bool allocate) {
+		if (parser.Read2Integers(pSection, pKey, (int*)&value)) {
+			return true;
+		}
+		return false;
+	}
+
+	template <>
+	inline bool read<Point3D>(Point3D& value, INI_EX& parser, const char* pSection, const char* pKey, bool allocate)
+	{
+		if (parser.Read3Integers(pSection, pKey, (int*)&value))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	template <>
+	inline bool read<RectangleStruct>(RectangleStruct& value, INI_EX& parser, const char* pSection, const char* pKey, bool allocate)
+	{
+		if (parser.Read4Integers(pSection, pKey, (int*)&value))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	template <>
+	inline bool read<Point2DByte>(Point2DByte& value, INI_EX& parser, const char* pSection, const char* pKey, bool allocate)
+	{
+		if (parser.Read2Bytes(pSection, pKey, (BYTE*)&value))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	template <>
+	inline bool read<CoordStruct>(CoordStruct& value, INI_EX& parser, const char* pSection, const char* pKey, bool allocate) {
+		if (parser.Read3Integers(pSection, pKey, (int*)&value)) {
+			return true;
+		}
+		return false;
+	}
+
+	template <>
+	inline bool read<CellStruct>(CellStruct& value, INI_EX& parser, const char* pSection, const char* pKey, bool allocate)
+	{
+		Point2D pBuffer;
+		if (parser.Read2Integers(pSection, pKey, (int*)&pBuffer))
+		{
+			value.X = (short)pBuffer.X;
+			value.Y = (short)pBuffer.Y;
+			return true;
 		}
 		return false;
 	}

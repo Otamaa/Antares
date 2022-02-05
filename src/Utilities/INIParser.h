@@ -47,6 +47,14 @@ public:
 		return Read<bool, 1>(pSection, pKey, bBuffer);
 	}
 
+	bool Read2Bool(const char* pSection, const char* pKey, bool* bBuffer) {
+		return Read<bool, 2>(pSection, pKey, bBuffer);
+	}
+
+	bool Read3Bool(const char* pSection, const char* pKey, bool* bBuffer) {
+		return Read<bool, 3>(pSection, pKey, bBuffer);
+	}
+
 	bool ReadInteger(const char* pSection, const char* pKey, int* nBuffer) {
 		return Read<int, 1>(pSection, pKey, nBuffer);
 	}
@@ -63,11 +71,47 @@ public:
 		return Read<int, 4>(pSection, pKey, nBuffer);
 	}
 
+	bool ReadBytes(const char* pSection, const char* pKey, byte* nBuffer) {
+		return Read<byte, 1>(pSection, pKey, nBuffer);
+	}
+
+	bool Read2Bytes(const char* pSection, const char* pKey, byte* nBuffer) {
+		return Read<byte, 2>(pSection, pKey, nBuffer);
+	}
 	bool Read3Bytes(const char* pSection, const char* pKey, byte* nBuffer) {
 		return Read<byte, 3>(pSection, pKey, nBuffer);
 	}
 
 	bool ReadDouble(const char* pSection, const char* pKey, double* nBuffer) {
 		return Read<double, 1>(pSection, pKey, nBuffer);
+	}
+
+	bool Read2Double(const char* pSection, const char* pKey, double* nBuffer) {
+		return Read<double, 2>(pSection, pKey, nBuffer);
+	}
+
+	bool Read3Double(const char* pSection, const char* pKey, double* nBuffer)
+	{
+		return Read<double, 3>(pSection, pKey, nBuffer);
+	}
+
+	bool ReadFloat(const char* pSection, const char* pKey, float* nBuffer)
+	{
+		return Read<float, 1>(pSection, pKey, nBuffer);
+	}
+
+	bool Read2Float(const char* pSection, const char* pKey, float* nBuffer)
+	{
+		return Read<float, 2>(pSection, pKey, nBuffer);
+	}
+
+	bool Read3Float(const char* pSection, const char* pKey, float* nBuffer)
+	{
+		return Read<float, 3>(pSection, pKey, nBuffer);
+	}
+
+	bool ReadArmor(const char* pSection, const char* pKey, int* nBuffer) {
+		*nBuffer = IniFile->ReadArmorType(pSection, pKey, *nBuffer);
+		return (*nBuffer != -1);
 	}
 };
