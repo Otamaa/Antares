@@ -257,6 +257,7 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->DockUnload_Facing.Read(exArt, pArtID, "DockUnloadCell");
 	this->DockUnload_Cell.Read(exArt, pArtID, "DockUnloadFacing");
+	this->IsMassSelectable.Read(exINI, pID, "MassSelectable");
 }
 
 void BuildingTypeExt::ExtData::CompleteInitialization() {
@@ -462,6 +463,7 @@ void BuildingTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->DockUnload_Cell)
 		.Process(this->Spy_Cursor)
 		.Process(this->EngineerRepairable)
+		.Process(this->IsMassSelectable)
 		//
 		.Process(this->Solid_Height)
 		.Process(this->Solid_Level)

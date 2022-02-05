@@ -269,6 +269,11 @@ public:
 		ValueableIdx<CursorType> Move_Cursor;
 		ValueableIdx<CursorType> NoMove_Cursor;
 
+		bool EliteRadImmune;
+		bool VetRadImmune;
+
+		Valueable<bool> Passengers_BySize;
+
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject),
 			//
 			Deploy_Cursor(27),
@@ -277,6 +282,9 @@ public:
 			NoEnter_Cursor(26),
 			Move_Cursor(18),
 			NoMove_Cursor(19),
+			EliteRadImmune(false),
+			VetRadImmune(false),
+			Passengers_BySize(true),
 			//
 			Survivors_PilotChance(-1),
 			Survivors_PassengerChance(-1),

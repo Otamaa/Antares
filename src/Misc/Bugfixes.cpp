@@ -1435,3 +1435,21 @@ DEFINE_HOOK(446E9F, BuildingClass_Place_FreeUnit_Mission, 6)
 
 	return 0x446EAD;
 }
+
+DEFINE_HOOK(7387D1, UnitClass_Destroy_ShakeScreenZero, 6)
+{
+	return RulesClass::Instance()->ShakeScreen ? 0x0 : 0x738801;
+}
+
+DEFINE_HOOK(71136F, TechnoTypeClass_CTOR_Initialize, 6)
+{
+	GET(TechnoTypeClass*, pThis, ESI);
+
+	pThis->WeaponCount = 0;
+	pThis->Bunkerable = false;
+	pThis->Parasiteable = false;
+	pThis->ImmuneToPoison = false;
+	pThis->ConsideredAircraft = false;
+
+	return 0;
+}

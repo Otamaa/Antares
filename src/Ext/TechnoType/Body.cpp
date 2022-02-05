@@ -242,24 +242,49 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 		}
 	}
 
-	if (pINI->ReadString(section, "VeteranAbilities", "", Ares::readBuffer)) {
-		char* context = nullptr;
-		for (char* cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
-			if (!_strcmpi(cur, "empimmune")) {
-				this->VeteranAbilityEMPIMMUNE = true;
-				this->EliteAbilityEMPIMMUNE = true;
+	auto ParseAbilities = [&](bool bVeteran , const char* pWhatToCheck)
+	{
+		auto bKey = bVeteran ? "VeteranAbilities" : "EliteAbilities";
+
+		if (pINI->ReadString(section, bKey , "", Ares::readBuffer)) {
+			char* context = nullptr;
+			for (char* cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
+				if (!_strcmpi(cur, pWhatToCheck)) {
+					return true;
+				}
 			}
 		}
+
+		return false;
+	};
+
+	if (ParseAbilities(true, "empimmune"))
+	{
+		this->VeteranAbilityEMPIMMUNE = true;
+		this->EliteAbilityEMPIMMUNE = true;
+	}
+	else if (ParseAbilities(false, "empimmune"))
+	{
+		this->EliteAbilityEMPIMMUNE = true;
 	}
 
-	if (pINI->ReadString(section, "EliteAbilities", "", Ares::readBuffer)) {
-		char* context = nullptr;
-		for (char* cur = strtok_s(Ares::readBuffer, ",", &context); cur; cur = strtok_s(nullptr, ",", &context)) {
-			if (!_strcmpi(cur, "empimmune")) {
-				this->EliteAbilityEMPIMMUNE = true;
-			}
-		}
+	if (ParseAbilities(true, "RADIMMUNE"))
+	{
+		this->VetRadImmune = true;
+		this->EliteRadImmune = true;
 	}
+	else if (ParseAbilities(false, "RADIMMUNE"))
+	{
+		this->EliteRadImmune = true;
+	}
+
+	/*toDo : https://ares-developers.github.io/Ares-docs/new/veteranabilities.html?highlight=abilities
+	* PROTECTED_DRIVER
+	* UNWARPABLE 
+	* POISONIMMUNE 
+	* PSIONICWEAPONIMMUNE 
+	* PSIONICSIMMUNE 
+	*/
 
 	// #733
 	this->ProtectedDriver.Read(exINI, section, "ProtectedDriver");

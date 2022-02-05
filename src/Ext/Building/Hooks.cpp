@@ -379,3 +379,18 @@ DEFINE_HOOK(449518, BuildingClass_IsSellable_FirestormWall, 6)
 
 	return pBldExt->Firewall_Is ? CheckHouseActiveFirestorm : CannotDemolish;
 }
+
+DEFINE_HOOK(459C03, BuildingClass_CanBeSelectedNow_MassSelectable, 6)
+{
+	GET(BuildingClass*, pThis, ESI);
+	auto pType = pThis->Type;
+	auto pTypeExt = BuildingTypeExt::ExtMap.Find(pType);
+
+	bool IsMassSelectable = pTypeExt->IsMassSelectable.Get(pType->IsUndeployable());
+
+	if(IsMassSelectable)
+		return 0x459C14;
+
+	R->EAX(false);
+	return 0x459C12;
+}

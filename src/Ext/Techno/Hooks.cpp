@@ -2086,3 +2086,43 @@ DEFINE_HOOK(74031A, UnitClass_GetCursorOverObject_NoManualEnter, 6)
 
 	return enterable ? 0x740324u : 0x74037Au;
 }
+
+DEFINE_HOOK(4DA584, FootClass_Update_RadImmune, 7)
+{
+	GET(TechnoTypeClass*, pThisType, EAX);
+	GET(FootClass*, pThis, ESI);
+
+	auto pExt = TechnoTypeExt::ExtMap.Find(pThisType);
+	auto& nVEt = pThis->Veterancy;
+
+	return (nVEt.IsElite() && pExt->EliteRadImmune) || (nVEt.IsVeteran() && pExt->VetRadImmune) ? 0x4DA63B : 0x0;
+}
+
+DEFINE_HOOK(736E8E, UnitClass_UpdateFiringState_Heal, 6)
+{
+	GET(UnitClass*, pThis, ESI);
+	auto& pRules = RulesClass::Instance();
+
+	auto pTarget = pThis->Target;
+	auto pTargetTechno = generic_cast<TechnoClass*>(pTarget);
+
+	if (!pTarget || (pTarget->AbstractFlags & AbstractFlags::Techno) == AbstractFlags::None
+		|| (pTargetTechno && pTargetTechno->GetHealthPercentage() <= pRules->ConditionGreen))
+		pThis->SetTarget(nullptr);
+
+	return 0x737063;
+}
+
+DEFINE_HOOK(739ADA, UnitClass_SimpleDeploy_Height, A)
+{
+	GET(UnitClass*, pThis, ESI);
+
+	if (pThis->Deployed)
+		return 0x739CBF;
+
+	if (!pThis->InAir && pThis->Type->DeployToLand && pThis->GetHeight() > 0)
+		pThis->InAir = 1;
+
+	R->EAX(true);
+	return 0x739B14;
+}

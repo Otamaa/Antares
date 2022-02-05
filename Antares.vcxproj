@@ -321,6 +321,7 @@
     <ClCompile Include="src\Ext\Techno\Hooks.HunterSeeker.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Insignia.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Mechanical.cpp" />
+    <ClCompile Include="src\Ext\Techno\Hooks.PassengersSize.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Prerequisites.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Sight.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Spotlights.cpp" />

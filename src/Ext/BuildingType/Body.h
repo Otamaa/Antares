@@ -222,13 +222,14 @@ public:
 
 		Nullable<int> DockUnload_Facing;
 		Nullable<CellStruct> DockUnload_Cell;
-
+		Nullable<bool> IsMassSelectable;
 		ExtData(BuildingTypeClass* OwnerObject) : Extension<BuildingTypeClass>(OwnerObject),
 			//
 			DockUnload_Facing(),
 			DockUnload_Cell(),
 			Spy_Cursor(),
 			EngineerRepairable(),
+			IsMassSelectable(),
 			//
 			Solid_Height(0),
 			Solid_Level(1),
