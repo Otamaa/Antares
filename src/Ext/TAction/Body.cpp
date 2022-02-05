@@ -21,9 +21,9 @@ bool TActionExt::ExtData::ActivateFirestorm(
 	TActionClass* pAction, HouseClass* pHouse, ObjectClass* pObject,
 	TriggerClass* pTrigger, CellStruct const& location)
 {
-	auto const pExt = HouseExt::ExtMap.Find(pHouse);
+	//auto const pExt = HouseExt::ExtMap.Find(pHouse);
 
-	if(!pExt->FirewallActive) {
+	if(!pHouse->FirestormActive) {
 		auto index = pHouse->FindSuperWeaponIndex(SW_Firewall::FirewallType);
 
 		if(index >= 0) {
@@ -43,9 +43,9 @@ bool TActionExt::ExtData::DeactivateFirestorm(
 	TActionClass* pAction, HouseClass* pHouse, ObjectClass* pObject,
 	TriggerClass* pTrigger, CellStruct const& location)
 {
-	auto const pExt = HouseExt::ExtMap.Find(pHouse);
+	//auto const pExt = HouseExt::ExtMap.Find(pHouse);
 
-	if(pExt->FirewallActive) {
+	if(pHouse->FirestormActive) {
 		auto index = pHouse->FindSuperWeaponIndex(SW_Firewall::FirewallType);
 
 		if(index >= 0) {

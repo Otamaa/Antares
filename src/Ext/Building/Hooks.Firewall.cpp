@@ -168,8 +168,8 @@ DEFINE_HOOK(483D94, CellClass_Setup_Slave, 6)
 	auto const pTypeExt = BuildingTypeExt::ExtMap.Find(pBuilding->Type);
 
 	if(pTypeExt->Firewall_Is) {
-		auto const pHouseExt = HouseExt::ExtMap.Find(pBuilding->Owner);
-		return pHouseExt->FirewallActive ? 0x483D6Bu : 0x483DCDu;
+		//auto const pHouseExt = HouseExt::ExtMap.Find(pBuilding->Owner);
+		return pBuilding->Owner->FirestormActive ? 0x483D6Bu : 0x483DCDu;
 	}
 
 	return 0x483DB0;
@@ -188,8 +188,8 @@ DEFINE_HOOK(51BD4C, InfantryClass_Update, 6)
 	}
 
 	if(pTypeExt->Firewall_Is) {
-		auto const pHouseExt = HouseExt::ExtMap.Find(pBld->Owner);
-		return pHouseExt->FirewallActive ? Impassable : Ignore;
+		//auto const pHouseExt = HouseExt::ExtMap.Find(pBld->Owner);
+		return pBld->Owner->FirestormActive ? Impassable : Ignore;
 	}
 
 	return NoDecision;
@@ -208,8 +208,8 @@ DEFINE_HOOK(51C4C8, InfantryClass_IsCellOccupied, 6)
 	}
 
 	if(pTypeExt->Firewall_Is) {
-		auto const pHouseExt = HouseExt::ExtMap.Find(pBld->Owner);
-		return pHouseExt->FirewallActive ? Impassable : Ignore;
+		//auto const pHouseExt = HouseExt::ExtMap.Find(pBld->Owner);
+		return pBld->Owner->FirestormActive ? Impassable : Ignore;
 	}
 
 	return NoDecision;
@@ -228,8 +228,8 @@ DEFINE_HOOK(73F7B0, UnitClass_IsCellOccupied, 6)
 	}
 
 	if(pTypeExt->Firewall_Is) {
-		auto const pHouseExt = HouseExt::ExtMap.Find(pBld->Owner);
-		return pHouseExt->FirewallActive ? Impassable : Ignore;
+		//auto const pHouseExt = HouseExt::ExtMap.Find(pBld->Owner);
+		return pBld->Owner->FirestormActive ? Impassable : Ignore;
 	}
 
 	return NoDecision;

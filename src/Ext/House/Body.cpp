@@ -459,8 +459,8 @@ bool HouseExt::UpdateAnyFirestormActive(bool const lastChange) {
 	// if last change activated one, there is at least one. else...
 	if(!lastChange) {
 		for(auto const& pHouse : *HouseClass::Array) {
-			auto const pData = HouseExt::ExtMap.Find(pHouse);
-			if(pData && pData->FirewallActive) {
+			//auto const pData = HouseExt::ExtMap.Find(pHouse);
+			if(pHouse->FirestormActive) {
 				IsAnyFirestormActive = true;
 				break;
 			}
@@ -517,13 +517,13 @@ HouseExt::ExtData::~ExtData()
 
 void HouseExt::ExtData::SetFirestormState(bool const active) {
 	auto const pHouse = this->OwnerObject();
-	auto const pData = HouseExt::ExtMap.Find(pHouse);
+	//auto const pData = HouseExt::ExtMap.Find(pHouse);
 
-	if(pData->FirewallActive == active) {
+	if(pHouse->FirestormActive == active) {
 		return;
 	}
 
-	pData->FirewallActive = active;
+	pHouse->FirestormActive = active;
 	UpdateAnyFirestormActive(active);
 
 	DynamicVectorClass<CellStruct> AffectedCoords;
@@ -840,7 +840,7 @@ void HouseExt::ExtData::Serialize(T& Stm) {
 	Stm
 		.Process(this->Degrades)
 		.Process(this->IonSensitive)
-		.Process(this->FirewallActive)
+		//.Process(this->FirewallActive)
 		.Process(this->SWLastIndex)
 		.Process(this->Factory_BuildingType)
 		.Process(this->Factory_InfantryType)

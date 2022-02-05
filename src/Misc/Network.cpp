@@ -134,7 +134,7 @@ void AresNetEvent::Handlers::RaiseFirewallToggle(HouseClass *Source) {
 void AresNetEvent::Handlers::RespondToFirewallToggle(NetworkEvent *Event) {
 	if(HouseClass * pSourceHouse = HouseClass::Array->GetItem(Event->HouseIndex)) {
 		HouseExt::ExtData *pData = HouseExt::ExtMap.Find(pSourceHouse);
-		bool FS = pData->FirewallActive;
+		bool FS = pSourceHouse->FirestormActive;
 		FS = !FS;
 		pData->SetFirestormState(FS);
 	}

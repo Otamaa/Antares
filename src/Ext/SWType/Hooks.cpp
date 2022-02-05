@@ -61,6 +61,7 @@ DEFINE_HOOK(653B3A, RadarClass_GetMouseAction_CustomSWAction, 5)
 		NothingToDo = 0, 
 		DifferentEventFlags = 0x653D6F 
 	};
+
 	if(idxSWType > -1) {
 		REF_STACK(const MouseEvent, EventFlags, 0x58);
 
@@ -562,8 +563,8 @@ DEFINE_HOOK(6CB920, SuperClass_ClickFire, 5)
 
 		// AI get non-draining SWs
 		if(!pOwner->ControlledByHuman()) {
-			auto const pOwnerExt = HouseExt::ExtMap.Find(pOwner);
-			if(!pOwnerExt->FirewallActive) {
+			//auto const pOwnerExt = HouseExt::ExtMap.Find(pOwner);
+			if(!pOwner->FirestormActive) {
 				pThis->Launch(*pCell, isPlayer);
 			} else {
 				SWTypeExt::Deactivate(pThis, *pCell, isPlayer);

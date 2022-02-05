@@ -50,8 +50,8 @@ bool BuildingExt::IsActiveFirestormWall(BuildingClass* const pBuilding, HouseCla
 {
 	if(HouseExt::IsAnyFirestormActive && pBuilding && pBuilding->Owner != pIgnore) {
 		if(!pBuilding->InLimbo && pBuilding->IsAlive) {
-			auto const pHouseExt = HouseExt::ExtMap.Find(pBuilding->Owner);
-			if(pHouseExt->FirewallActive) {
+			//auto const pHouseExt = HouseExt::ExtMap.Find(pBuilding->Owner);
+			if(pBuilding->Owner->FirestormActive) {
 				auto const pTypeExt = BuildingTypeExt::ExtMap.Find(pBuilding->Type);
 				return pTypeExt->Firewall_Is;
 			}
@@ -697,8 +697,8 @@ void BuildingExt::ExtData::UpdateFirewall(bool const changedState) {
 		return;
 	}
 
-	auto const pHouseExt = HouseExt::ExtMap.Find(pThis->Owner);
-	auto const active = pHouseExt->FirewallActive;
+	//auto const pHouseExt = HouseExt::ExtMap.Find(pThis->Owner);
+	auto const active = pThis->Owner->FirestormActive;//pHouseExt->FirewallActive;
 
 	if(!changedState) {
 		// update only the idle anim

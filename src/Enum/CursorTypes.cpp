@@ -309,11 +309,7 @@ DEFINE_HOOK(5BDB90, MouseClass_GetCursorFirstFrame_Minimap, B)
 
 	MouseCursor* pDecided = CursorType::GetCursor(nCursor, reinterpret_cast<MouseCursor*>(nCursor));
 
-	int nMiniFrame = pDecided->MiniFrame;
-	if (!wSmall || nMiniFrame < 0)
-		nMiniFrame = pDecided->Frame;
-
-	R->EAX(nMiniFrame);
+	R->EAX((!wSmall || pDecided->MiniFrame < 0) ? pDecided->Frame : pDecided->MiniFrame);
 	return 0x5BDBB6;
 }
 
@@ -385,29 +381,9 @@ DEFINE_HOOK(5BDDC0, MouseClass_Actions_Reset, 5)
 DEFINE_HOOK(653CA6, RadarClass_GetMouseAction_AllowMinimap, 5)
 {
 	if (MouseCursor* pDecided = CursorType::TempCursor)
-	{
-		if (pDecided->MiniFrame >= 0)
-		{
-			return 0x653CC0;
-		}
-		else
-		{
-			return 0x653CBA;
-		}
-	}
-	else
-	{
-		GET(size_t, nCursor, EAX);
-		//overwrote the ja, need to replicate it
-		if (nCursor > 0x47)
-		{
-			return 0x653CBA;
-		}
-		else
-		{
-			return 0x653CAB;
-		}
-	}
+		return (pDecided->MiniFrame >= 0) ? 0x653CC0 : 0x653CBA;
+
+	return (R->EAX<size_t>() > 0x47) ? 0x653CBA: 0x653CAB;
 }
 
 DEFINE_HOOK(4AB35A, DisplayClass_SetAction_CustomCursor, 6)
@@ -716,16 +692,16 @@ DEFINE_HOOK(6FFEC0, TechnoClass_GetActionOnObject_Cursors, 5)
 	GET_STACK(ObjectClass*, pTarget, 0x4);
 
 	auto const& pThisExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
-	CursorType::Insert((int)pThisExt->Move_Cursor.Get(), Action::Move, false);
-	CursorType::Insert((int)pThisExt->NoMove_Cursor.Get(), Action::NoMove, false);
+	CursorType::Insert(pThisExt->Move_Cursor.Get(), Action::Move, false);
+	CursorType::Insert(pThisExt->NoMove_Cursor.Get(), Action::NoMove, false);
 
 	if (auto pTargetType = pTarget->GetTechnoType())
 	{
 		auto const& pTargetExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
 
-		CursorType::Insert((int)pTargetExt->Enter_Cursor.Get(), Action::Repair, false);
-		CursorType::Insert((int)pTargetExt->Enter_Cursor.Get(), Action::Enter, false);
-		CursorType::Insert((int)pTargetExt->NoEnter_Cursor.Get(), Action::NoEnter, false);
+		CursorType::Insert(pTargetExt->Enter_Cursor.Get(), Action::Repair, false);
+		CursorType::Insert(pTargetExt->Enter_Cursor.Get(), Action::Enter, false);
+		CursorType::Insert(pTargetExt->NoEnter_Cursor.Get(), Action::NoEnter, false);
 	}
 
 	return 0;
@@ -736,8 +712,8 @@ DEFINE_HOOK(700600, TechnoClass_GetActionOnCell_Cursors, 5)
 	GET(TechnoClass*, pThis, ECX);
 
 	auto const& pThisExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
-	CursorType::Insert((int)pThisExt->Move_Cursor.Get(), Action::Move, false);
-	CursorType::Insert((int)pThisExt->NoMove_Cursor.Get(), Action::NoMove, false);
+	CursorType::Insert(pThisExt->Move_Cursor.Get(), Action::Move, false);
+	CursorType::Insert(pThisExt->NoMove_Cursor.Get(), Action::NoMove, false);
 
 	return 0;
 }
@@ -747,9 +723,9 @@ DEFINE_HOOK(7000CD, TechnoClass_GetActionOnObject_SelfDeployCursor, 6)
 	GET(TechnoClass*, pThis, ESI);
 
 	auto const& pThisExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
-	CursorType::Insert((int)pThisExt->Deploy_Cursor.Get(), Action::AreaAttack, false);
-	CursorType::Insert((int)pThisExt->Deploy_Cursor.Get(), Action::Self_Deploy, false);
-	CursorType::Insert((int)pThisExt->NoDeploy_Cursor.Get(), Action::NoDeploy, false);
+	CursorType::Insert(pThisExt->Deploy_Cursor.Get(), Action::AreaAttack, false);
+	CursorType::Insert(pThisExt->Deploy_Cursor.Get(), Action::Self_Deploy, false);
+	CursorType::Insert(pThisExt->NoDeploy_Cursor.Get(), Action::NoDeploy, false);
 
 	return 0;
 }
@@ -761,7 +737,7 @@ DEFINE_HOOK(7400F0, UnitClass_GetActionOnObject_SelfDeployCursor_Bunker, 6)
 	if (pThis->BunkerLinkedItem)
 	{
 		auto const& pThisExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
-		CursorType::Insert((int)pThisExt->Deploy_Cursor.Get(), Action::Self_Deploy, false);
+		CursorType::Insert(pThisExt->Deploy_Cursor.Get(), Action::Self_Deploy, false);
 		return 0x73FFE6;
 	}
 
