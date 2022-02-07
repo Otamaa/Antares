@@ -486,6 +486,7 @@ bool SWTypeExt::Launch(SuperClass* pThis, NewSWType* pSW, const CellStruct &Coor
 			if(pAnim && !(flags & SuperWeaponFlags::NoAnim)) {
 				coords.Z += pData->SW_AnimHeight;
 				AnimClass *placeholder = GameCreate<AnimClass>(pAnim, coords);
+				placeholder->Owner = pThis->Owner;
 				placeholder->Invisible = !pData->IsAnimVisible(pThis->Owner);
 			}
 
@@ -616,6 +617,7 @@ void SWTypeExt::CreateChronoAnim(SuperClass* const pThis, const CoordStruct &Coo
 		if(auto pAnim = GameCreate<AnimClass>(pAnimType, Coords)) {
 			auto const pData = SWTypeExt::ExtMap.Find(pThis->Type);
 			pAnim->Invisible = !pData->IsAnimVisible(pThis->Owner);
+			pAnim->Owner = pThis->Owner;
 			pThis->Animation = pAnim;
 			PointerExpiredNotification::NotifyInvalidAnim().Add(pThis);
 		}

@@ -36,7 +36,8 @@ DEFINE_HOOK(4A76ED, DiskLaserClass_Update_Anim, 7)
 			pThis->Damage, pWarhead, LandType::Clear, coords);
 
 		if(pType) {
-			GameCreate<AnimClass>(pType, coords);
+			if(auto pAnim = GameCreate<AnimClass>(pType, coords))
+				pAnim->Owner = pThis->Owner->GetOwningHouse();
 		}
 	}
 

@@ -28,6 +28,10 @@ template<> const DWORD Extension<TechnoClass>::Canary = 0x55555555;
 TechnoExt::ExtContainer TechnoExt::ExtMap;
 
 bool TechnoExt::NeedsRegap = false;
+void TechnoExt::ExtData::InitializeConstants()
+{
+}
+
 
 void TechnoExt::SpawnSurvivors(FootClass* const pThis, TechnoClass* const pKiller, const bool Select, const bool IgnoreDefenses)
 {
@@ -1419,6 +1423,7 @@ DEFINE_HOOK(6F4500, TechnoClass_DTOR, 5)
 	GET(TechnoClass*, pItem, ECX);
 
 	//TechnoExt::ExtData *pItemExt = TechnoExt::ExtMap.Find(pItem);
+
 	TechnoExt::ExtMap.Remove(pItem);
 	return 0;
 }

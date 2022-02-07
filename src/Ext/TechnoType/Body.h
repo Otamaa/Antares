@@ -432,6 +432,6 @@ public:
 	static bool HasSelectionGroupID(ObjectTypeClass* pType, const char* pID);
 
 	static MouseCursorType GetCursorByWeapon(TechnoClass* pTech, int nWeaponIdx, bool bOutOfrange = true);
-
+	static bool PassangersAllowed(TechnoTypeClass* pThis, TechnoTypeClass* pPassanger);
 	//static void ReadWeapon(WeaponStruct *pWeapon, const char *prefix, const char *section, CCINIClass *pINI);
 };

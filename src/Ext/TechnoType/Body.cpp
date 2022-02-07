@@ -466,6 +466,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->PassengersWhitelist.Read(exINI, section, "Passengers.Allowed");
 	this->PassengersBlacklist.Read(exINI, section, "Passengers.Disallowed");
+	this->Passengers_BySize.Read(exINI, section, "Passengers.BySize");
 
 	this->NoManualUnload.Read(exINI, section, "NoManualUnload");
 	this->NoManualFire.Read(exINI, section, "NoManualFire");
@@ -711,6 +712,7 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->NoEnter_Cursor)
 		.Process(this->Move_Cursor)
 		.Process(this->NoMove_Cursor)
+		.Process(this->Passengers_BySize)
 		//
 		.Process(this->Survivors_Pilots)
 		.Process(this->Survivors_PilotChance)

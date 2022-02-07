@@ -130,6 +130,8 @@ void PsychicDominatorStateMachine::Update()
 				pAnim = GameCreate<AnimClass>(pAnimType, coords);
 			}
 			PsyDom::Anim = pAnim;
+			if(PsyDom::Anim && !PsyDom::Anim->Owner)
+				PsyDom::Anim->Owner = this->Super->Owner;
 		
 			auto sound = pData->SW_ActivationSound.Get(RulesClass::Instance->PsychicDominatorActivateSound);
 			if(sound != -1) {

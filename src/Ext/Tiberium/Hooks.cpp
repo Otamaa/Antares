@@ -5,6 +5,7 @@
 #include <MouseClass.h>
 #include <ScenarioClass.h>
 #include <Helpers\Macro.h>
+#include <Ext/AnimType/Body.h>
 
 // this was only a leftover stub from TS. reimplemented
 // using the same mechanism.
@@ -42,7 +43,8 @@ DEFINE_HOOK(489270, CellChainReact, 5)
 
 			// create an explosion
 			if(auto pType = MapClass::SelectDamageAnimation(4 * damage, pWarhead, pCell->LandType, crd)) {
-				GameCreate<AnimClass>(pType, crd, 0, 1, 0x600, 0);
+				if(auto pAnim = GameCreate<AnimClass>(pType, crd, 0, 1, 0x600, 0))
+					AnimTypeExt::SetMakeInfOwner(pAnim,nullptr,nullptr,nullptr);
 			}
 
 			// damage the area, without affecting tiberium
@@ -58,7 +60,8 @@ DEFINE_HOOK(489270, CellChainReact, 5)
 							int delay = ScenarioClass::Instance->Random.RandomRanged(minDelay, maxDelay);
 							crd = pNeighbour->GetCoords();
 
-							GameCreate<AnimClass>(pType, crd, delay, 1, 0x600, 0);
+							if(auto pAnim = GameCreate<AnimClass>(pType, crd, delay, 1, 0x600, 0))
+								AnimTypeExt::SetMakeInfOwner(pAnim,nullptr,nullptr,nullptr);
 						}
 					}
 				}

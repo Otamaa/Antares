@@ -60,14 +60,18 @@ bool SW_ChronoWarp::Activate(SuperClass* pThis, const CellStruct &Coords, bool I
 		auto const pCellSource = MapClass::Instance->GetCellAt(pSource->ChronoMapCoords);
 		auto coordsSource = pCellSource->GetCoordsWithBridge();
 		coordsSource.Z += pData->SW_AnimHeight;
-		GameCreate<AnimClass>(pAnimType, coordsSource);
+		if(auto pAnim = GameCreate<AnimClass>(pAnimType, coordsSource))
+			if(pSource)
+				pAnim->Owner = pSource->Owner;
 	}
 
 	if(auto const pAnimType = pData->Chronosphere_BlastDest.Get(RulesClass::Instance->ChronoBlastDest)) {
 		auto const pCellTarget = MapClass::Instance->GetCellAt(Coords);
 		auto coordsTarget = pCellTarget->GetCoordsWithBridge();
 		coordsTarget.Z += pData->SW_AnimHeight;
-		GameCreate<AnimClass>(pAnimType, coordsTarget);
+		if(auto pAnim = GameCreate<AnimClass>(pAnimType, coordsTarget))
+			if(pSource)
+				pAnim->Owner = pSource->Owner;
 	}
 
 	DynamicVectorClass<ChronoWarpStateMachine::ChronoWarpContainer> RegisteredBuildings;

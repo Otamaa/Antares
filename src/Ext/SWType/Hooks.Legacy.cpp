@@ -46,6 +46,8 @@ DEFINE_HOOK(53B080, PsyDom_Fire, 5) {
 			CoordStruct animCoords = coords;
 			animCoords.Z += pData->Dominator_SecondAnimHeight;
 			PsyDom::Anim = GameCreate<AnimClass>(pAnimType, animCoords);
+			if(PsyDom::Anim && !PsyDom::Anim->Owner)
+				PsyDom::Anim->Owner = pFirer;
 		}
 
 		// kill
@@ -547,6 +549,7 @@ DEFINE_HOOK(53A140, LightningStorm_Strike, 7) {
 
 			// create the cloud and do some book keeping.
 			if(auto const pAnim = GameCreate<AnimClass>(pAnimType, coords)) {
+				pAnim->Owner = pSuper->Owner;
 				LightningStorm::CloudsManifesting->AddItem(pAnim);
 				LightningStorm::CloudsPresent->AddItem(pAnim);
 			}
@@ -588,6 +591,7 @@ DEFINE_HOOK(53A300, LightningStorm_Strike2, 5) {
 			auto const pAnimType = it.at(rnd % it.size());
 
 			if(auto const pAnim = GameCreate<AnimClass>(pAnimType, coords)) {
+				pAnim->Owner = pSuper->Owner;
 				LightningStorm::BoltsPresent->AddItem(pAnim);
 			}
 		}
@@ -642,7 +646,8 @@ DEFINE_HOOK(53A300, LightningStorm_Strike2, 5) {
 			// fancy stuff if damage is dealt
 			auto const pAnimType = MapClass::SelectDamageAnimation(
 				damage, pWarhead, pCell->LandType, coords);
-			GameCreate<AnimClass>(pAnimType, coords);
+			if(auto pAnim = GameCreate<AnimClass>(pAnimType, coords))
+				pAnim->Owner = pSuper->Owner;
 		}
 
 		// has the last target been destroyed?
@@ -663,7 +668,8 @@ DEFINE_HOOK(53A300, LightningStorm_Strike2, 5) {
 					auto const rnd = ScenarioClass::Instance->Random.Random();
 					auto const pAnimType = it.at(rnd % it.size());
 
-					GameCreate<AnimClass>(pAnimType, coords);
+					if(auto pAnim = GameCreate<AnimClass>(pAnimType, coords))
+						pAnim->Owner = pSuper->Owner;
 				}
 			}
 		}
@@ -957,7 +963,8 @@ DEFINE_HOOK(44CE46, BuildingClass_Mi_Missile_Pulsball, 5)
 	// also support no pulse ball
 	if(pPulseBall) {
 		auto flh = pThis->GetFLH(0, CoordStruct::Empty);
-		GameCreate<AnimClass>(pPulseBall, flh);
+		if(auto pAnim = GameCreate<AnimClass>(pPulseBall, flh))
+			pAnim->Owner = pThis->GetOwningHouse();
 	}
 
 	pThis->MissionStatus = 2;

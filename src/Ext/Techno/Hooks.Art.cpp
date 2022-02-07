@@ -188,7 +188,8 @@ DEFINE_HOOK(415085, AircraftClass_Update_DamageSmoke, 7)
 				int chance = (pThis->Health > 0) ? pExt->SmokeChanceRed.Get(10) : pExt->SmokeChanceDead.Get(80);
 
 				if(dice < chance) {
-					GameCreate<AnimClass>(pType, pThis->Location);
+					if(auto pAnim = GameCreate<AnimClass>(pType, pThis->Location))
+						pAnim->Owner = pThis->GetOwningHouse();
 				}
 			}
 		}

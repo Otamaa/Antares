@@ -1973,21 +1973,45 @@ DEFINE_HOOK(7162B0, TechnoTypeClass_GetPipMax_MindControl, 6)
 	return 0x7162BC;
 }
 
+bool TechnoTypeExt::PassangersAllowed(TechnoTypeClass* pThis, TechnoTypeClass* pPassanger)
+{
+	auto const pExt = TechnoTypeExt::ExtMap.Find(pThis);
+
+	return (pExt->PassengersWhitelist.empty() || pExt->PassengersWhitelist.Contains(pPassanger))
+		&& !pExt->PassengersBlacklist.Contains(pPassanger);
+}
+
+bool TechnoExt::IsEligibleSize(TechnoClass* pThis, TechnoClass* pPassanger)
+{
+	auto pThisType = pThis->GetTechnoType();
+	auto const pThisTypeExt = TechnoTypeExt::ExtMap.Find(pThisType);
+	auto pThatType = pPassanger->GetTechnoType();
+
+	if (pThatType->Size > pThisType->SizeLimit)
+		return false;
+
+	if (pThisTypeExt->Passengers_BySize.Get())
+	{
+		if (pThatType->Size > (pThisType->Passengers - pThis->Passengers.GetTotalSize()))
+			return false;
+	}
+	else if (pThis->Passengers.NumPassengers >= pThisType->Passengers)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 DEFINE_HOOK(73769E, UnitClass_ReceivedRadioCommand_SpecificPassengers, 8)
 {
 	GET(UnitClass* const, pThis, ESI);
 	GET(TechnoClass const* const, pSender, EDI);
 
 	auto const pType = pThis->GetTechnoType();
-	auto const pExt = TechnoTypeExt::ExtMap.Find(pType);
-
 	auto const pSenderType = pSender->GetTechnoType();
 
-	auto const allowed = (pExt->PassengersWhitelist.empty() ||
-			pExt->PassengersWhitelist.Contains(pSenderType))
-		&& !pExt->PassengersBlacklist.Contains(pSenderType);
-
-	return allowed ? 0u : 0x73780Fu;
+	return TechnoTypeExt::PassangersAllowed(pType,pSenderType) ? 0u : 0x73780Fu;
 }
 
 DEFINE_HOOK(41949F, AircraftClass_ReceivedRadioCommand_SpecificPassengers, 6)
@@ -2004,13 +2028,8 @@ DEFINE_HOOK(41949F, AircraftClass_ReceivedRadioCommand_SpecificPassengers, 6)
 	}
 
 	auto const pSenderType = pSender->GetTechnoType();
-	auto const pExt = TechnoTypeExt::ExtMap.Find(pType);
 
-	auto const allowed = (pExt->PassengersWhitelist.empty() ||
-			pExt->PassengersWhitelist.Contains(pSenderType))
-		&& !pExt->PassengersBlacklist.Contains(pSenderType);
-
-	return allowed ? Allowed : Disallowed;
+	return TechnoTypeExt::PassangersAllowed(pType, pSenderType) ? Allowed : Disallowed;
 }
 
 //

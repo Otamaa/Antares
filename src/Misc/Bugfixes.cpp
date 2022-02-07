@@ -30,6 +30,7 @@
 #include "../Ext/WeaponType/Body.h"
 #include "../Ext/WarheadType/Body.h"
 #include <Ext/Building/Body.h>
+#include <Ext/AnimType/Body.h>
 
 #include "../Utilities/TemplateDef.h"
 
@@ -1183,7 +1184,8 @@ DEFINE_HOOK(4B5EB0, DropPodLocomotionClass_ILocomotion_Process_Smoke, 6)
 		}
 
 		if(AnimTypeClass* pType = pExt->DropPodTrailer) {
-			GameCreate<AnimClass>(pType, Coords);
+						if(auto pAnim = GameCreate<AnimClass>(pType, Coords))
+				AnimTypeExt::SetMakeInfOwner(pAnim,nullptr,nullptr,nullptr);
 		}
 	}
 

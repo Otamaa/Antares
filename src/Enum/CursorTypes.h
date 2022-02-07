@@ -44,10 +44,6 @@ public:
 	static const Action SuperWeaponDisallowed = static_cast<Action>(0x7E);
 	static MouseCursor* TempCursor;
 
-	static bool IsMapcontains(Action other) {
-		return ActionCursor_Map.find(other) != ActionCursor_Map.end();
-	}
-
 	static std::map<Action, int> ActionCursor_Map;
 
 	static void Clear() {} //do nothing 

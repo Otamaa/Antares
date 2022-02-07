@@ -3,7 +3,7 @@
 #include "../TechnoType/Body.h"
 #include "../House/Body.h"
 #include "../Rules/Body.h"
-
+#include <Ext/AnimType/Body.h>
 #include "../../Misc/SavegameDef.h"
 
 #include <AnimClass.h>
@@ -131,9 +131,9 @@ bool BuildingExt::ExtData::RubbleYell(bool beingRepaired) {
 
 		pBuilding->Limbo(); // only takes it off the map
 		pBuilding->DestroyNthAnim(BuildingAnimSlot::All);
+		auto pOwner = HouseExt::GetHouseKind(owner, true, pBuilding->Owner);
 
-		if(!remove) {
-			auto pOwner = HouseExt::GetHouseKind(owner, true, pBuilding->Owner);
+		if(!remove) {		
 			auto pNew = static_cast<BuildingClass*>(pNewType->CreateObject(pOwner));
 
 			if(strength <= -1 && strength >= -100) {
@@ -152,7 +152,9 @@ bool BuildingExt::ExtData::RubbleYell(bool beingRepaired) {
 		}
 
 		if(pAnimType) {
-			GameCreate<AnimClass>(pAnimType, pBuilding->GetCoords());
+			if(auto pAnim = GameCreate<AnimClass>(pAnimType, pBuilding->GetCoords())) {
+				pAnim->Owner = pOwner;
+			}
 		}
 
 		return true;
@@ -714,6 +716,8 @@ void BuildingExt::ExtData::UpdateFirewall(bool const changedState) {
 				auto const crd = pThis->GetCoords() - CoordStruct{ 740, 740, 0 };
 				Anim = GameCreate<AnimClass>(pType, crd, 0, 1, 0x604, -10);
 				Anim->IsBuildingAnim = true;
+				if(!Anim->Owner)
+					Anim->Owner = pThis->Owner;
 			}
 		}
 	} else {
@@ -736,6 +740,8 @@ void BuildingExt::ExtData::UpdateFirewall(bool const changedState) {
 				Anim = GameCreate<AnimClass>(pType, crd, 1, 0, 0x600, -10);
 				Anim->IsFogged = pThis->IsFogged;
 				Anim->IsBuildingAnim = true;
+				if(!Anim->Owner)
+					Anim->Owner = pThis->Owner;
 			}
 		} else if(Anim) {
 			GameDelete(Anim);
@@ -784,9 +790,12 @@ void BuildingExt::ExtData::ImmolateVictims() {
 bool BuildingExt::ExtData::ImmolateVictim(ObjectClass* const pVictim, bool const destroy) {
 	if(pVictim && pVictim->Health > 0) {
 		auto const pRulesExt = RulesExt::Global();
+		auto const pThis = this->OwnerObject();
+		auto const pThisOwner = pThis->GetOwningHouse();
+		auto const pVictimOwner = pVictim->GetOwningHouse();
 
 		if(destroy) {
-			auto const pThis = this->OwnerObject();
+			
 
 			auto const pWarhead = pRulesExt->FirestormWarhead.Get(
 				RulesClass::Instance->C4Warhead);
@@ -802,7 +811,9 @@ bool BuildingExt::ExtData::ImmolateVictim(ObjectClass* const pVictim, bool const
 
 		if(pType) {
 			auto const crd = pVictim->GetCoords();
-			GameCreate<AnimClass>(pType, crd, 0, 1, 0x600, -10, false);
+			if(auto pAnim = GameCreate<AnimClass>(pType, crd, 0, 1, 0x600, -10, false)) {
+				AnimTypeExt::SetMakeInfOwner(pAnim,pThisOwner,pVictimOwner,pThisOwner);
+			}
 		}
 
 		return true;

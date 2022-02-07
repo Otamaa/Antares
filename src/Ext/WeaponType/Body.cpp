@@ -9,6 +9,7 @@
 #include "../Techno/Body.h"
 #include "../TechnoType/Body.h"
 #include "../../Utilities/TemplateDef.h"
+#include <Ext/AnimType/Body.h>
 
 template<> const DWORD Extension<WeaponTypeClass>::Canary = 0x33333333;
 WeaponTypeExt::ExtContainer WeaponTypeExt::ExtMap;
@@ -184,9 +185,12 @@ bool WeaponTypeExt::ExtData::conductAbduction(BulletClass * Bullet) {
 		return false;
 	}
 
+	if (!TechnoTypeExt::PassangersAllowed(AttackerType, TargetType)){
+		return false;
+	}
+
 	// Don't abduct the target if it's too fat in general, or if there's not enough room left in the hold // alternatively, NumPassengers
-	if((TargetType->Size > AttackerType->SizeLimit)
-		|| (TargetType->Size > (AttackerType->Passengers - Attacker->Passengers.GetTotalSize()))) {
+	if(!TechnoExt::IsEligibleSize(Attacker,Target)){
 		return false;
 	}
 
@@ -251,8 +255,9 @@ bool WeaponTypeExt::ExtData::conductAbduction(BulletClass * Bullet) {
 
 	// if we have an abducting animation, play it
 	if(this->Abductor_AnimType) {
-		GameCreate<AnimClass>(this->Abductor_AnimType, Bullet->TargetCoords);
-		//this->Abductor_Anim->Owner=Bullet->Owner->Owner;
+		if(auto pAnim = GameCreate<AnimClass>(this->Abductor_AnimType, Bullet->TargetCoords)){
+			AnimTypeExt::SetMakeInfOwner(pAnim,Bullet->Owner->GetOwningHouse(),Bullet->Target->GetOwningHouse(),Bullet->Owner->GetOwningHouse());
+		}
 	}
 
 	Target->Locomotor->Force_Track(-1, CoordStruct::Empty);

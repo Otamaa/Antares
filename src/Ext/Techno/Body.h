@@ -10,7 +10,7 @@
 #include "../../Utilities/Enums.h"
 
 #include "../_Container.hpp"
-
+#include <map>
 class AircraftClass;
 class AlphaShapeClass;
 class BuildingLightClass;
@@ -159,7 +159,7 @@ public:
 		Action GetDeactivatedAction(ObjectClass* pHovered = nullptr) const;
 
 		void InvalidateAttachEffectPointer(void *ptr);
-
+		virtual void InitializeConstants() override;
 		void RefineTiberium(float amount, int idxType);
 		void DepositTiberium(float amount, float bonus, int idxType);
 
@@ -245,6 +245,9 @@ public:
 
 	static void DecreaseAmmo(
 		TechnoClass* pThis, WeaponTypeClass const* pWeapon = nullptr);
+
+	static bool IsEligibleSize(TechnoClass* pThis, TechnoClass* pPassanger);
+
 /*
 	static int SelectWeaponAgainst(TechnoClass *pThis, TechnoClass *pTarget);
 	static bool EvalWeaponAgainst(TechnoClass *pThis, TechnoClass *pTarget, WeaponTypeClass* W);
