@@ -11,6 +11,14 @@
 
 #include "../_Container.hpp"
 #include <map>
+
+struct PipDrawData
+{
+	int PipIdx{ 0 };
+	int DrawCount{ 1 };
+	bool IsActive{ false };
+};
+
 class AircraftClass;
 class AlphaShapeClass;
 class BuildingLightClass;
@@ -90,7 +98,7 @@ public:
 		AbstractClass* SuperTarget; // the attached super weapon's target (if any)
 
 		bool SupressLostEva;
-
+		std::map<int ,PipDrawData> PassangersPipData;
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject),
 			idxSlot_Wave(0),
 			idxSlot_Beam(0),
@@ -123,7 +131,8 @@ public:
 			Crate_ArmorMultiplier(1.0),
 			Crate_SpeedMultiplier(1.0),
 			Crate_Cloakable(false),
-			SupressLostEva(false)
+			SupressLostEva(false),
+			PassangersPipData()
 		{ }
 
 		virtual ~ExtData() {

@@ -30,6 +30,7 @@ TechnoExt::ExtContainer TechnoExt::ExtMap;
 bool TechnoExt::NeedsRegap = false;
 void TechnoExt::ExtData::InitializeConstants()
 {
+
 }
 
 
@@ -1366,6 +1367,7 @@ void TechnoExt::ExtData::Serialize(T& Stm) {
 		.Process(this->SuperTarget)
 		//
 		.Process(this->SupressLostEva)
+		.Process(this->PassangersPipData)
 		;
 }
 
