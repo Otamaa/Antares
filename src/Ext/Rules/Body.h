@@ -100,6 +100,8 @@ public:
 		Valueable<bool> DiskLaserAnimEnabled;
 		Valueable<bool> RepairStopOnInsufficientFunds;
 		Valueable<int> CrateMoney_Random;
+		Valueable<bool> IronCurtain_flash;
+
 		ExtData(RulesClass* OwnerObject) : Extension<RulesClass>(OwnerObject),
 			ElectricDeath(nullptr),
 			EngineerDamage(0.0),
@@ -136,7 +138,8 @@ public:
 			DegradeAmountConsumer(1),
 			CanMakeStuffUp(false),
 			RepairStopOnInsufficientFunds(true),
-			CrateMoney_Random(900)
+			CrateMoney_Random(900),
+			IronCurtain_flash(true)
 		{
 			MultiEngineer[0] = false; // Skirmish
 			MultiEngineer[1] = false; // LAN
@@ -152,8 +155,7 @@ public:
 
 		void InitializeAfterTypeData(RulesClass* pThis);
 
-		virtual void InvalidatePointer(void *ptr, bool bRemoved) override {
-		}
+		virtual void InvalidatePointer(void *ptr, bool bRemoved) override {	}
 
 		virtual void LoadFromStream(AresStreamReader &Stm) override;
 

@@ -480,6 +480,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->Slam_Sound.Read(exINI, section, "SlamSound");
 	this->EnemyUIName.Read(exINI, section, "EnemyUIName");
 	this->Is_Fake.Read(exINI, section, "Fake");
+	this->Fake_of.Read(exINI, section ,"FakeOf");
 	//this->NoManualEnter.Read(exINI, section, "NoManualEnter");
 
 	// quick fix - remove after the rest of weapon selector code is done
@@ -718,6 +719,7 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->Slam_Sound)
 		.Process(this->EnemyUIName)
 		.Process(this->Is_Fake)
+		.Process(this->Fake_of)
 		//
 		.Process(this->Survivors_Pilots)
 		.Process(this->Survivors_PilotChance)

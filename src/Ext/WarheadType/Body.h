@@ -89,6 +89,8 @@ public:
 		Valueable<bool> SuppressDeathWeapon_Infantry;
 		ValueableVector<TechnoTypeClass*> SuppressDeathWeapon;
 		Valueable<bool> Supress_LostEva;
+		Valueable<double> Temporal_HealthFactor;
+		Nullable<bool> IronCurtain_flash;
 
 		ExtData(WarheadTypeClass* OwnerObject) : Extension<WarheadTypeClass>(OwnerObject),
 			MindControl_Permanent(false),
@@ -110,7 +112,9 @@ public:
 			CellSpread_MaxAffect(-1),
 			DamageAirThreshold(0),
 			AttachedEffect(OwnerObject),
-			Supress_LostEva(false)
+			Supress_LostEva(false),
+			Temporal_HealthFactor(0.0),
+			IronCurtain_flash()
 		{
 			VersesData vs;
 			for(int i = 0; i < 11; ++i) {

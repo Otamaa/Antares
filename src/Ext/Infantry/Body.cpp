@@ -41,15 +41,16 @@ Action InfantryExt::GetEngineerEnterEnemyBuildingAction(
 	// only skirmish allows to disable it, so we only check there. for all other
 	// modes, it's always on. single player campaigns also use special multi
 	// engineer behavior.
-	auto const gameMode = SessionClass::Instance->GameMode;
-	auto allowDamage = gameMode != GameMode::Skirmish 
-		|| GameModeOptionsClass::Instance->MultiEngineer;
+	//auto const gameMode = SessionClass::Instance->GameMode;
+	//auto allowDamage = gameMode != GameMode::Skirmish 
+	//	|| GameModeOptionsClass::Instance->MultiEngineer;
 
-	if(gameMode == GameMode::Campaign) {
+	//if(gameMode == GameMode::Campaign) {
 		// single player missions are currently hardcoded to "don't do damage".
-		allowDamage = false; // TODO: replace this by a new rules tag.
-	}
+	//	allowDamage = false; // TODO: replace this by a new rules tag.
+	//}
 
+	auto allowDamage = GameModeOptionsClass::Instance->MultiEngineer;
 	// damage if multi engineer is enabled and target isn't that low on health.
 	if(allowDamage) {
 

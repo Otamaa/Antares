@@ -115,6 +115,8 @@ void WarheadTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->SuppressDeathWeapon.Read(exINI, section, "DeathWeapon.Suppress");
 
 	this->Supress_LostEva.Read(exINI, section, "UnitLost.Suppress");
+	this->Temporal_HealthFactor.Read(exINI, section, "Temporal.HealthFactor");
+	this->IronCurtain_flash.Read(exINI, section, "IronCurtain.Fash");
 };
 
 /*!
@@ -564,6 +566,8 @@ void WarheadTypeExt::ExtData::Serialize(T& Stm) {
 		
 		//
 		.Process(this->Supress_LostEva)
+		.Process(this->Temporal_HealthFactor)
+		.Process(this->IronCurtain_flash)
 		
 		;
 }

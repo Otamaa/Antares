@@ -10,6 +10,7 @@
 #include "../Bullet/Body.h"
 #include "../WeaponType/Body.h"
 #include "../../Enum/ArmorTypes.h"
+#include <Ext/Rules/Body.h>
 
 // feature #384: Permanent MindControl Warheads + feature #200: EMP Warheads
 // attach #407 here - set TechnoClass::Flashing.Duration // that doesn't exist, according to yrpp::TechnoClass.h::struct FlashData
@@ -166,21 +167,19 @@ DEFINE_HOOK(702669, TechnoClass_ReceiveDamage_SuppressDeathWeapon, 9)
 	return 0x702672;
 }
 
-//ToDo: this
 DEFINE_HOOK(701A5C, TechnoClass_ReceiveDamage_IronCurtainFlash, 7)
 {
 	GET_STACK(WarheadTypeClass* const, pWarhead, 0xD0);
 	GET(TechnoClass*, pThis, ESI);
 
-	bool ICFlash = true; //control thru [AudioVisual] / WH itself
+	auto const pExt = WarheadTypeExt::ExtMap.Find(pWarhead);
 
-	if (!pWarhead || !ICFlash)
+	if (!pWarhead || !pExt->IronCurtain_flash.Get(RulesExt::Global()->IronCurtain_flash.Get()))
 		return 0x701A98;
 
 	return pThis->ForceShielded ? 0x701A65 : 0x701A69;
 }
 
-/*ToDo: this
 DEFINE_HOOK(71AFB2, TemporalClass_Fire_HealthFactor, 5)
 {
 	GET(TechnoClass*, pTarget, ECX);
@@ -198,7 +197,6 @@ DEFINE_HOOK(71AFB2, TemporalClass_Fire_HealthFactor, 5)
 	R->EAX(nCalc_b <= 1.0 ? 1 : static_cast<int>(nCalc_b));
 	return 0x71AFB7;
 }
-*/
 
 /*
 5F53E5 = ObjectClass_ReceiveDamage_Relative, 6

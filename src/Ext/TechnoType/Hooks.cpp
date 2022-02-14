@@ -209,12 +209,26 @@ DEFINE_HOOK(4449DF, BuildingClass_KickOutUnit_PreventClone, 6) {
 	return 0x444A53;
 }
 
+DEFINE_HOOK(731E29,sub_731D90_FakeOf, 8)
+{
+	GET(TechnoClass*, pTech, ECX);
+	auto pOwner = pTech->Owner;
+	auto pType = pTech->GetTechnoType();
+	auto pExt = TechnoTypeExt::ExtMap.Find(pType); //this may cause performance issues , need to use new ExtSystem from Secsome to medigate this 
+												   // -Otamaa
+	if (auto pFakeType = pExt->Fake_of.Get())
+		pType = pFakeType;
+
+	R->EAX(pType->GetActualCost(pOwner));
+	return 0x731E42;
+}
+
 /*
 455DA0 = BuildingClass_IsFactory_CloningFacility, 6
 50BEB0 = HouseClass_GetCostMult, 6
 
 6AB8BB = SelectClass_ProcessInput_BuildTime, 6
-731E08 = sub_731D90_FakeOf, 6
+
 523932 = InfantryTypeClass_CTOR_Initialize, 8
 45E416 = BuildingTypeClass_CTOR_Initialize, 6
 

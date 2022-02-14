@@ -3,11 +3,13 @@
 #include <FootClass.h>
 #include <YRPPGlobal.h>
 
+//ToDo: all of these
 namespace AresHadleTunnelLocoStuffs
 {
 	void Handle(FootClass* pOwner, bool bDigIn = false, bool PlayAnim = false)
 	{
 		//Differentiate DigIn and DigOut Sound
+		//not sure if these on correct position atm ! -Otamaa
 		auto nSound = bDigIn ? RulesGlobal->DigSound : RulesGlobal->DigSound;
 		auto nLoc = pOwner->Location;
 

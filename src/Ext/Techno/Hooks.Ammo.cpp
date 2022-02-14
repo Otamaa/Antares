@@ -16,7 +16,7 @@ DEFINE_HOOK(43FE8E, BuildingClass_Update_Reload, 6)
 {
 	GET(BuildingClass *, B, ESI);
 	BuildingTypeClass *BType = B->Type;
-	if(!BType->Hospital && !BType->Armory) { // TODO: rethink this
+	if(!BType->Hospital && !BType->Armory) { // .TODO: rethink this
 		B->Reload();
 	}
 	return 0x43FEBE;

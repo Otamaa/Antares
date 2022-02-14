@@ -247,6 +247,7 @@ DEFINE_HOOK(469EBA, BulletClass_DetonateAt_Splits, 6)
 				}
 			}
 		}
+		targets.Clear();
 	}
 
 	return 0x46A290;

@@ -1,6 +1,10 @@
 #include "Body.h"
 #include <YRPPGlobal.h>
 
+// These were totally reworked 
+// i dont really understand what this do atm , may revisit later on !
+// -Otamaa
+
 DEFINE_HOOK(6A793F, SidebarClass_Update_Strip1, 6)
 {
 	GET(SidebarClass*, pThis, ESI);

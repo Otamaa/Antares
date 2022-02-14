@@ -110,6 +110,7 @@ void RulesExt::ExtData::LoadBeforeTypeData(RulesClass *pThis, CCINIClass *pINI) 
 	pData->DiskLaserAnimEnabled.Read(exINI, sectionAV, "DiskLaserAnimEnabled");
 	pData->RepairStopOnInsufficientFunds.Read(exINI, sectionGeneral, "RepairStopOnInsufficientFunds");
 	pData->CrateMoney_Random.Read(exINI, "CrateRules", "RandomCrateMoney");
+	pData->IronCurtain_flash.Read(exINI, sectionAV, "IronCurtainFlash");
 }
 
 // this runs between the before and after type data loading methods for rules ini

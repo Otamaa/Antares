@@ -83,9 +83,22 @@ namespace WarpPerStep
 		if (!pThis)
 			return 0;
 
+		for (auto pTemp = pThis; pTemp; pTemp = pTemp->PrevTemporal)
+		{
+			if (nStep > 50)
+				break;
+			++nStep;
+			auto pOwner = pTemp->Owner;
+			auto pOwnerExt = TechnoExt::ExtMap.Find(pOwner);
+			auto pWeapon = pOwner->GetWeapon(pOwnerExt->idxSlot_Warp)->WeaponType;
+			nAddStep += pWeapon->Damage;
+			pTemp->WarpPerStep = pWeapon->Damage;
+		}
+
+		/*
 		do
 		{
-			if (nStep >= 50)
+			if (nStep > 50)
 				break;
 
 			++nStep;
@@ -97,7 +110,7 @@ namespace WarpPerStep
 			pThis = pThis->PrevTemporal;
 
 		} while (pThis);
-
+		*/
 		return nAddStep;
 	}
 };

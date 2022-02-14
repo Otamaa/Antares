@@ -394,7 +394,6 @@ DEFINE_HOOK(459C03, BuildingClass_CanBeSelectedNow_MassSelectable, 6)
 	return 0x459C12;
 }
 
-/*
 DEFINE_HOOK(4509B4, BuildingClass_UpdateRepair_Funds, 7)
 {
 	GET(BuildingClass*, pThis, ESI);
@@ -402,6 +401,7 @@ DEFINE_HOOK(4509B4, BuildingClass_UpdateRepair_Funds, 7)
 	return (!pThis->Owner->IsPlayerControl() || RulesExt::Global()->RepairStopOnInsufficientFunds.Get()) ? 0x0:0x4509BB;
 }
 
+/* , not really sure ?
 DEFINE_HOOK(447A63, BuildingClass_QueueImageAnim_Sell, 3)
 {
 	GET(BuildingClass*, pThis, ESI);

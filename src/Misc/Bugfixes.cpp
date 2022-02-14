@@ -35,6 +35,8 @@
 #include "../Utilities/TemplateDef.h"
 
 #include <Enum/CursorTypes.h>
+#include <Utilities/Macro.h>
+#include <HoverLocomotionClass.h>
 
 #include <cstdlib>
 #include <array>
@@ -1585,35 +1587,260 @@ DEFINE_HOOK(73F7DD, UnitClass_IsCellOccupied_Bib, 8)
 	return pThis && pBuilding->Owner->IsAlliedWith(pThis) ? 0x0 : 0x73F823;
 }
 
+DEFINE_HOOK(4CA0E3, FactoryClass_AbandonProduction_Invalidate, 6)
+{
+	GET(FactoryClass*, pThis, ESI);
+	if (pThis->Owner == HouseClass::Player())
+	{
+		if (auto pObject = pThis->Object)
+		{
+			if (pObject->WhatAmI() == AbstractType::Building)
+			{
+				pObject->RemoveSidebarObject();
+			}
+		}
+	}
+
+	return 0;
+}
+
+DEFINE_HOOK(5005CC , HouseClass_SetFactoryCreatedManually, 6)
+{
+	GET(HouseClass*, pThis, ECX);
+	pThis->unknown_53D1 = true;
+	return 0x500612;
+}
+
+DEFINE_HOOK(5007BE, HouseClass_SetFactoryCreatedManually2, 6)
+{
+	GET(HouseClass*, pThis, ECX);
+	pThis->unknown_53D1 = false;
+	return 0x5006C0;
+}
+
+DEFINE_HOOK(50067C , HouseClass_ClearFactoryCreatedManually, 6)
+{
+	GET(HouseClass*, pThis, ECX);
+	pThis->unknown_53D1 = (BYTE)R->DL();
+	return 0x50080D;
+}
+
+DEFINE_HOOK(4B619F, DropPodLocomotionClass_ILocomotion_MoveTo_AtmosphereEntry, 5)
+{
+	return RulesClass::Instance->AtmosphereEntry ? 0x0 : 0x4B61D6;
+}
+
+DEFINE_HOOK(4586D6, BuildingClass_KillOccupiers, 9)
+{
+	GET(InfantryClass*, pOccupant, ECX);
+	GET(TechnoClass*, pKiller, EBP);
+	pOccupant->RegisterDestruction(pKiller);
+	return 0x4586DF;
+}
+
+DEFINE_HOOK(4239F0 ,AnimClass_UpdateBounce_Damage, 8)
+{
+	GET(ObjectClass*, pObj, EDI);
+	GET(AnimClass*, pThis, EBP);
+	auto const pType = pThis->Type;
+
+	return (!pObj || pType->DamageRadius < 0 || ((int)pType->Damage == 0))  ? 0x423A92 : 0x4239F8;
+}
+
+DEFINE_HOOK(74A884 ,VoxelAnimClass_Update_Damage, 6)
+{
+	GET(VoxelAnimClass*, pThis, EBP);
+	auto const pType = pThis->Type;
+
+	if (pType->DamageRadius < 0 || !pType->Damage || !pType->Warhead)
+		return 0x74A934;
+
+	auto const nCoord = pThis->Bounce.GetCoords();
+	auto const pCell = MapClass::Instance->TryGetCellAt(nCoord);
+
+	if(!pCell)
+		return 0x74A934;
+
+	for (auto pObj = pCell->FirstObject; pObj; pObj = pObj->NextObject)
+	{
+		auto nDistance = abs(pObj->Location.X - nCoord.X) + abs(pObj->Location.Y - nCoord.Y);		
+		if (nDistance <= pType->DamageRadius)
+		{
+			pObj->ReceiveDamage(&pType->Damage, TacticalClass::AdjustForZ(nDistance), pType->Warhead, nullptr, false, false, pThis->OwnerHouse);
+		}
+	}
+
+	return 0x74A934;
+}
+
+struct MPlayerScoreType
+{
+	char Name[0x40];
+	int Scheme;
+	int NonGameOvers;
+	int Lost[4];
+	int Kill[4];
+	int Builts[4];
+	int Score[4];
+};
+
+static constexpr reference<MPlayerScoreType, 0xA8D1FCu, 8u> MPScores;
+DEFINE_HOOK(5C9A6E , Global_CollectScoreScreenData, 5)
+{
+	GET_STACK(wchar_t*, pName, 0x4);
+	GET_STACK(const char*, pName_C, 0x8); 
+	GET_STACK(int, nScheme, 0xC);
+	GET_STACK(int, nLost, 0x10);
+	GET_STACK(int, nKills, 0x14);
+	GET_STACK(int, nBuilt, 0x18);
+	GET_STACK(int, nScore, 0x1C);
+	Debug::Log("%ls: %s\n Scheme : %d\n Lost = %d\n Kills = %d\n Built = %d\n Score = %d\n",
+		pName,pName_C,nScheme,nLost,nKills,nBuilt,nScore);
+	return 0x5C9A73;
+}
+
+DEFINE_HOOK(534F89 , Game_ReloadNeutralMIX_NewLine, 5)
+{
+	Debug::Log("LOADED NEUTRAL.MIX\n");
+	return 0x534F96;
+}
+
+DEFINE_HOOK(4D9EE1 ,FootClass_CanBeSold_Dock, 6)
+{
+	GET(BuildingClass*, pDocker, EAX);
+	GET(FootClass*, pThis, ESI);
+	GET(CoordStruct*, pCoord, ECX);
+
+	R->EAX(pDocker->GetDockCoords(pCoord,pThis));
+	return 0x4D9EE7;
+}
+
+DEFINE_HOOK(4D5782 , FootClass_ApproachTarget_Passive, 6)
+{
+	GET(FootClass*, pThis, EBX);
+	
+	R->CL(pThis->ShouldLoseTargetNow || pThis->InOpenToppedTransport);
+	return 0x4D5788;
+}
+
+DEFINE_HOOK(716D98 , TechnoTypeClass_Load_Palette, 5)
+{
+	GET(TechnoTypeClass*, pThis, EDI);
+
+	if (std::strlen(pThis->PaletteFile) && pThis->PaletteFile[0] != '\0')
+		return 0x716D9D;
+
+	pThis->Palette = nullptr;
+	return 0x716DAA;
+}
+
+DEFINE_HOOK(5FDDA4 ,OverlayTypeClass_IsNottiberium_debugLog_removeMemcpy , 6)
+{
+	GET(OverlayTypeClass*, pThis, EAX);
+
+	auto nString = *reinterpret_cast<char**>(0x833490);
+	Debug::Log(nString, pThis->get_ID());
+	return 0x5FDDC1;
+}
+
+DEFINE_HOOK(51F716 ,InfantryClass_Mi_Unload_Undeploy, 5)
+{
+	GET(InfantryTypeClass*, pThisType, ECX);
+	GET(InfantryClass*, pThis, ESI);
+
+	if (pThisType->UndeployDelay < 0)
+		pThis->PlayAnim(DoType::Undeploy, true, false);
+
+	R->EBX(1);
+	return 0x51F7C9;
+}
+
 /*
-4CA0E3 = FactoryClass_AbandonProduction_Invalidate, 6
-5005CC = HouseClass_SetFactoryCreatedManually, 6
-50067C = HouseClass_ClearFactoryCreatedManually, 6
-5007BE = HouseClass_SetFactoryCreatedManually2, 6
-4B619F = DropPodLocomotionClass_ILocomotion_MoveTo_AtmosphereEntry, 5
-4586D6 = BuildingClass_KillOccupiers, 9
-4239F0 = AnimClass_UpdateBounce_Damage, 8
-74A884 = VoxelAnimClass_Update_Damage, 6
-5C9A6E = Global_CollectScoreScreenData, 5
-534F89 = Game_ReloadNeutralMIX_NewLine, 5
-7BB445 = XSurface_20, 6
-4D9EE1 = FootClass_CanBeSold_Dock, 6
-4D5782 = FootClass_ApproachTarget_Passive, 6
-716D98 = TechnoTypeClass_Load_Palette, 5
-5FDDA4 = IsOverlayIdxTiberium_Log, 6
-51F716 = InfantryClass_Mi_Unload_Undeploy, 5
-551A30 = LayerClass_YSortReorder, 5
-5F6612 = ObjectClass_UnInit_SkipInvalidation, 9
-725A1F = AnnounceInvalidPointer_SkipBehind, 5
-458E1E = BuildingClass_GetOccupyRangeBonus_Demacroize, A
+// idk ?
+DEFINE_HOOK(551A30, LayerClass_YSortReorder, 5)
+{
+	GET(LayerClass*, pThis, ECX);
 
-//Ares rc 1
-4DB37C = FootClass_Remove_Airspace, 6
-451A28 = BuildingClass_PlayAnim_Destroy, 7
-451E40 = BuildingClass_DestroyNthAnim_Destroy, 7
-514F60 = HoverLocomotionClass_ILocomotion_MoveTo, 7
-514E97 = HoverLocomotionClass_ILocomotion_MoveTo, 7
-516305 = HoverLocomotionClass_sub_515ED0, 9
-6BED08 = Game_Terminate_Mouse, 7
+	auto const nCount = pThis->Count;
+	std::sort(&pThis->Items[nCount / 15 * (Unsorted::CurrentFrame % 15)], ((Unsorted::CurrentFrame % 15) >= 14) ?
+		&pThis->Items[nCount] : &pThis->Items[nCount / 15 + nCount / 15 / 4], [](const auto& lhs, const auto& rhs)
+	{
+		return lhs->GetYSort() < rhs->GetYSort();
+	});
 
+	return 0x551A84;
+}
 */
+
+DEFINE_HOOK(5F6612 , ObjectClass_UnInit_SkipInvalidation, 9)
+{
+	GET(ObjectClass*, pThis, ESI);
+
+	if (!pThis->Limbo())
+		AbstractClass::AnnounceExpiredPointer(pThis, true);
+
+	return 0x5F6625;
+}
+
+DEFINE_HOOK(725A1F ,AnnounceInvalidPointer_SkipBehind, 5)
+{
+	GET(AnimClass*, pAnim, ESI);
+
+	return (pAnim->Type == RulesClass::Instance->Behind) ? 0x725C08 : 0x0;
+}
+
+DEFINE_HOOK(458E1E ,BuildingClass_GetOccupyRangeBonus_Demacroize, A)
+{
+	GET(int , v1 ,EDI);
+	GET(int, a1, EAX);
+
+	if (v1 >= a1)
+		v1 = a1;
+
+	R->EAX(v1);
+
+	return 0x458E2D;
+}
+
+DEFINE_HOOK(4DB37C , FootClass_Remove_Airspace, 6)
+{
+	return 0x4DB3A4;
+}
+
+DEFINE_HOOK(451A28 , BuildingClass_PlayAnim_Destroy, 7)
+{
+	GET(AnimClass*, pAnim, ECX);
+	pAnim->UnInit();
+	return 0x451A2F;
+}
+
+DEFINE_HOOK(514F60 , HoverLocomotionClass_ILocomotion_MoveTo, 7)
+{
+	GET(HoverLocomotionClass*, pThis, ESI);
+
+	auto const pFoot = pThis->Owner ? pThis->Owner : pThis->LinkedTo;
+	
+	if (!pFoot->Destination)
+		pFoot->SetSpeedPercentage(0.0);
+
+	return 0x0;
+}
+
+DEFINE_HOOK(516305 ,HoverLocomotionClass_sub_515ED0, 9)
+{
+	GET(HoverLocomotionClass*, pThis, ESI);
+
+	auto const pFoot = pThis->LinkedTo;
+	pThis->HoverLocomotionClass_514F70(true);
+	if (!pFoot->Destination)
+		pFoot->SetSpeedPercentage(0.0);
+
+	return 0x51630E;
+}
+
+DEFINE_HOOK(6BED08 , Game_Terminate_Mouse, 7)
+{
+	GET(void*, pSomething, ECX);
+	YRMemory::Deallocate(pSomething);
+	return 0x6BED34;
+}

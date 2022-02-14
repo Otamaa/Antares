@@ -1,6 +1,8 @@
 #include "Body.h"
 #include <YRPPGlobal.h>
 
+//ToDo: all of these
+
 DEFINE_HOOK(6AF748, SlaveManagerClass_UpdateSlaves_SlaveScan, 6)
 {
 	//GET(InfantryClass*, pSlave, ESI);

@@ -276,6 +276,7 @@ public:
 		NullableIdx<VocClass> Slam_Sound;
 		Valueable<CSFText> EnemyUIName;
 		Valueable<bool> Is_Fake;
+		Valueable<TechnoTypeClass*> Fake_of;
 
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject),
 			//
@@ -291,6 +292,7 @@ public:
 			Slam_Sound(),
 			EnemyUIName(),
 			Is_Fake(false),
+			Fake_of(nullptr),
 			//
 			Survivors_PilotChance(-1),
 			Survivors_PassengerChance(-1),
