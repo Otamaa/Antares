@@ -10,7 +10,8 @@ DEFINE_HOOK(53CC6E, IonBlastClass_Update, 6)
 		: 0x53CE0A
 	;
 }
-
+//53CB91 = IonBlastClass_DTOR, 6
+//53CC63 = IonBlastClass_Update_Beam, 6
 DEFINE_HOOK(53CC0D, IonBlastClass_Update_DTOR, 5)
 {
 	GET(IonBlastClass *, IB, EBX);

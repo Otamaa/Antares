@@ -165,3 +165,49 @@ DEFINE_HOOK(702669, TechnoClass_ReceiveDamage_SuppressDeathWeapon, 9)
 
 	return 0x702672;
 }
+
+//ToDo: this
+DEFINE_HOOK(701A5C, TechnoClass_ReceiveDamage_IronCurtainFlash, 7)
+{
+	GET_STACK(WarheadTypeClass* const, pWarhead, 0xD0);
+	GET(TechnoClass*, pThis, ESI);
+
+	bool ICFlash = true; //control thru [AudioVisual] / WH itself
+
+	if (!pWarhead || !ICFlash)
+		return 0x701A98;
+
+	return pThis->ForceShielded ? 0x701A65 : 0x701A69;
+}
+
+/*ToDo: this
+DEFINE_HOOK(71AFB2, TemporalClass_Fire_HealthFactor, 5)
+{
+	GET(TechnoClass*, pTarget, ECX);
+	GET(TemporalClass*, pThis, ESI);
+	GET(int, nStreght, EAX);
+
+	auto pOwner = pThis->Owner;
+	auto pOwnerExt = TechnoExt::ExtMap.Find(pOwner);
+	auto pWarhead = pOwner->GetWeapon(pOwnerExt->idxSlot_Warp)->WeaponType->Warhead;
+	auto pWarheadExt = WarheadTypeExt::ExtMap.Find(pWarhead);
+
+	auto nCalc = (1.0 - pTarget->Health / pTarget->GetTechnoType()->Strength) * pWarheadExt->Temporal_HealthFactor.Get();
+	auto nCalc_b = (1.0 - nCalc) * (10 * nStreght) + nCalc * 0.0;
+
+	R->EAX(nCalc_b <= 1.0 ? 1 : static_cast<int>(nCalc_b));
+	return 0x71AFB7;
+}
+*/
+
+/*
+5F53E5 = ObjectClass_ReceiveDamage_Relative, 6
+4892BE = DamageArea_NullDamage, 6
+489E9F = DamageArea_BridgeAbsoluteDestroyer, 5
+489FD8 = DamageArea_BridgeAbsoluteDestroyer2, 6
+48A15D = DamageArea_BridgeAbsoluteDestroyer3, 6
+48A229 = DamageArea_BridgeAbsoluteDestroyer4, 6
+48A283 = DamageArea_BridgeAbsoluteDestroyer5, 6
+629BC0 = ParasiteClass_UpdateSquiddy_Culling, 8
+5F5456 = ObjectClass_ReceiveDamage_Culling, 6
+*/

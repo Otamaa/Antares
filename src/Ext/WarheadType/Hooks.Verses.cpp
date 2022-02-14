@@ -1,5 +1,14 @@
 #include "Body.h"
 
+/*
+6F36E3 = TechnoClass_SelectWeapon_Verses, 5
+708AF7 = TechnoClass_ShouldRetaliate_Verses, 7
+6FCB6A = TechnoClass_CanFire_Verses, 7
+6F7D3D = TechnoClass_CanAutoTargetObject_Verses, 7
+70CEA0 = TechnoClass_EvalThreatRating_Verses1, 6
+70CF45 = TechnoClass_EvalThreatRating, B
+489235 = GetTotalDamage_Verses, 8
+*/
 #define GET_VERSES(reg_wh, reg_armor) \
 	GET(WarheadTypeClass *, WH, reg_wh); \
 	GET(int, Armor, reg_armor); \

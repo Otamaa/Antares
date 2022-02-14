@@ -75,3 +75,15 @@ DEFINE_HOOK(6FF4DE, TechnoClass_Fire_IsLaser, 6) {
 	// skip all default handling
 	return 0x6FF656;
 }
+
+DEFINE_HOOK(71AAAC, TemporalClass_Update_Abductor, 6)
+{
+	GET(TemporalClass*, pThis, ESI);
+
+	auto pOwner = pThis->Owner;
+	auto pOwnerExt = TechnoExt::ExtMap.Find(pOwner);
+	auto pWeapon = pOwner->GetWeapon(pOwnerExt->idxSlot_Warp)->WeaponType;
+	auto pWeaponExt = WeaponTypeExt::ExtMap.Find(pWeapon);
+
+	return (pWeaponExt->Abductor && pWeaponExt->conductAbduction(pOwner, pThis->Target)) ? 0x71AAD5 : 0x0;
+}

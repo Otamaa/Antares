@@ -34,7 +34,7 @@ DEFINE_HOOK(6FAF0D, TechnoClass_Update_EMPLock, 6) {
 }
 
 // copy the remaining EMP duration to the unit when undeploying a building.
-DEFINE_HOOK(44A04C, BuildingClass_Unload_CopyEMPDuration, 6) {
+DEFINE_HOOK(44A04C, BuildingClass_Mi_Selling_EMPDuration, 6) {
 	GET(TechnoClass *, pBuilding, EBP);
 	GET(TechnoClass *, pUnit, EBX);
 

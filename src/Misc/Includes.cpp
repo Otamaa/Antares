@@ -1,6 +1,13 @@
 #include "../Ares.h"
 #include "Includes.h"
 
+/*reworked
+525CA5 = INIClass_Parse_IniSectionIncludes_PreProcess1, 8
+525DDB = INIClass_Parse_IniSectionIncludes_PreProcess2, 5
+525C28 = INIClass_Parse_IniSectionIncludes_CopySection1, 7
+525E44 = INIClass_Parse_IniSectionIncludes_CopySection2, 7
+5260D9 = INIClass_Parse_Override, 7
+*/
 int Includes::LastReadIndex = -1;
 DynamicVectorClass<CCINIClass*> Includes::LoadedINIs;
 DynamicVectorClass<char*> Includes::LoadedINIFiles;

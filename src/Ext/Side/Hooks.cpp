@@ -9,7 +9,7 @@
 #include <VoxClass.h>
 
 //0x4F8C97
-DEFINE_HOOK(4F8C97, Sides_BuildConst, 6)
+DEFINE_HOOK(4F8C97, HouseClass_Update_BuildConst, 6)
 {
 	GET(HouseClass *, pThis, ESI);
 
@@ -30,7 +30,7 @@ DEFINE_HOOK(4F8C97, Sides_BuildConst, 6)
 }
 
 //0x4F8F54
-DEFINE_HOOK(4F8F54, Sides_SlaveMinerCheck, 6)
+DEFINE_HOOK(4F8F54, HouseClass_Update_SlaveMinerCheck, 6)
 {
 	GET(HouseClass *, pThis, ESI);
 	GET(int, n, EDI);
@@ -47,9 +47,9 @@ DEFINE_HOOK(4F8F54, Sides_SlaveMinerCheck, 6)
 	return 0x4F8F75;
 }
 
-DEFINE_HOOK_AGAIN(507DBA, Sides_BaseDefenses, 6) // HouseClass_PickAntiArmorDefense
-DEFINE_HOOK_AGAIN(507FAA, Sides_BaseDefenses, 6) // HouseClass_PickAntiInfantryDefense
-DEFINE_HOOK(507BCA, Sides_BaseDefenses, 6) // HouseClass_PickAntiAirDefense
+DEFINE_HOOK_AGAIN(507DBA, HouseClass_BaseDefenses, 6) // HouseClass_PickAntiArmorDefense
+DEFINE_HOOK_AGAIN(507FAA, HouseClass_BaseDefenses, 6) // HouseClass_PickAntiInfantryDefense
+DEFINE_HOOK(507BCA, HouseClass_BaseDefenses, 6) // HouseClass_PickAntiAirDefense
 {
 	GET(HouseTypeClass *, pCountry, EAX);
 	static DynamicVectorClass<BuildingTypeClass*> dummy;
@@ -133,17 +133,17 @@ A_FINE_HOOK(687586, INIClass_ReadScenario, 7)
 */
 
 // WRONG! Stoopidwood passes CD= instead of Side= into singleplayer campaigns, TODO: fix that shit
-DEFINE_HOOK(642B36, Sides_LoadTextColor1, 5)
+DEFINE_HOOK(642B36, ProgressScreenClass_GetLoadTextColor, 5)
 	{ return SideExt::LoadTextColor(R, 0x68CAA9); }
 
 // WRONG! Stoopidwood passes CD= instead of Side= into singleplayer campaigns, TODO: fix that shit
-DEFINE_HOOK(643BB9, Sides_LoadTextColor2, 5)
+DEFINE_HOOK(643BB9, ProgressScreenClass_UpdateSingleProgressBar, 5)
 	{ return SideExt::LoadTextColor(R, 0x643BEF); }
 
-DEFINE_HOOK(642B91, Sides_LoadTextColor3, 5)
+DEFINE_HOOK(642B91, ProgressScreenClass_GetSideColor, 5)
 	{ return SideExt::LoadTextColor(R, 0x68CAA9); }
 
-DEFINE_HOOK(6847B7, Sides_LoadTextColor_CacheMP, 6) {
+DEFINE_HOOK(6847B7, ScenarioClass_PrepareMapAndUDP, 6) {
 	GET(HouseTypeClass*, pType, EAX);
 
 	SideExt::CurrentLoadTextColor = -1;
@@ -157,7 +157,7 @@ DEFINE_HOOK(6847B7, Sides_LoadTextColor_CacheMP, 6) {
 	return 0;
 }
 
-DEFINE_HOOK(686D7F, Sides_LoadTextColor_CacheSP, 6) {
+DEFINE_HOOK(686D7F, INIClass_ReadScenario_CacheSP, 6) {
 	LEA_STACK(INIClass*, pINI, 0x1C);
 
 	const char* pDefault = "";
@@ -565,4 +565,14 @@ DEFINE_HOOK(683D05, sub_683AB0_LoadingScoreB, 5)
 {
 	R->EAX(idxLoadingTheme);
 	return (idxLoadingTheme == -2) ? 0 : 0x683D14;
+}
+
+DEFINE_HOOK(6873AB, INIClass_ReadScenario_EarlyLoadRules, 5)
+{
+	if (SessionClass::Instance->GameMode == GameMode::Campaign) {
+		RulesClass::Global()->Read_Sides(CCINIClass::INI_Rules);
+		SideExt::ExtMap.LoadAllFromINI(CCINIClass::INI_Rules);
+	}
+	R->EAX(0x1180);
+	return 0x6873B0;
 }

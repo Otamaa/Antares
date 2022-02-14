@@ -12,6 +12,7 @@
 #include <InfantryClass.h>
 #include <SuperClass.h>
 #include <ScenarioClass.h>
+#include <NetworkEvents.h>
 
 #include <DiscreteDistributionClass.h>
 #include <DiscreteSelectionClass.h>
@@ -669,3 +670,28 @@ DEFINE_HOOK(5098F0, HouseClass_Update_AI_TryFireSW, 5) {
 
 	return 0x509AE7;
 }
+
+/* not sure what function this call (0x100382D0) ?
+* Pick target ? 
+DEFINE_HOOK(4C78D6 ,Networking_RespondToEvent_SpecialPlace, 8)
+{
+	GET(NetworkEvent*, pEvent, ESI);
+	GET(HouseClass* const, pHouse, EDI);
+
+	//SW.UseAITargeting
+	bool UseSWTargeting = false;
+
+	auto pSuper = pHouse->Supers[pEvent->Checksum];
+	//auto pExt = SWTypeExt::ExtMap.Find(pSuper->Type);
+
+	if (UseSWTargeting)
+	{
+		// idk ? 
+	}
+	else
+	{
+		auto nCoord = static_cast<CellStruct>(pEvent->CommandCount);
+		pHouse->Fire_SW(pEvent->Checksum, nCoord);
+	}
+	return 0x4C78F8;
+}*/

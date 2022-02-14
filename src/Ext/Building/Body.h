@@ -88,6 +88,7 @@ public:
 		TimerStruct CashUpgradeTimers[3];
 
 		VectorClass<int> DockReloadTimers;
+		bool DeliveredFromSW;
 
 	public:
 		ExtData(BuildingClass* OwnerObject) : Extension<BuildingClass>(OwnerObject),
@@ -99,13 +100,13 @@ public:
 			AboutToChronoshift(false),
 			SecretLab_Placed(false),
 			TogglePower_HasPower(true),
-			SensorArrayActiveCounter(0)
+			SensorArrayActiveCounter(0),
+			DeliveredFromSW(false)
 		{ }
 
 		virtual ~ExtData() = default;
 
-		virtual void InvalidatePointer(void* ptr, bool bRemoved) override {
-		}
+		virtual void InvalidatePointer(void* ptr, bool bRemoved) override {	}
 
 		virtual void LoadFromStream(AresStreamReader &Stm) override;
 

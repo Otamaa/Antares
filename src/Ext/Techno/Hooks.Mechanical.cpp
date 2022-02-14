@@ -6,16 +6,55 @@
 #include <Enum/CursorTypes.h>
 
 /*
-6FA361 = TechnoClass_Update_LoseTarget, 5
-6F8F1F = TechnoClass_FindTargetType_Heal, 6
-6F8EE3 = TechnoClass_FindTargetType_Heal, 6
-6F7FC5 = TechnoClass_CanAutoTargetObject_Heal, 7 
+
+DEFINE_HOOK(6F7FC5, TechnoClass_CanAutoTargetObject_Heal, 7)
+{
+	//GET(TechnoClass*, pThis, EDI);
+	//GET(AbstractClass*, pTarget, ESI);
+
+	return 0x6F7FDF;
+}
+
 51C913 = InfantryClass_CanFire_Heal, 7
 520731 = InfantryClass_UpdateFiringState_Heal, 5
 
 736E8E = UnitClass_UpdateFiringState_Heal, 6
-741113 = UnitClass_CanFire_Heal, A
 */
+
+DEFINE_HOOK(741113, UnitClass_CanFire_Heal, A)
+{
+	GET(ObjectClass*, pTarget, EDI);
+
+	return pTarget->IsFullHP() ? 0x741121 : 0x74113A;
+}
+
+DEFINE_HOOK(6FA361, TechnoClass_Update_LoseTarget, 5)
+{
+	GET(TechnoClass*, pThis, ESI);
+	GET(HouseClass*, pHouse, EDI);
+
+	HouseClass* pOwner = R->BL() ? pHouse : pThis->Owner;
+	auto pTarget = pThis->Target;
+
+	bool IsAlly = false;
+	if (auto pTechTarget = generic_cast<TechnoClass*>(pTarget))
+	{
+		IsAlly = pTechTarget->Owner->IsAlliedWith(pOwner);
+	}
+
+	return pThis->CombatDamage() <= 0 && IsAlly ? 0x6FA472 : 0x6FA39D;
+}
+
+DEFINE_HOOK_AGAIN(6F8F1F, TechnoClass_FindTargetType_Heal, 6)
+DEFINE_HOOK(6F8EE3, TechnoClass_FindTargetType_Heal, 6)
+{
+	GET(unsigned int, nVal, EBX);
+
+	nVal |= 0x403Cu;
+
+	R->EBX(nVal);
+	return 0x6F8F25;
+}
 
 DEFINE_HOOK(51E710 ,InfantryClass_GetActionOnObject_Heal, 7)
 {

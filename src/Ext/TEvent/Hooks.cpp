@@ -2,7 +2,7 @@
 
 #include <HouseClass.h>
 
-DEFINE_HOOK(71E949, EventClass_HasOccured, 7)
+DEFINE_HOOK(71E949, TEventClass_HasOccured, 7)
 {
 	GET(TEventClass*, pEvent, EBP);
 
@@ -18,7 +18,7 @@ DEFINE_HOOK(71E949, EventClass_HasOccured, 7)
 }
 
 // the general events requiring a house
-DEFINE_HOOK(71F06C, EventClass_HasOccured_PlayerAtX1, 5)
+DEFINE_HOOK(71F06C, TEventClass_HasOccured_PlayerAtX1, 5)
 {
 	GET(int const, param, ECX);
 
@@ -32,10 +32,10 @@ DEFINE_HOOK(71F06C, EventClass_HasOccured_PlayerAtX1, 5)
 }
 
 // validation for Spy as House, the Entered/Overflown Bys and the Crossed V/H Lines
-DEFINE_HOOK_AGAIN(71ED33, EventClass_HasOccured_PlayerAtX2, 5)
-DEFINE_HOOK_AGAIN(71F1C9, EventClass_HasOccured_PlayerAtX2, 5)
-DEFINE_HOOK_AGAIN(71F1ED, EventClass_HasOccured_PlayerAtX2, 5)
-DEFINE_HOOK(71ED01, EventClass_HasOccured_PlayerAtX2, 5)
+DEFINE_HOOK_AGAIN(71ED33, TEventClass_HasOccured_PlayerAtX2, 5)
+DEFINE_HOOK_AGAIN(71F1C9, TEventClass_HasOccured_PlayerAtX2, 5)
+DEFINE_HOOK_AGAIN(71F1ED, TEventClass_HasOccured_PlayerAtX2, 5)
+DEFINE_HOOK(71ED01, TEventClass_HasOccured_PlayerAtX2, 5)
 {
 	GET(int const, param, ECX);
 	R->EAX(TEventExt::ResolveHouseParam(param));
@@ -43,7 +43,7 @@ DEFINE_HOOK(71ED01, EventClass_HasOccured_PlayerAtX2, 5)
 }
 
 // param for Attacked by House is the array index
-DEFINE_HOOK(71EE79, EventClass_HasOccured_PlayerAtX3, 9)
+DEFINE_HOOK(71EE79, TEventClass_HasOccured_PlayerAtX3, 9)
 {
 	GET(int, param, EAX);
 	GET(HouseClass* const, pHouse, EDX);
@@ -56,3 +56,9 @@ DEFINE_HOOK(71EE79, EventClass_HasOccured_PlayerAtX3, 9)
 
 	return (pHouse->ArrayIndex == param) ? 0x71EE82u : 0x71F163u;
 }
+
+/*
+71F683 = TEventClass_GetFlags, 5
+71F39B = TEventClass_SaveToINI, 5
+71F9C0 = TEventClass_Persistable, 6
+*/

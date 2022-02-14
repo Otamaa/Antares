@@ -215,6 +215,8 @@ void BuildingExt::ExtData::KickOutOfRubble() {
 			item.first->UnInit();
 		}
 	}
+
+	list.Clear();
 }
 
 // #666: IsTrench/Traversal
@@ -795,13 +797,11 @@ bool BuildingExt::ExtData::ImmolateVictim(ObjectClass* const pVictim, bool const
 		auto const pVictimOwner = pVictim->GetOwningHouse();
 
 		if(destroy) {
-			
-
 			auto const pWarhead = pRulesExt->FirestormWarhead.Get(
 				RulesClass::Instance->C4Warhead);
 
 			auto damage = pVictim->Health;
-			pVictim->ReceiveDamage(&damage, 0, pWarhead, nullptr, true, true,
+			pVictim->ReceiveDamage(&damage, 0, pWarhead, pThis, true, true,
 				pThis->Owner);
 		}
 
@@ -1140,7 +1140,9 @@ void BuildingExt::ExtData::Serialize(T& Stm) {
 		.Process(this->CashUpgradeTimers)
 		.Process(this->SecretLab_Placed)
 		.Process(this->TogglePower_HasPower)
-		.Process(this->DockReloadTimers);
+		.Process(this->DockReloadTimers)
+		.Process(this->DeliveredFromSW)
+		;
 }
 
 void BuildingExt::ExtData::LoadFromStream(AresStreamReader &Stm) {
@@ -1175,9 +1177,7 @@ bool BuildingExt::SaveGlobals(AresStreamWriter& Stm) {
 // =============================
 // container
 
-BuildingExt::ExtContainer::ExtContainer() : Container("BuildingClass") {
-}
-
+BuildingExt::ExtContainer::ExtContainer() : Container("BuildingClass") {}
 BuildingExt::ExtContainer::~ExtContainer() = default;
 
 // =============================

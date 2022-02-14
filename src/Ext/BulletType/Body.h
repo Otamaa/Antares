@@ -12,7 +12,7 @@
 
 class BulletClass;
 class ConvertClass;
-
+class ParticleSystemTypeClass;
 class BulletTypeExt
 {
 public:
@@ -44,6 +44,7 @@ public:
 		Nullable<Leptons> BallisticScatterMax;
 
 		Valueable<int> AnimLength;
+		Valueable<ParticleSystemTypeClass*> AttachedSystem;
 
 		ExtData(BulletTypeClass* OwnerObject) : Extension<BulletTypeClass>(OwnerObject),
 			Splits(false),
@@ -54,7 +55,8 @@ public:
 			SubjectToFirewall(true),
 			Parachuted(false),
 			SubjectToTrenches(true),
-			ImageConvert()
+			ImageConvert(),
+			AttachedSystem(nullptr)
 		{ }
 
 		virtual ~ExtData() = default;

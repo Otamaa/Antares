@@ -126,3 +126,14 @@ DEFINE_HOOK(5F96B0, ObjectTypeClass_TheaterSpecificID, 6)
 	}
 	return 0x5F9702;
 }
+
+/*
+5F8277 = ObjectTypeClass_Load3DArt_NoSpawnAlt1, 7
+5F848C = ObjectTypeClass_Load3DArt_NoSpawnAlt2, 6
+
+DEFINE_HOOK(73B6E3, UnitClass_DrawVXL_NoSpawnAlt, 6)
+{
+	GET(UnitClass*, pThis, EBX);
+	R->EDX() = *(a1->_EBX.data + 0x2FC) + 0x1E0; //EXT vtbl ?
+	return 0x73B6E9
+}*/

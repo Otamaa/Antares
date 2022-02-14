@@ -14,6 +14,10 @@
 #include <GameOptionsClass.h>
 #include "../Ares.version.h"
 
+/*
+64DAC3 = Networking_CalculateFrameCRC, 0
+52E9AA = Frontend_WndProc_Checksum, 5
+*/
 #ifdef MAKE_GAME_SLOWER_FOR_NO_REASON
 template<typename T>
 inline void ChecksumItem(const T *it, DWORD &CombinedChecksum) {

@@ -145,11 +145,15 @@ bool SW_ChronoWarp::Activate(SuperClass* pThis, const CellStruct &Coords, bool I
 
 		// if this is a newly produced unit that still is in its
 		// weapons factory, this skips it.
-		if(pTechno->WhatAmI() == AbstractType::Unit) {
-			if(auto const pLinkBld = abstract_cast<BuildingClass*>(pTechno->GetNthLink(0))) {
-				if(pLinkBld->Type->WeaponsFactory) {
-					if(MapClass::Instance->GetCellAt(pTechno->Location)->GetBuilding() == pLinkBld) {
-						return true;
+		if (pTechno)
+		{
+			bool bIncludeNaval = true;
+			if (pTechno->WhatAmI() == AbstractType::Unit) {
+				if (auto const pLinkBld = abstract_cast<BuildingClass*>(pTechno->GetNthLink(0))) {
+					if (pTechno->GetCell()->GetBuilding() == pLinkBld) {
+						if (pLinkBld->Type->WeaponsFactory || (bIncludeNaval && pLinkBld->Type->Naval)) {
+							return true;
+						}
 					}
 				}
 			}

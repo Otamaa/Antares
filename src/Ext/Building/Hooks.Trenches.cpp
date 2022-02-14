@@ -27,7 +27,7 @@ DEFINE_HOOK(457D58, BuildingClass_CanBeOccupied_SpecificOccupiers, 6)
 		bool isIneligible = ((pThis->IsRedHP() && pThis->Type->TechLevel == -1) || pInf->IsMindControlled()); // 
 		bool isNeutral = pThis->Owner->IsNeutral();
 		bool isRaidable = (pBuildTypeExt->BunkerRaidable && isEmpty); // if it's not empty, it cannot be raided anymore, 'cause it already was
-		bool sameOwner = (pThis->Owner == pInf->Owner);
+		bool isSameOwner = (pThis->Owner == pInf->Owner);
 
 		bool allowedOccupier = pBuildTypeExt->CanBeOccupiedBy(pInf);
 
@@ -35,21 +35,9 @@ DEFINE_HOOK(457D58, BuildingClass_CanBeOccupied_SpecificOccupiers, 6)
 		/*	The building switches owners after the first occupant enters,
 			so this check should not interfere with the player who captured it,
 			only prevent others from entering it while it's occupied. (Bug #699) */
-			can_occupy = sameOwner ? true : (isNeutral || isRaidable);
+			can_occupy = isSameOwner ? true : (isNeutral || isRaidable);
 		}
 	}
-
-/*
-// original code replaced by this hook
-	if(pInf->Occupier) {
-		if ( pThis->Owner != pInf->Owner && !pThis->Owner->Country->MultiplayPassive
-			|| pThis->GetOccupantCount() == pThis->BuildingType->MaxNumberOccupants
-			|| pThis->IsRedHP()
-			|| pInf->IsMindControlled() )
-			return 0;
-	}
-	return 1;
-*/
 
 	return can_occupy ? 0x457DD5 : 0x457DA3;
 }
@@ -82,7 +70,6 @@ DEFINE_HOOK(457DB7, BuildingClass_CanBeOccupied_SpecificAssaulters, 6)
 
 // #664: Advanced Rubble - turning into rubble part
 // moved to before the survivors get unlimboed, per sanity's requirements
-// TODO review
 DEFINE_HOOK(441F12, BuildingClass_Destroy_RubbleYell, 6)
 {
 	GET(BuildingClass *, pThis, ESI);
@@ -309,6 +296,7 @@ A_FINE_HOOK(457DF5, BuildingClass_UnloadOccupants_AboutToStartUnloading, 6)
 	<Renegade> at what place in the chain is that executed?
 	<DCoder> in the middle of where the building changes ownership from old player to new
 */
+// Removed ? -Otamaa
 DEFINE_HOOK(448401, BuildingClass_ChangeOwnership_TrenchEVA, 6)
 {
 	GET(BuildingClass *, pBld, ESI);

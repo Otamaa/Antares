@@ -30,6 +30,40 @@ DEFINE_HOOK(457533, BuildingClass_Infiltrate_Standard, 6)
 	return R->Origin() + 6;
 }
 
+namespace DrawProductionData
+{
+	void DrawCameo(BuildingClass* pThis , Point2D* pLocation, RectangleStruct* pBounds)
+	{
+		auto pFactory = pThis->Factory;
+		if (pThis->Owner->ControlledByPlayer()) {
+			pFactory = pThis->Owner->GetPrimaryFactory(pThis->Type->Factory, pThis->Type->Naval, BuildCat::DontCare);
+		}
+
+		if (pFactory && pFactory->Object) {
+			auto pProdType = pFactory->Object->GetTechnoType();
+			auto pProdExt = TechnoTypeExt::ExtMap.Find(pProdType);
+
+			// support for pcx cameos
+			if (auto pPCX = pProdExt->CameoPCX.GetSurface()) {
+				const int cameoWidth = 60;
+				const int cameoHeight = 48;
+
+				RectangleStruct cameoBounds = { 0, 0, cameoWidth, cameoHeight };
+				RectangleStruct destRect = { pLocation->X - cameoWidth / 2, pLocation->Y - cameoHeight / 2, cameoWidth, cameoHeight };
+				RectangleStruct destClip = Drawing::Intersect(&destRect, pBounds, nullptr, nullptr);
+
+				DSurface::Hidden_2->Blit(pBounds, &destClip, pPCX, &cameoBounds, &cameoBounds, true, true);
+			}
+			else {
+				// old shp cameos, fixed palette
+				auto pCameo = pProdType->GetCameo();
+				auto pConvert = pProdExt->CameoPal.Convert ? pProdExt->CameoPal.GetConvert() : FileSystem::CAMEO_PAL;
+				DSurface::Hidden_2->DrawSHP(pConvert, pCameo, 0, pLocation, pBounds, BlitterFlags(0xE00), 0, 0, 0, 1000, 0, nullptr, 0, 0, 0);
+			}
+		}
+	}
+};
+
 DEFINE_HOOK(43E7B0, BuildingClass_DrawVisible, 5)
 {
 	GET(BuildingClass*, pThis, ECX);
@@ -42,41 +76,17 @@ DEFINE_HOOK(43E7B0, BuildingClass_DrawVisible, 5)
 	// helpers (with support for the new spy effect)
 	bool bAllied = pThis->Owner->IsAlliedWith(HouseClass::Player);
 	bool bReveal = pExt->RevealProduction && pThis->DisplayProductionTo.Contains(HouseClass::Player);
+	bool bObserver = HouseClass::Observer() || HouseClass::IsPlayerObserver();
 
 	// show building or house state
-	if(pThis->IsSelected && (bAllied || bReveal)) {
+	if(pThis->IsSelected && (bAllied || bReveal || bObserver)) {
 		Point2D loc = {pLocation->X - 10, pLocation->Y + 10};
 		pThis->DrawExtraInfo(loc, pLocation, pBounds);
 	}
 
 	// display production cameo
-	if(pThis->IsSelected && bReveal) {
-		auto pFactory = pThis->Factory;
-		if(pThis->Owner->ControlledByPlayer()) {
-			pFactory = pThis->Owner->GetPrimaryFactory(pType->Factory, pType->Naval, BuildCat::DontCare);
-		}
-
-		if(pFactory && pFactory->Object) {
-			auto pProdType = pFactory->Object->GetTechnoType();
-			auto pProdExt = TechnoTypeExt::ExtMap.Find(pProdType);
-
-			// support for pcx cameos
-			if(auto pPCX = pProdExt->CameoPCX.GetSurface()) {
-				const int cameoWidth = 60;
-				const int cameoHeight = 48;
-
-				RectangleStruct cameoBounds = {0, 0, cameoWidth, cameoHeight};
-				RectangleStruct destRect = {pLocation->X - cameoWidth / 2, pLocation->Y - cameoHeight / 2, cameoWidth, cameoHeight};
-				RectangleStruct destClip = Drawing::Intersect(&destRect, pBounds, nullptr, nullptr);
-
-				DSurface::Hidden_2->Blit(pBounds, &destClip, pPCX, &cameoBounds, &cameoBounds, true, true);
-			} else {
-				// old shp cameos, fixed palette
-				auto pCameo = pProdType->GetCameo();
-				auto pConvert = pProdExt->CameoPal.Convert ? pProdExt->CameoPal.GetConvert() : FileSystem::CAMEO_PAL;
-				DSurface::Hidden_2->DrawSHP(pConvert, pCameo, 0, pLocation, pBounds, BlitterFlags(0xE00), 0, 0, 0, 1000, 0, nullptr, 0, 0, 0);
-			}
-		}
+	if(pThis->IsSelected && (bReveal || bObserver)) {
+		DrawProductionData::DrawCameo(pThis, pLocation, pBounds);
 	}
 
 	return 0x43E8F2;

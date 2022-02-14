@@ -11,8 +11,7 @@ AbstractExt::ExtContainer AbstractExt::ExtMap;
 template <typename T>
 void AbstractExt::ExtData::Serialize(T& Stm) {
 	Stm
-		.Process(this->LastChecksumTime)
-		.Process(this->LastChecksum);
+		;
 }
 
 void AbstractExt::ExtData::LoadFromStream(AresStreamReader &Stm) {

@@ -19,19 +19,6 @@ DEFINE_HOOK(4232CE, AnimClass_Draw_SetPalette, 6)
 	return 0;
 }
 
-DEFINE_HOOK(468379, BulletClass_Draw_SetAnimPalette, 6)
-{
-	GET(BulletClass *, Bullet, ESI);
-	auto pExt = BulletTypeExt::ExtMap.Find(Bullet->Type);
-
-	if(ConvertClass* Convert = pExt->GetConvert()) {
-		R->EBX<ConvertClass *>(Convert);
-		return 0x4683D7;
-	}
-
-	return 0;
-}
-
 DEFINE_HOOK_AGAIN(42511B, AnimClass_Expired_ScorchFlamer, 7)
 DEFINE_HOOK_AGAIN(4250C9, AnimClass_Expired_ScorchFlamer, 7)
 DEFINE_HOOK(42513F, AnimClass_Expired_ScorchFlamer, 7)

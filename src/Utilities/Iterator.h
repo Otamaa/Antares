@@ -3,6 +3,16 @@
 #include <ArrayClasses.h>
 #include <vector>
 
+namespace std_Vec
+{
+	template<class T, class I, class = typename std::enable_if<std::is_integral<I>::value>::type>
+	void remove(std::vector<T>& v, I index)
+	{
+		const auto& iter = v.cbegin() + Conversions::narrow_cast<typename std::vector<T>::difference_type>(index);
+		v.erase(iter);
+	}
+}
+
 template<typename T>
 class Iterator {
 private:

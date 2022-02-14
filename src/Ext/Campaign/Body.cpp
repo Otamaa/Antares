@@ -57,9 +57,18 @@ CampaignExt::ExtContainer::~ExtContainer() = default;
 // =============================
 // container hooks
 
-DEFINE_HOOK(46D090, CampaignClass_DTOR, 6)
+DEFINE_HOOK_AGAIN(46CF3D ,CampaignClass_CTOR, 5)
+DEFINE_HOOK(46CC03, CampaignClass_CTOR, 5)
 {
-	GET(CampaignClass*, pItem, ECX);
+	GET(CampaignClass*, pItem, ESI);
+	CampaignExt::ExtMap.FindOrAllocate(pItem);
+	return 0;
+}
+
+DEFINE_HOOK_AGAIN(46D0B6 , CampaignClass_DTOR, 6)
+DEFINE_HOOK(46CC36, CampaignClass_DTOR, 6)
+{
+	GET(CampaignClass*, pItem, ESI);
 	CampaignExt::ExtMap.Remove(pItem);
 	return 0;
 }

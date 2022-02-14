@@ -2,6 +2,7 @@
 #include "../../Ares.h"
 
 #include <OverlayClass.h>
+#include <ScenarioClass.h>
 
 DEFINE_HOOK(668BF0, RulesClass_Addition, 5)
 {
@@ -63,4 +64,11 @@ DEFINE_HOOK(66748A, RulesClass_CTOR_TiberiumTransmogrify, 6)
 	GET(RulesClass*, pThis, ESI);
 	pThis->TiberiumTransmogrify = 0;
 	return 0;
+}
+
+DEFINE_HOOK(48248D , CellClass_CrateBeingCollected_MoneyRandom,6)
+{
+	GET(int, nVal, EAX);
+	R->EDI(nVal + ScenarioClass::Instance->Random(RulesExt::Global()->CrateMoney_Random.Get()));
+	return 0x4824A7;
 }

@@ -7,8 +7,10 @@
 #include <Conversions.h>
 #include <HouseClass.h>
 
+// 73B672 = UnitClass_DrawVXL, 6
+
 /* #604 - customizable parachutes */
-DEFINE_HOOK(5F5ADD, Parachute_Animation, 6)
+DEFINE_HOOK(5F5ADD, ObjectClass_SpawnParachuted_Animation, 6)
 {
 	GET(TechnoClass *, T, ESI);
 

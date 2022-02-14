@@ -28,3 +28,8 @@ DEFINE_HOOK(6DD8D7, TActionClass_Execute, A)
 	R->EDX(value);
 	return (value > 144u) ? Handled : Default;
 }
+
+/*
+6E3EE0 = TActionClass_GetFlags, 5
+6E3B60 = TActionClass_GetMode, 8
+*/

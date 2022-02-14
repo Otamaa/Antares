@@ -4,7 +4,8 @@
 
 #include <MouseClass.h>
 
-DEFINE_HOOK(45EC90, Foundations_GetFoundationWidth, 6)
+//DEFINE_HOOK(45EC90, Foundations_GetFoundationWidth, 6)
+DEFINE_HOOK(45EC90, BuildingTypeClass_GetFoundationWidth, 6)
 {
 	GET(BuildingTypeClass*, pThis, ECX);
 	BuildingTypeExt::ExtData* pData = BuildingTypeExt::ExtMap.Find(pThis);
@@ -17,7 +18,8 @@ DEFINE_HOOK(45EC90, Foundations_GetFoundationWidth, 6)
 	return 0;
 }
 
-DEFINE_HOOK(45ECA0, Foundations_GetFoundationHeight, 6)
+//DEFINE_HOOK(45ECA0, Foundations_GetFoundationHeight, 6)
+DEFINE_HOOK(45ECA0, BuildingTypeClass_GetFoundationHeight, 6)
 {
 	GET(BuildingTypeClass*, pThis, ECX);
 	BuildingTypeExt::ExtData* pData = BuildingTypeExt::ExtMap.Find(pThis);
@@ -37,7 +39,8 @@ DEFINE_HOOK(45ECA0, Foundations_GetFoundationHeight, 6)
 	return 0;
 }
 
-DEFINE_HOOK(656584, MapClass_GetFoundationShape, 6)
+//DEFINE_HOOK(656584, MapClass_GetFoundationShape, 6)
+DEFINE_HOOK(656584, RadarClass_GetFoundationShape, 6)
 {
 	GET(RadarClass*, pThis, ECX);
 	GET(BuildingTypeClass*, pType, EAX);

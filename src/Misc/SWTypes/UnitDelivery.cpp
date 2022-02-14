@@ -2,6 +2,7 @@
 #include "../../Ext/House/Body.h"
 #include "../../Ext/Techno/Body.h"
 #include "../../Utilities/TemplateDef.h"
+#include <Ext/Building/Body.h>
 
 #include <AircraftClass.h>
 #include <BuildingClass.h>
@@ -107,7 +108,7 @@ void UnitDeliveryStateMachine::PlaceUnits()
 		}
 
 		// move the target cell so this object is centered on the actual location
-		auto PlaceCoords = this->Coords - CellStruct{extentX / 2, extentY / 2};
+		auto PlaceCoords = this->Coords - CellStruct{ (short)(extentX / 2), (short)(extentY / 2)};
 
 		// find a place to put this
 		if(!anywhere) {
@@ -119,6 +120,10 @@ void UnitDeliveryStateMachine::PlaceUnits()
 
 		if(auto pCell = MapClass::Instance->TryGetCellAt(PlaceCoords)) {
 			Item->OnBridge = pCell->ContainsBridge();
+
+			auto pExt = BuildingExt::ExtMap.Find(ItemBuilding);
+			if (!pExt->DeliveredFromSW)
+				pExt->DeliveredFromSW = true;
 
 			// set the appropriate mission
 			if(ItemBuilding && pData->SW_DeliverBuildups) {

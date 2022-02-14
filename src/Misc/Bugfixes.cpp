@@ -88,12 +88,6 @@ DEFINE_HOOK(441D25, BuildingClass_Destroy, 0A)
 	return 0x441D37;
 }
 
-// bugfix #379: Temporal friendly kills give veterancy
-// bugfix #1266: Temporal kills gain double experience
-DEFINE_HOOK(71A922, TemporalClass_Update, 6) {
-	return 0x71A97D;
-}
-
 // bugfix #874 A: Temporal warheads affect Warpable=no units
 DEFINE_HOOK(71AF2B, TemporalClass_Fire_UnwarpableA, A) {
 	// skip freeing captured and destroying spawned units,
@@ -188,6 +182,8 @@ A_FINE_HOOK(74036E, FooClass_GetCursorOverObject, 5)
 }
 */
 
+
+// replaced later ! -Otamaa
 // 42461D, 6
 // 42463A, 6
 // correct warhead for animation damage
@@ -413,16 +409,6 @@ A_FINE_HOOK(48439A, CellClass_GetColourComponents, 5)
 }
 */
 
-DEFINE_HOOK(6873AB, INIClass_ReadScenario_EarlyLoadRules, 5)
-{
-	if(SessionClass::Instance->GameMode == GameMode::Campaign) {
-		RulesClass::Global()->Read_Sides(CCINIClass::INI_Rules);
-		SideExt::ExtMap.LoadAllFromINI(CCINIClass::INI_Rules);
-	}
-	R->EAX(0x1180);
-	return 0x6873B0;
-}
-
 // allowhiresmodes
 /*
 A_FINE_HOOK(5FA41D, GameOptionsClass_CTOR, 5)
@@ -598,7 +584,7 @@ DEFINE_HOOK(62A2F8, ParasiteClass_PointerGotInvalid, 6)
 }
 
 // update parasite coords along with the host
-DEFINE_HOOK(4DB87E, FootClass_SetCoords, 6)
+DEFINE_HOOK(4DB87E, FootClass_SetLocation_Parasite, 6)
 {
 	GET(FootClass *, F, ESI);
 	if(F->ParasiteEatingMe) {
@@ -706,12 +692,13 @@ DEFINE_HOOK(413FA3, AircraftClass_Init_Cloakable, 5)
 	return 0;
 }
 
-DEFINE_HOOK(48A507, SelectDamageAnimation_FixNegatives, 5)
+DEFINE_HOOK(48A4F9, SelectDamageAnimation_FixNegatives, 6)
 {
 	GET(int, Damage, EDI);
 	Damage = abs(Damage);
 	R->EDI(Damage);
-	return 0;
+
+	return Damage ?  0x48A4FF:0x48A618;
 }
 
 /* #1354 - Aircraft and empty SovParaDropInf list */
@@ -725,7 +712,7 @@ DEFINE_HOOK(41D887, AirstrikeClass_Fire, 6)
 }
 
 // issue #1282: remap wall using its owner's colors
-DEFINE_HOOK(47F9A4, DrawOverlay_WallRemap, 6) {
+DEFINE_HOOK(47F9A4, CellClass_DrawOverlay_WallRemap, 6) {
 	GET(CellClass*, pCell, ESI);
 	
 	int idx = pCell->WallOwnerIndex;
@@ -813,7 +800,7 @@ DEFINE_HOOK(4CA437, FactoryClass_GetCRC, 0)
 }
 
 // issue #1532
-DEFINE_HOOK(749088, Count_ResetWithGivenCount, 6)
+DEFINE_HOOK(749088, FixedWidthCounter_ResetWithGivenCount, 6)
 {
 	GET(unsigned int, Width, EAX);
 	if(Width > 512) {
@@ -901,34 +888,6 @@ DEFINE_HOOK(47243F, CaptureManagerClass_DecideUnitFate_BuildingFate, 6) {
 	return 0;
 }
 
-DEFINE_HOOK(4471D5, BuildingClass_Sell_DetonateNoBuildup, 6)
-{
-	GET(BuildingClass *, pStructure, ESI);
-	if(auto Bomb = pStructure->AttachedBomb) {
-		Bomb->Detonate();
-	}
-
-	return 0;
-}
-
-DEFINE_HOOK(44A1FF, BuildingClass_Mi_Selling_DetonatePostBuildup, 6) {
-	GET(BuildingClass *, pStructure, EBP);
-	if(auto Bomb = pStructure->AttachedBomb) {
-		Bomb->Detonate();
-	}
-
-	return 0;
-}
-
-DEFINE_HOOK(4D9F7B, FootClass_Sell_Detonate, 6)
-{
-	GET(FootClass *, pSellee, ESI);
-	if(auto Bomb = pSellee->AttachedBomb) {
-		Bomb->Detonate();
-	}
-	return 0;
-}
-
 DEFINE_HOOK(739956, UnitClass_Deploy_TransferIvanBomb, 6)
 {
 	GET(UnitClass *, pUnit, EBP);
@@ -988,7 +947,7 @@ DEFINE_HOOK(51DF27, InfantryClass_Remove_Teleport, 6)
 
 // issues 1002020, 896263, 895954: clear stale mind control pointer to prevent
 // crashes when accessing properties of the destroyed controllers.
-DEFINE_HOOK(7077EE, TechnoClass_PointerGotInvalid_ResetMindControl, 6)
+DEFINE_HOOK(707B09, TechnoClass_PointerGotInvalid_ResetMindControl, 6)
 {
 	GET(TechnoClass*, pThis, ESI);
 	GET(void*, ptr, EBP);
@@ -1357,7 +1316,6 @@ DEFINE_HOOK(6FA2C7, TechnoClass_Update_DrawHidden, 8)
 	return !disallowed ? 0u : 0x6FA30Cu;
 }
 
-
 // https://ares-developers.github.io/Ares-docs/bugfixes/type1/distanceoverflow.html?highlight=distance
 // Backport : Otamaa
 DEFINE_HOOK(5F6515, AbstractClass_Distance2DSquared_1, 8)
@@ -1455,3 +1413,207 @@ DEFINE_HOOK(71136F, TechnoTypeClass_CTOR_Initialize, 6)
 
 	return 0;
 }
+
+// iron curtained units would crush themselves
+DEFINE_HOOK(7187DA, TeleportLocomotionClass_Unwarp_PreventSelfCrush, 6) {
+	GET(TechnoClass*, pTeleporter, EDI);
+	GET(TechnoClass*, pContent, ECX);
+	return (pTeleporter == pContent) ? 0x71880A : 0;
+}
+
+// sink stuff that simply cannot exist on water
+DEFINE_HOOK(7188F2, TeleportLocomotionClass_Unwarp_SinkJumpJets, 7) {
+	GET(CellClass*, pCell, EAX);
+	GET(TechnoClass**, pTechno, ESI);
+
+	if (pCell->Tile_Is_Wet()) {
+		if (UnitClass* pUnit = specific_cast<UnitClass*>(pTechno[3])) {
+			if (pUnit->Deactivated) {
+				// this thing does not float
+				R->BL(0);
+			}
+
+			// manually sink it
+			if (pUnit->Type->SpeedType == SpeedType::Hover && pUnit->Type->JumpJet) {
+				return 0x718A66;
+			}
+		}
+	}
+
+	return 0;
+}
+
+DEFINE_HOOK(446AAF, BuildingClass_Place_SkipFreeUnits, 6)
+{
+	// allow free units and non-separate aircraft to be created
+	// only once.
+	GET(BuildingClass*, pBld, EBP);
+	BuildingExt::ExtData* pExt = BuildingExt::ExtMap.Find(pBld);
+	if (!pExt->FreeUnits_Done) {
+		pExt->FreeUnits_Done = true;
+		return 0;
+	}
+
+	// skip handling free units
+	return 0x446FB6;
+}
+
+DEFINE_HOOK(7BB445, XSurface_20, 6)
+{
+	return R->EAX() ? 0x0 : 0x7BB90C;
+}
+
+DEFINE_HOOK(6B7D50, SpawnManagerClass_CountDockedSpawns, 6)
+{
+	GET(SpawnManagerClass*, pThis, EAX);
+
+	int nCur = 0;
+	for (auto const& pNode : pThis->SpawnedNodes)
+	{
+		if (pNode)
+		{
+			auto nStatus = pNode->Status;
+			if ((nStatus == SpawnNodeStatus::Idle ||
+				nStatus == SpawnNodeStatus::Dead ||
+				nStatus == SpawnNodeStatus::Reloading) &&
+				pNode->SpawnTimer.StartTime >= 0 &&
+				!pNode->SpawnTimer.TimeLeft
+				)
+			{
+				++nCur;
+			}
+		}
+	}
+
+	R->EAX(nCur);
+	return 0x6B7D73;
+}
+
+DEFINE_HOOK(6E20D8, TActionClass_DestroyAttached_Loop, 5)
+{
+	GET(int, nLoopVal, EAX);
+
+	return nLoopVal < 4 ? 0x6E20E0 : 0x0;
+}
+
+DEFINE_HOOK(44D0C3, BuildingClass_Missile_EMPFire_WeaponType, 5)
+{
+	GET(BulletClass*, pBullet, EAX);
+	GET(WeaponTypeClass*, pWeapon, EBP);
+
+	pBullet->SetWeaponType(pWeapon);
+	return 0;
+}
+
+DEFINE_HOOK(70133E, TechnoClass_GetWeaponRange_Demacroize, 5)
+{
+	GET(int, nVal1, EDI);
+	GET(int, nVal2, EBX);
+
+	R->EAX(nVal1 >= nVal2 ? nVal2 : nVal1);
+	return 0x701388;
+}
+
+DEFINE_HOOK(707EEA, TechnoClass_GetGuardRange_Demacroize, 6)
+{
+	GET(int, nVal1, EBX);
+	GET(int, nVal2, EAX);
+
+	R->EAX(nVal2 >= nVal1 ? nVal2 : nVal1);
+	return 0x707F08;
+}
+
+DEFINE_HOOK(707A47, TechnoClass_PointerGotInvalid_LastTarget, A)
+{
+	GET(TechnoClass*, pThis, ESI);
+	GET(void*, ptr, EBP);
+
+	if (pThis->LastTarget == ptr)
+		pThis->LastTarget = nullptr;
+
+	return 0;
+}
+
+DEFINE_HOOK(7461C5, UnitClass_BallooonHoverExplode_OverrideCheck, 6)
+{
+	GET(UnitClass*, pThis, EDI);
+	GET(UnitTypeClass*, pType, EAX);
+
+	R->CL(pType->BalloonHover || pType->Explodes || pThis->HasAbility(Ability::Explodes));
+	return 0x7461CB;
+}
+
+DEFINE_HOOK(6F90F8, TechnoClass_SelectAutoTarget_Demacroize, 6)
+{
+	GET(int, nVal1, EDI);
+	GET(int, nVal2, EAX);
+
+	R->EAX(nVal2 >= nVal1 ? nVal2 : nVal1);
+	return 0x6F9116;
+}
+
+DEFINE_HOOK(6FCF53, TechnoClass_SetTarget_Burst, 6)
+{
+	return 0x6FCF61;
+}
+
+DEFINE_HOOK(7119D5, TechnoTypeClass_CTOR_NoInit_Particles, 6)
+{
+	GET(TechnoTypeClass*, pThis, ESI);
+
+	pThis->DamageParticleSystems = ParticleSystemTypeClass::TypeListArray();
+	pThis->DestroyParticleSystems = ParticleSystemTypeClass::TypeListArray();
+
+	return 0x711A00;
+}
+
+DEFINE_HOOK_AGAIN(717855, TechnoTypeClass_UpdatePalette_Reset, 6)
+DEFINE_HOOK(717823, TechnoTypeClass_UpdatePalette_Reset, 6)
+{
+	GET(TechnoTypeClass*, pThis, ESI);
+
+	pThis->Palette = nullptr;
+
+	return 0;
+}
+
+DEFINE_HOOK(73F7DD, UnitClass_IsCellOccupied_Bib, 8)
+{
+	GET(BuildingClass*, pBuilding, ESI);
+	GET(UnitClass*, pThis, EBX);
+
+	return pThis && pBuilding->Owner->IsAlliedWith(pThis) ? 0x0 : 0x73F823;
+}
+
+/*
+4CA0E3 = FactoryClass_AbandonProduction_Invalidate, 6
+5005CC = HouseClass_SetFactoryCreatedManually, 6
+50067C = HouseClass_ClearFactoryCreatedManually, 6
+5007BE = HouseClass_SetFactoryCreatedManually2, 6
+4B619F = DropPodLocomotionClass_ILocomotion_MoveTo_AtmosphereEntry, 5
+4586D6 = BuildingClass_KillOccupiers, 9
+4239F0 = AnimClass_UpdateBounce_Damage, 8
+74A884 = VoxelAnimClass_Update_Damage, 6
+5C9A6E = Global_CollectScoreScreenData, 5
+534F89 = Game_ReloadNeutralMIX_NewLine, 5
+7BB445 = XSurface_20, 6
+4D9EE1 = FootClass_CanBeSold_Dock, 6
+4D5782 = FootClass_ApproachTarget_Passive, 6
+716D98 = TechnoTypeClass_Load_Palette, 5
+5FDDA4 = IsOverlayIdxTiberium_Log, 6
+51F716 = InfantryClass_Mi_Unload_Undeploy, 5
+551A30 = LayerClass_YSortReorder, 5
+5F6612 = ObjectClass_UnInit_SkipInvalidation, 9
+725A1F = AnnounceInvalidPointer_SkipBehind, 5
+458E1E = BuildingClass_GetOccupyRangeBonus_Demacroize, A
+
+//Ares rc 1
+4DB37C = FootClass_Remove_Airspace, 6
+451A28 = BuildingClass_PlayAnim_Destroy, 7
+451E40 = BuildingClass_DestroyNthAnim_Destroy, 7
+514F60 = HoverLocomotionClass_ILocomotion_MoveTo, 7
+514E97 = HoverLocomotionClass_ILocomotion_MoveTo, 7
+516305 = HoverLocomotionClass_sub_515ED0, 9
+6BED08 = Game_Terminate_Mouse, 7
+
+*/

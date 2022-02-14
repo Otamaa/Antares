@@ -69,7 +69,7 @@ DEFINE_HOOK(445355, BuildingClass_KickOutUnit_Firewall, 6)
 }
 
 // placement linking
-DEFINE_HOOK(6D5455, sub_6D5030, 6)
+DEFINE_HOOK(6D5455, TecticalClass_DrawPlacement_FirewallLink, 6)
 {
 	GET(BuildingTypeClass* const, pType, EAX);
 	auto const pExt = BuildingTypeExt::ExtMap.Find(pType);
@@ -78,7 +78,7 @@ DEFINE_HOOK(6D5455, sub_6D5030, 6)
 }
 
 // placement linking
-DEFINE_HOOK(6D5A5C, sub_6D59D0, 6)
+DEFINE_HOOK(6D5A5C, TecticalClass_DrawPlacement_Firewall, 6)
 {
 	GET(BuildingTypeClass* const, pType, EDX);
 	auto const pExt = BuildingTypeExt::ExtMap.Find(pType);
@@ -103,7 +103,7 @@ DEFINE_HOOK(43EFB3, BuildingClass_GetStaticImageFrame, 6)
 }
 
 // ignore damage
-DEFINE_HOOK(4423E7, BuildingClass_ReceiveDamage_FSW, 5)
+DEFINE_HOOK(4423E7, BuildingClass_ReceiveDamage_FirestromWall, 5)
 {
 	GET(BuildingClass* const, pThis, ESI);
 	GET_STACK(int* const, pDamage, 0xA0);
@@ -162,7 +162,7 @@ DEFINE_HOOK(440378, BuildingClass_Update_FirestormWall, 6)
 }
 
 // pathfinding 1
-DEFINE_HOOK(483D94, CellClass_Setup_Slave, 6)
+DEFINE_HOOK(483D94, CellClass_UpdatePassability, 6)
 {
 	GET(BuildingClass* const, pBuilding, ESI);
 	auto const pTypeExt = BuildingTypeExt::ExtMap.Find(pBuilding->Type);

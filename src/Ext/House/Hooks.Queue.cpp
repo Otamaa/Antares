@@ -176,3 +176,31 @@ DEFINE_HOOK(50B370, HouseClass_ShouldDisableCameo, 5)
 	R->EAX(ret);
 	return 0x50B669;
 }
+
+/*
+DEFINE_HOOK(6AB312, SidebarClass_ProcessCameoClick_Power, 6)
+{
+	GET(TechnoClass*, pThis, ESI);
+
+	auto pType = pThis->GetTechnoType();
+
+	auto nState = HouseExt::HasFactory(pThis->Owner, pType, false);
+	if(nState == HouseExt::FactoryState::Available)
+		return 0x6AB95A;
+
+	R->EAX(nState);
+	return 0x6AB320;
+}*/
+
+DEFINE_HOOK(535DB6, SetStructureTabCommandClass_Execute_Power, 6)
+{
+	GET(BuildingClass*, pBuild, EAX);
+	R->EAX(pBuild->FindFactory(false, true));
+	return 0x535DC2;
+}
+DEFINE_HOOK(535E76, SetDefenseTabCommandClass_Execute_Power, 6)
+{
+	GET(BuildingClass*, pBuild, EAX);
+	R->EAX(pBuild->FindFactory(false, true));
+	return 0x535E82;
+}

@@ -45,3 +45,40 @@ DEFINE_HOOK(4A76ED, DiskLaserClass_Update_Anim, 7)
 
 	return 0;
 }
+
+DEFINE_HOOK(70CBB0, TechnoClass_DealParticleDamage_AmbientDamage, 6)
+{
+	enum { SkipAndCleanup = 0x70CC3E, BeginVectorCheck = 0x70CBB9, IsCollapsable = 0x70CBF7 };
+	GET_BASE(WeaponTypeClass*, pWeapon, 0x14);
+	GET(int, nsize, EAX);
+
+	if (!pWeapon || !pWeapon->AmbientDamage)
+		return  SkipAndCleanup;
+
+	if (nsize > 0)
+		return  BeginVectorCheck;
+
+	R->EDI(pWeapon);
+	return IsCollapsable;
+}
+
+/*
+DEFINE_HOOK(6FF26E, TechnoClass_Fire_DetachedRailgun2, 6)
+{
+	GET(WeaponTypeClass*, pWeapon, EBX);
+
+	bool bIsDetachedRailgun = false;
+
+	return bIsDetachedRailgun ? 0x6FF274 : 0x0;
+}
+
+DEFINE_HOOK(6FF1FB, TechnoClass_Fire_DetachedRailgun, 6)
+{
+	GET(WeaponTypeClass*, pWeapon, EBX);
+
+	bool bIsDetachedRailgun = false;
+
+	return bIsDetachedRailgun ? 0x6FF20F : 0x0;
+}
+
+*/

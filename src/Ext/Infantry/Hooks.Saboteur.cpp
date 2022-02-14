@@ -96,7 +96,8 @@ DEFINE_HOOK(51B2CB, InfantryClass_SetTarget_Saboteur, 6)
 	return 0x51B33F;
 }
 
-DEFINE_HOOK(51A03E, InfantryClass_UpdatePosition_Saboteur, 6)
+//DEFINE_HOOK(51A03E, InfantryClass_UpdatePosition_Saboteur, 6)
+DEFINE_HOOK(519FF8, InfantryClass_UpdatePosition_Saboteur, 6)
 {
 	GET(InfantryClass* const, pThis, ESI);
 	GET(BuildingClass* const, pBuilding, EDI);

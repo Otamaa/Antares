@@ -3,9 +3,12 @@
 #include "../WeaponType/Body.h"
 #include "../../Misc/Debug.h"
 #include "../../Ares.h"
+#include <Ext/Techno/Body.h>
 
 #include <BuildingClass.h>
 #include <InfantryClass.h>
+#include <ScenarioClass.h>
+#include <HouseClass.h>
 
 // bugfix #471: InfantryTypes and BuildingTypes don't reload their ammo properly
 
@@ -43,7 +46,7 @@ DEFINE_HOOK(51BCB2, InfantryClass_Update_Reload, 6)
 	return 0x51BCC0;
 }
 
-DEFINE_HOOK(51DF8C, InfantryClass_Fire_RearmTimer, 6)
+DEFINE_HOOK(51DF8C, InfantryClass_Fire_Ammo, 6)
 {
 	GET(InfantryClass *, I, ESI);
 	int Ammo = I->Type->Ammo;
@@ -53,7 +56,7 @@ DEFINE_HOOK(51DF8C, InfantryClass_Fire_RearmTimer, 6)
 	return 0;
 }
 
-DEFINE_HOOK(6FF66C, TechnoClass_Fire_RearmTimer, 6)
+DEFINE_HOOK(6FF66C, UnitClass_Fire_Ammo, 6)
 {
 	GET(TechnoClass *, T, ESI);
 	if(BuildingClass * B = specific_cast<BuildingClass *>(T)) {
@@ -66,7 +69,7 @@ DEFINE_HOOK(6FF66C, TechnoClass_Fire_RearmTimer, 6)
 }
 
 // weapons can take more than one round of ammo
-DEFINE_HOOK(6FCA0D, TechnoClass_GetFireError_Ammo, 6)
+DEFINE_HOOK(6FCA0D, TechnoClass_CanFire_Ammo, 6)
 {
 	GET(TechnoClass* const, pThis, ESI);
 	GET(WeaponTypeClass* const, pWeapon, EBX);
@@ -87,6 +90,24 @@ DEFINE_HOOK(6FF656, TechnoClass_Fire_Ammo, A)
 
 	return 0x6FF660;
 }
+//ToDo: this
+/*
+DEFINE_HOOK(6F3410, TechnoClass_SelectWeapon_NoAmmoWeapon, 5)
+{
+	GET(TechnoClass*, pThis, ESI);
+	auto pType = pThis->GetTechnoType();
+	auto pTypeExt = TechnoTypeExt::ExtMap.Find(pType);
+
+	if (pThis->Ammo < 0)
+		return 0;
+
+	int pTypeAmmo = pTypeExt->NoAmmoWeapon.Get();
+	if (!pTypeAmmo || pThis->Ammo > pTypeExt->NoAmmoAmount.Get())
+		return 0;
+
+	R->EAX(pTypeAmmo);
+	return 0x6F3406;
+}*/
 
 // variable amounts of rounds to reload
 DEFINE_HOOK(6FB05B, TechnoClass_Reload_ReloadAmount, 6)
@@ -105,4 +126,14 @@ DEFINE_HOOK(6FB05B, TechnoClass_Reload_ReloadAmount, 6)
 	pThis->Ammo = Math::clamp(ammo, 0, pType->Ammo);
 
 	return 0x6FB061;
+}
+
+DEFINE_HOOK(6FD0BF, TechnoClass_GetROF_AttachEffect, 6)
+{
+	GET(TechnoClass*, pThis, ESI);
+	auto nOwnerRof = pThis->Owner ? pThis->Owner->ROFMultiplier : 1.0;
+	auto nTechnoExtROF = TechnoExt::ExtMap.Find(pThis)->nRofAdd * nOwnerRof; //Used on AE 
+
+	__asm { fmul nTechnoExtROF };
+	return 0x6FD0CB;
 }

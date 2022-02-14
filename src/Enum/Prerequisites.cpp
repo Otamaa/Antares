@@ -128,6 +128,9 @@ bool Prereqs::HouseOwnsGeneric(HouseClass const* const pHouse, int const Index)
 bool Prereqs::HouseOwnsSpecific(HouseClass const* const pHouse, int const Index)
 {
 	auto const pType = BuildingTypeClass::Array->Items[Index];
+	if (!pType)
+		return false;
+
 	auto const pPowerup = pType->PowersUpBuilding;
 	if(*pPowerup) {
 		auto const pCore = BuildingTypeClass::Find(pPowerup);
@@ -181,7 +184,7 @@ bool Prereqs::HouseOwnsAny(HouseClass const* const pHouse, const DynamicVectorCl
 bool Prereqs::ListContainsSpecific(const BTypeIter &List, int const Index)
 {
 	auto const pItem = BuildingTypeClass::Array->Items[Index];
-	return List.contains(pItem);
+	return pItem ? List.contains(pItem) : false;
 }
 
 bool Prereqs::ListContainsGeneric(const BTypeIter &List, int const Index)

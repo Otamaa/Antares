@@ -6,6 +6,8 @@
 #include <BuildingTypeClass.h>
 #include <ScenarioClass.h>
 
+// Removed ?  -Otamaa
+// 505288 = HouseClass_FindFirstBuildableBuildingTypeFromArray_SWAllowed, 6
 // #917 - validate build list before it needs to be generated
 DEFINE_HOOK(5054B0, HouseClass_GenerateAIBuildList_EnsureSanity, 6)
 {
@@ -164,6 +166,15 @@ DEFINE_HOOK(50610E, HouseClass_FindPositionForBuilding_FixShipyard, 7)
 	}
 }
 
+DEFINE_HOOK(506306 ,HouseClass_FindPlaceToBuild_Evaluate, 6)
+{
+	GET(BuildingTypeClass*, pThis, EDX);
+	auto pExt = BuildingTypeExt::ExtMap.Find(pThis);
+
+	R->CL(pExt->AI_InnerBase.Get(pThis->CloakGenerator));
+	return 0x50630C;
+}
+
 // don't crash if you can't find a base unit
 // I imagine we'll have a pile of hooks like this sooner or later
 DEFINE_HOOK(4F65BF, HouseClass_CanAffordBase, 6)
@@ -177,7 +188,7 @@ DEFINE_HOOK(4F65BF, HouseClass_CanAffordBase, 6)
 	return 0x4F65DA;
 }
 
-DEFINE_HOOK(5D705E, MPGameMode_SpawnBaseUnit, 6)
+DEFINE_HOOK(5D705E, MPGameMode_SpawnBaseUnit_BaseUnit, 6)
 {
 	enum { hasBaseUnit = 0x5D7084, hasNoBaseUnit = 0x5D70DB };
 

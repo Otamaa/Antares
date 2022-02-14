@@ -516,6 +516,8 @@ DEFINE_HOOK(6AC6D9, MapClass_FlashCameo, 0)
 	return 0x6AC71A;
 }
 
+// All these below replaced with single hook , -Otamaa
+//6AA600 = StripClass_RecheckCameos, 0
 DEFINE_HOOK(6AA6EA, TabCameoListClass_RecheckCameos_Memcpy, 0)
 {
 	GET(int, CameoIndex, EAX);

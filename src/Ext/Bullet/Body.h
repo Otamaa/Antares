@@ -6,6 +6,8 @@
 #include "../../Ares.h"
 
 #include "../../Misc/Debug.h"
+#include <ParticleSystemClass.h>
+#include <Utilities/Constructs.h>
 
 class SuperWeaponTypeClass;
 
@@ -18,16 +20,21 @@ public:
 	{
 	public:
 		SuperWeaponTypeClass *NukeSW;
-
+		UniqueGamePtr<ParticleSystemClass> ParticleSys;
 		ExtData(BulletClass* OwnerObject) : Extension(OwnerObject),
 			NukeSW(nullptr)
+			, ParticleSys()
 		{ }
 
 		virtual ~ExtData() = default;
 
 		bool DamageOccupants();
+		void CreateParticleSys();
 
-		virtual void InvalidatePointer(void *ptr, bool bRemoved) override {
+		virtual void InvalidatePointer(void *ptr, bool bRemoved) override 
+		{
+			if (ParticleSys.get() && (ParticleSys.get() == ptr))
+					ParticleSys.release();	
 		}
 
 		virtual void LoadFromStream(AresStreamReader &Stm) override;
@@ -46,4 +53,6 @@ public:
 	};
 
 	static ExtContainer ExtMap;
+
+
 };

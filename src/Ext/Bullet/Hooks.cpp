@@ -1,3 +1,5 @@
+#include "Body.h"
+
 #include <BulletClass.h>
 #include <BuildingClass.h>
 #include <CellClass.h>
@@ -12,6 +14,21 @@
 #include <Helpers/Iterators.h>
 
 #include "../../Misc/TrajectoryHelper.h"
+
+#include <Ext/WarheadType/Body.h>
+
+DEFINE_HOOK(468379, BulletClass_Draw_SetAnimPalette, 6)
+{
+	GET(BulletClass*, Bullet, ESI);
+	auto pExt = BulletTypeExt::ExtMap.Find(Bullet->Type);
+
+	if (ConvertClass* Convert = pExt->GetConvert()) {
+		R->EBX<ConvertClass*>(Convert);
+		return 0x4683D7;
+	}
+
+	return 0;
+}
 
 DEFINE_HOOK(468BE2, BulletClass_ShouldDetonate_Obstacle, 6)
 {
@@ -345,4 +362,37 @@ DEFINE_HOOK(468000, BulletClass_GetAnimFrame, 6)
 
 	R->EAX(frame);
 	return 0x468088;
+}
+
+DEFINE_HOOK(5F4FE7 ,ObjectClass_Put_BulletClass_AddPArticleSys, 8)
+{
+	GET(ObjectClass*, pThis, ESI);
+	GET(ObjectTypeClass*, pType, EBX);
+
+	if (auto pBullet = specific_cast<BulletClass*>(pThis))
+		if (auto pExt = BulletExt::ExtMap.Find(pBullet))
+			pExt->CreateParticleSys();
+
+	return pType ? 0x5F4FEF: 0x5F5210;
+}
+
+DEFINE_HOOK(46670F, BulletClass_Update_PreImpactAnim, 6)
+{
+	GET(BulletClass*, pThis, EBP);
+
+	if(!pThis->NextAnim)
+		return 0x46671D;
+
+	if (auto pWH = pThis->WH)
+	{
+		auto pWHExt = WarheadTypeExt::ExtMap.Find(pWH);
+		if (pWHExt->PreImpactAnim.Get())
+		{
+			auto nAnimCoord  = pThis->NextAnim->GetCoords();
+			pThis->Location = nAnimCoord;
+			pThis->Target = MapClass::Instance->TryGetCellAt(nAnimCoord);
+		}
+	}
+
+	return 0x467FEE;
 }

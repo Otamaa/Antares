@@ -112,7 +112,7 @@ DEFINE_HOOK(4753F0, ArmorType_FindIndex, A)
 	char buf[0x20];
 
 	const char *curTitle = fallback < static_cast<int>(ArmorType::Array.size())
-		? ArmorType::Array[fallback]->Name
+		? ArmorType::Array[fallback]->Name.data()
 		: "none";
 
 	pINI->ReadString(Section, Key, curTitle, buf);

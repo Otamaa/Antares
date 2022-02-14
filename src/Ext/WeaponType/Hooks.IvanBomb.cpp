@@ -6,6 +6,7 @@
 #include <Helpers/Iterators.h>
 #include <BulletClass.h>
 #include <WarheadTypeClass.h>
+#include <BuildingClass.h>
 
 // custom ivan bomb attachment
 // bugfix #385: Only InfantryTypes can use Ivan Bombs
@@ -210,20 +211,6 @@ DEFINE_HOOK(46934D, BulletClass_DetonateAt_IvanBombs, 6)
 	return 0x469AA4;
 }
 
-// deglobalized manual detonation settings
-/*
-DEFINE_HOOK(6FFFB1, TechnoClass_GetCursorOverObject_IvanBombs, 8)
-{
-	GET(TechnoClass*, pThis, EDI);
-	auto pBomb = pThis->AttachedBomb;
-	auto pExt = WeaponTypeExt::BombExt.get_or_default(pBomb);
-
-	bool canDetonate = (pBomb->GetBombType() == BombType::NormalBomb)
-		? pExt->Ivan_CanDetonateTimeBomb.Get(RulesClass::Instance->CanDetonateTimeBomb)
-		: pExt->Ivan_CanDetonateDeathBomb.Get(RulesClass::Instance->CanDetonateDeathBomb);
-	return canDetonate ? 0x6FFFCC : 0x700006;
-}*/
-
 /*
 6FFEC0 = TechnoClass_GetActionOnObject_IvanBombsA, 5
 6FFF9E = TechnoClass_GetActionOnObject_IvanBombsB, 8
@@ -236,10 +223,41 @@ DEFINE_HOOK(51F1D8, InfantryClass_ActionOnObject_IvanBombs, 6)
 	return 0x51F1EA;
 }
 
+DEFINE_HOOK(7388EB, UnitClass_ActionOnObject_IvanBombs, 6){
+	return 0x7388FD;
+}
+
 // #896027: do not announce pointers as expired to bombs
 // if the pointed to object is staying in-game.
 DEFINE_HOOK(725961, AnnounceInvalidPointer_BombCloak, 6)
 {
 	GET(bool, remove, EDI);
 	return remove ? 0 : 0x72596C;
+}
+
+
+DEFINE_HOOK(4471D5, BuildingClass_Sell_DetonateNoBuildup, 6){
+	GET(BuildingClass *, pStructure, ESI);
+	if(auto Bomb = pStructure->AttachedBomb) {
+		Bomb->Detonate();
+	}
+
+	return 0;
+}
+
+DEFINE_HOOK(44A1FF, BuildingClass_Mi_Selling_DetonatePostBuildup, 6){
+	GET(BuildingClass *, pStructure, EBP);
+	if(auto Bomb = pStructure->AttachedBomb) {
+		Bomb->Detonate();
+	}
+
+	return 0;
+}
+
+DEFINE_HOOK(4D9F7B, FootClass_Sell_Detonate, 6){
+	GET(FootClass *, pSellee, ESI);
+	if(auto Bomb = pSellee->AttachedBomb) {
+		Bomb->Detonate();
+	}
+	return 0;
 }

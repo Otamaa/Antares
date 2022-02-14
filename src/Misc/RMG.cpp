@@ -141,7 +141,7 @@ DEFINE_HOOK(5982D5, MapSeedClass_LoadFromINI, 6)
 	return 0;
 }
 
-DEFINE_HOOK(598FB8, RMG_GenerateUrban, 5)
+DEFINE_HOOK(598FB8, MapSeedClass_Generate_UrbanAreas, 5)
 {
 	if(RMG::UrbanAreas) {
 		GET(void *, pMapSeed, ESI);

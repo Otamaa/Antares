@@ -44,9 +44,7 @@ public:
 
 		char* pBuffer = fName;
 
-		SET_REG8(dl, 0);
-		SET_REG32(ecx, pBuffer);
-		CALL(0x687CE0);
+		Game::WriteMapFiles(pBuffer);
 
 		wchar_t msg[0xA0] = L"\0";
 		wsprintfW(msg, L"Map Snapshot saved as '%hs'.", fName);

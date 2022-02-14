@@ -72,6 +72,8 @@ const wchar_t* CSFLoader::GetDynamicString(const char* pLabelName, const wchar_t
 	return String->Text;
 }
 
+//7349CF = StringTable_ParseFile_Buffer, 7
+
 //0x7346D0
 DEFINE_HOOK(7346D0, CSF_LoadBaseFile, 6)
 {

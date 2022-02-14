@@ -1368,6 +1368,10 @@ void TechnoExt::ExtData::Serialize(T& Stm) {
 		//
 		.Process(this->SupressLostEva)
 		.Process(this->PassangersPipData)
+		.Process(this->SelfHealing_CombatDelayTimer)
+		.Process(this->DisableWeaponTimer)
+		.Process(this->nRofAdd)
+		.Process(this->TakeVehicle)
 		;
 }
 
@@ -1450,5 +1454,18 @@ DEFINE_HOOK(70C249, TechnoClass_Load_Suffix, 5)
 DEFINE_HOOK(70C264, TechnoClass_Save_Suffix, 5)
 {
 	TechnoExt::ExtMap.SaveStatic();
+	return 0;
+}
+
+DEFINE_HOOK(710415, TechnoClass_AnimPointerExpired, 6)
+{
+	GET(TechnoClass*, pThis, ECX);
+	GET(AnimClass*, pPtr, EAX);
+
+	auto const pExt = TechnoExt::ExtMap.Find(pThis);
+	//usage ? 
+	// AnnounceInvalidPtr(pPtr .pExt->SomeAnim);
+	AnnounceInvalidPointer(pPtr, pExt->EMPSparkleAnim);
+
 	return 0;
 }

@@ -11,6 +11,10 @@
 
 	Graion Dilach, 2013-05-31
 */
+DEFINE_HOOK(565215 , MapClass_CTOR_NoInit_Crates, 6)
+{
+	return 0x56522D;
+}
 
 //overrides for crate checks
 //481D52 - pass

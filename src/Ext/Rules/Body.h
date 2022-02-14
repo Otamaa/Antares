@@ -98,7 +98,8 @@ public:
 		Valueable<bool> DamageAirConsiderBridges;
 
 		Valueable<bool> DiskLaserAnimEnabled;
-
+		Valueable<bool> RepairStopOnInsufficientFunds;
+		Valueable<int> CrateMoney_Random;
 		ExtData(RulesClass* OwnerObject) : Extension<RulesClass>(OwnerObject),
 			ElectricDeath(nullptr),
 			EngineerDamage(0.0),
@@ -133,7 +134,9 @@ public:
 			DropPodTrailer(),
 			DegradeAmountNormal(0),
 			DegradeAmountConsumer(1),
-			CanMakeStuffUp(false)
+			CanMakeStuffUp(false),
+			RepairStopOnInsufficientFunds(true),
+			CrateMoney_Random(900)
 		{
 			MultiEngineer[0] = false; // Skirmish
 			MultiEngineer[1] = false; // LAN

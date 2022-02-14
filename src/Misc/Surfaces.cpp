@@ -146,7 +146,8 @@ DEFINE_HOOK(537BC0, Game_MakeScreenshot, 0)
 	return 0x537DC9;
 }
 
-DEFINE_HOOK(4F4583, GScreenClass_DrawOnTop_TheDarkSideOfTheMoon, 6)
+//DEFINE_HOOK(4F4583, GScreenClass_DrawOnTop_TheDarkSideOfTheMoon, 6)
+DEFINE_HOOK(6D4B25 ,TacticalClass_Draw_TheDarkSideOfTheMoon, 5)
 {
 	const int AdvCommBarHeight = 32;
 

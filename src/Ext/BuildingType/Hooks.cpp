@@ -34,7 +34,7 @@ DEFINE_HOOK(445F80, BuildingClass_Place, 5)
 	return 0;
 }
 
-DEFINE_HOOK(43FB6D, BuildingClass_Update_LFP, 6)
+DEFINE_HOOK(43FB6D, BuildingClass_Update_LaserFencePost, 6)
 {
 	GET(BuildingClass*, B, ESI);
 	if(B->Type->LaserFencePost) {
@@ -43,7 +43,7 @@ DEFINE_HOOK(43FB6D, BuildingClass_Update_LFP, 6)
 	return 0;
 }
 
-DEFINE_HOOK(465D4A, BuildingType_IsUndeployable, 6)
+DEFINE_HOOK(465D4A, BuildingTypeClass_IsUndeployable, 6)
 {
 	GET(BuildingTypeClass *, pThis, ECX);
 	if(pThis->Foundation == BuildingTypeExt::CustomFoundation) {

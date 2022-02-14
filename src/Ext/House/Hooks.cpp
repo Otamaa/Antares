@@ -18,6 +18,7 @@
 #include <TiberiumClass.h>
 #include <MessageListClass.h>
 #include <ScenarioClass.h>
+#include <FactoryClass.h>
 
 // =============================
 // other hooks
@@ -521,4 +522,91 @@ DEFINE_HOOK(4F8440, HouseClass_Update_TogglePower, 5)
 	pExt->UpdateTogglePower();
 
 	return 0;
+}
+
+//508C7F = HouseClass_UpdatePower_Auxiliary, 6
+/*
+{
+  HouseClass *pThis; // esi
+  int v2; // eax
+  unsigned int v3; // edx
+  int v4; // eax
+
+  pThis = a1->_ESI.data;
+  v2 = 0;
+  v3 = pThis->HouseClassExt;
+  if ( *(v3 + 12) >= 0 )
+	v2 = *(v3 + 12);
+  pThis->PowerOutput = v2;
+  v4 = 0;
+  if ( *(v3 + 12) <= 0 )
+	v4 = -*(v3 + 12);
+  pThis->PowerDrain = v4;
+  return 0x508C8B;
+}
+*/
+
+//508E66 = HouseClass_UpdateRadar_Battery, 8
+/*
+{
+  int result; // eax
+
+  result = 0x508F2F;
+  if ( *(*(a1->_ECX.data + 0x16084) + 16) > 0 ) // batt
+	result = 0x508E87;
+  return result;
+}
+*/
+
+//4FF563 = HouseClass_RegisterTechnoLoss_StatCounters_KeepAlive, 6
+//4FF71B = HouseClass_RegisterTechnoGain_StatCounters_KeepAlive, 6
+
+//504796 = HouseClass_AddAnger_MultiplayPassive, 6
+/*
+{
+  int result; // eax
+
+  if ( MEMORY[0xA8B238] && *(*(*(a1->_ESP.data + 0x10) + 0x34) + 0x1A6) )
+  {
+	a1->_ECX.data = 0;
+	result = 0x50479C;
+  }
+  else
+  {
+	a1->_ECX.data = *(a1->_ECX.data + 0x5614);
+	result = 0x50479C;
+  }
+  return result;
+}
+*/
+
+DEFINE_HOOK(509140, HouseClass_Update_Factories_Queues, 5)
+{
+	GET(HouseClass*, H, ECX);
+	GET_STACK(AbstractType, nWhat, 0x4);
+	GET_STACK(bool, bIsNaval, 0x8);
+	GET_STACK(BuildCat, nBuildCat, 0xC);
+	
+	if (nWhat == AbstractType::BuildingType && nBuildCat != BuildCat::DontCare)
+		H->Update_FactoriesQueues(nWhat, bIsNaval, nBuildCat);
+	
+	return 0;
+}
+
+DEFINE_HOOK(6A9822, StripClass_Draw_Power, 5)
+{
+	GET(FactoryClass*, pFact, ECX);
+
+	bool IsDone = pFact->IsDone();
+	if (IsDone)
+	{
+		if (auto pObj = pFact->Object)
+		{
+			if (pObj->WhatAmI() == AbstractType::Building)
+				IsDone = pObj->FindFactory(true, true) != nullptr;
+		}
+	}
+
+	R->AL(IsDone);
+	return 0x6A9827;
 }

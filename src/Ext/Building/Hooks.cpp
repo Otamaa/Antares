@@ -5,6 +5,7 @@
 #include "../TechnoType/Body.h"
 #include "../../Misc/Network.h"
 #include <Ext/House/Body.h>
+#include <Ext/Rules/Body.h>
 
 #include <SpecificStructures.h>
 #include <ScenarioClass.h>
@@ -386,11 +387,31 @@ DEFINE_HOOK(459C03, BuildingClass_CanBeSelectedNow_MassSelectable, 6)
 	auto pType = pThis->Type;
 	auto pTypeExt = BuildingTypeExt::ExtMap.Find(pType);
 
-	bool IsMassSelectable = pTypeExt->IsMassSelectable.Get(pType->IsUndeployable());
-
-	if(IsMassSelectable)
+	if(pTypeExt->IsMassSelectable.Get(pType->IsUndeployable()))
 		return 0x459C14;
 
 	R->EAX(false);
 	return 0x459C12;
 }
+
+/*
+DEFINE_HOOK(4509B4, BuildingClass_UpdateRepair_Funds, 7)
+{
+	GET(BuildingClass*, pThis, ESI);
+
+	return (!pThis->Owner->IsPlayerControl() || RulesExt::Global()->RepairStopOnInsufficientFunds.Get()) ? 0x0:0x4509BB;
+}
+
+DEFINE_HOOK(447A63, BuildingClass_QueueImageAnim_Sell, 3)
+{
+	GET(BuildingClass*, pThis, ESI);
+	GET_BASE(AnimTypeClass*, pAnim, 0x8);
+
+	auto pExt = BuildingTypeExt::ExtMap.Find(pThis->Type);
+	if (pThis->CurrentMission == Mission::Selling)
+		pAnim = pExt->Sell_Anim.Get();
+
+	R->EDX(pThis->Type);
+	R->EAX(pAnim);
+	return 0x447A6C;
+}*/

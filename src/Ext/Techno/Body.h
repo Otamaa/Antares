@@ -99,6 +99,11 @@ public:
 
 		bool SupressLostEva;
 		std::map<int ,PipDrawData> PassangersPipData;
+		TimerStruct SelfHealing_CombatDelayTimer;
+		TimerStruct DisableWeaponTimer;
+		double nRofAdd;
+		bool TakeVehicle;
+
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject),
 			idxSlot_Wave(0),
 			idxSlot_Beam(0),
@@ -132,7 +137,11 @@ public:
 			Crate_SpeedMultiplier(1.0),
 			Crate_Cloakable(false),
 			SupressLostEva(false),
-			PassangersPipData()
+			PassangersPipData(),
+			SelfHealing_CombatDelayTimer(),
+			DisableWeaponTimer(),
+			nRofAdd(1.0),
+			TakeVehicle(false)
 		{ }
 
 		virtual ~ExtData() {

@@ -72,7 +72,8 @@ DEFINE_HOOK(44B2FE, BuildingClass_Mi_Attack_IsPrism, 6)
 	return IsNotPrism;
 }
 
-DEFINE_HOOK(447FAE, BuildingClass_GetFireError_PrismForward, 6)
+//DEFINE_HOOK(447FAE, BuildingClass_GetFireError_PrismForward, 6)
+DEFINE_HOOK(447FAE, BuildingClass_CanFire_PrismForward, 6)
 {
 	GET(BuildingClass* const, pThis, ESI);
 	enum { BusyCharging = 0x447FB8, NotBusyCharging = 0x447FC3 };

@@ -9,6 +9,97 @@
 
 #include "../../Misc/Debug.h"
 
+/*
+6FB191 = TechnoClass_CreateGap, 8
+4D8642 = FootClass_UpdatePosition, 6
+6FB4B1 = TechnoClass_DeleteGap_new, 6
+6F6B66 = TechnoClass_Remove_DeleteGap, A
+6FB723 = TechnoClass_CreateGap_RefreshMap, 6
+6FB446 = TechnoClass_CreateGap_RefreshMap, 5
+701735 = TechnoClass_ChangeOwnership_OwnerChange, 6
+55AFB3 = LogicClass_Update_Gaps, 6
+657CE0 = RadarClass_MinimapChanged, 5
+65731F = RadarClass_UpdateMinimap_Lock, 6
+65757C = RadarClass_UpdateMinimap_Unlock, 8
+657CF2 = MapClass_MinimapChanged_Lock1, 6
+657D35 = MapClass_MinimapChanged_Unlock1, 7
+657D3D = MapClass_MinimapChanged_Lock2, 6
+657D8A = MapClass_MinimapChanged_Unlock2, 7
+
+DEFINE_HOOK(6FB306, TechnoClass_CreateGap_Optimize, 6)
+{
+	GET(CellClass*, pCell, EAX);
+
+	auto nCounter = pCell->ShroudCounter;
+	if ((nCounter >= 0) && (nCounter != 1))
+	{
+		nCounter += 1;
+		pCell->ShroudCounter = nCounter;
+	}
+
+	++pCell->GapsCoveringThisCell;
+
+	if (nCounter >= 1)
+		pCell->CopyFlags &= 0xFFFFFFE7;
+
+	return 0x6FB3BD;
+}
+
+DEFINE_HOOK(6FB5F0, TechnoClass_DeleteGap_Optimize, 6)
+{
+	GET(CellClass*, pCell, EAX);
+
+	auto nGapCover = pCell->GapsCoveringThisCell - 1;
+	pCell->GapsCoveringThisCell = nGapCover;
+
+	if (!HouseClass::Player()->SpySatActive || nGapCover > 0)
+		return 0x6FB69E;
+
+	--pCell->ShroudCounter;
+	if (pCell->ShroudCounter <= 0)
+		pCell->CopyFlags |= 0x18u;
+
+	return 0x6FB69E;
+}
+ 
+44E2B0 = BuildingClass_Mi_Unload_LargeGap, 6
+454BDC = BuildingClass_UpdatePowered_LargeGap, 7
+4566D5 = BuildingClass_GetRangeOfRadial_LargeGap, 6
+
+DEFINE_HOOK_AGAIN(6FB4A3, TechnoClass_CreateGap_LargeGap, 7)
+DEFINE_HOOK(6FB1B5, TechnoClass_CreateGap_LargeGap, 7)
+{
+	GET(TechnoClass*, pThis, ESI);
+	GET(TechnoTypeClass*, pThisType, EAX);
+
+	//Ares Reimplement this GapRadiusInCells
+	pThis->GapRadius = pThisType->GapRadiusInCells;
+
+	return R->Origin() + 0xD;
+}
+
+
+*/
+
+DEFINE_HOOK(65757C, RadarClass_UpdateMinimap_Unlock, 8)
+{
+	GET(RadarClass*, pThis, ESI);
+
+	pThis->unknown_121C->Unlock();
+	pThis->unknown_1220->Unlock();
+
+	return R->AL() ? 0x657584 : 0x6576A5;
+}
+
+DEFINE_HOOK(65731F, RadarClass_UpdateMinimap_Lock, 6)
+{
+	GET(RadarClass*, pThis, ESI);
+	pThis->unknown_121C->Lock();
+	pThis->unknown_1220->Lock();
+
+	return 0;
+}
+
 DEFINE_HOOK(6FB191, TechnoClass_CreateGap, 8)
 {
 	GET(TechnoClass *, T, ESI);

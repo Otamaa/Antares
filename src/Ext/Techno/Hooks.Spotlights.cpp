@@ -133,11 +133,29 @@ DEFINE_HOOK(436459, BuildingLightClass_Update, 6)
 	return R->AL() ? 0x436461u : 0x4364C8u;
 }
 
-DEFINE_HOOK(435BE0, BuildingLightClass_Draw_Start, 6)
+DEFINE_HOOK(435BFA, BuildingLightClass_Draw_Start, 6)
 {
-	GET(BuildingLightClass *, BL, ECX);
-	TechnoExt::ActiveBuildingLight = BL;
-	return 0;
+	GET(BuildingLightClass *, BL, ESI);
+
+  auto v2 = BL->OwnerObject;
+  
+  if ( !v2
+    || v2->CloakState >= CloakState::Cloaked
+    || v2->Deactivated
+    || v2->IsBeingWarpedOut()
+    || v2->GetHeight() < -10)
+  {
+	  auto pBld = specific_cast<BuildingClass*>(v2);
+	  if (pBld && (!pBld->IsPowerOnline() || pBld->IsFogged))
+		  return 0x4361BC;
+
+    return 0x4361BC;
+  }
+
+	auto pTypeData = TechnoExt::ExtMap.Find(v2);
+	TechnoExt::ActiveBuildingLight = pTypeData->Spotlight;
+
+	return 0x435C52;
 }
 
 DEFINE_HOOK(436072, BuildingLightClass_Draw_430, 6)

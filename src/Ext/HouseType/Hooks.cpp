@@ -99,6 +99,8 @@ DEFINE_HOOK(553D06, LoadProgressMgr_Draw_LSBrief, 6)
 	return 0x553E54;
 }
 
+// replaced with this -Otamaa 
+//4E3562 = Game_GetFlagSurface, 5
 DEFINE_HOOK(4E3579, HTExt_DrawFlag, 0)
 {
 	GET(int, n, ECX);
@@ -123,7 +125,8 @@ DEFINE_HOOK(4E3579, HTExt_DrawFlag, 0)
 	return 0x4E3686;
 }
 
-DEFINE_HOOK(72B690, HTExt_LSPAL, 0)
+//DEFINE_HOOK(72B690, HTExt_LSPAL, 0)
+DEFINE_HOOK(72B690, LoadScreenPal_Load, 0)
 {
 	GET(int, n, EDI);
 
@@ -150,7 +153,8 @@ DEFINE_HOOK(72B690, HTExt_LSPAL, 0)
 	return 0x72B804;
 }
 
-DEFINE_HOOK(4E38D8, HTExt_GetSTT, 0)
+//DEFINE_HOOK(4E38D8, HTExt_GetSTT, 0)
+DEFINE_HOOK(4E38D8, LoadPlayerCountryString, 0)
 {
 	GET(int, n, ECX);
 
@@ -173,6 +177,11 @@ DEFINE_HOOK(4E38D8, HTExt_GetSTT, 0)
 	return 0x4E39F1;
 }
 
+/* Taunt were completely handled on 3.0++ -Otamaa
+536438 = TauntCommandClass_Execute, 5
+48DA3B = sub_48D1E0_PlayTaunt, 5
+752B70 = PlayTaunt, 5
+*/
 DEFINE_HOOK(752BA1, HTExt_GetTaunt, 6)
 {
 	GET(TauntDataStruct, TauntData, ECX);
@@ -291,7 +300,8 @@ DEFINE_HOOK(4E3A6A, hWnd_PopulateWithCountryNames, 6) {
 	return 0x4E3ACF;
 }
 
-DEFINE_HOOK(6AA0CA, TabCameoListClass_Draw_DrawObserverBackground, 6)
+//DEFINE_HOOK(6AA0CA, TabCameoListClass_Draw_DrawObserverBackground, 6)
+DEFINE_HOOK(6AA0CA, StripClass_Draw_DrawObserverBackground, 6)
 {
 	enum { DrawSHP = 0x6AA0ED, DontDraw = 0x6AA159 };
 
@@ -313,8 +323,8 @@ DEFINE_HOOK(6AA0CA, TabCameoListClass_Draw_DrawObserverBackground, 6)
 	}
 }
 
-
-DEFINE_HOOK(6AA164, TabCameoListClass_Draw_DrawObserverFlag, 6)
+//DEFINE_HOOK(6AA164, TabCameoListClass_Draw_DrawObserverFlag, 6)
+DEFINE_HOOK(6AA164, StripClass_Draw_DrawObserverFlag, 6)
 {
 	enum { IDontKnowYou = 0x6AA16D, DrawSHP = 0x6AA1DB, DontDraw = 0x6AA2CE };
 

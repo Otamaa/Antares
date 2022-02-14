@@ -114,6 +114,7 @@ DEFINE_HOOK(6F9E50, TechnoClass_Update, 5)
 	return 0;
 }
 
+// moved where ? -Otamaa
 //! TechnoClass::Update is called every frame; returning 0 tells it to execute the original function's code as well.
 //! EXCEPT if the target is under Temporal, use the 71A860 hook for that - Graion, 2013-06-13.
 DEFINE_HOOK(6F9E76, TechnoClass_Update_CheckOperators, 6)
@@ -204,7 +205,7 @@ DEFINE_HOOK(7014D5, TechnoClass_ChangeOwnership_RadarJammer, 6)
 }
 
 // fix for vehicle paradrop alignment
-DEFINE_HOOK(415CA6, AircraftClass_Paradrop, 6)
+DEFINE_HOOK(415CA6, AircraftClass_Paradrop_Units, 6)
 {
 	GET(AircraftClass *, A, EDI);
 	GET(FootClass *, P, ESI);
@@ -361,17 +362,6 @@ DEFINE_HOOK(71A84E, TemporalClass_UpdateA, 5)
 	return 0x71A88D;
 }
 
-// temporal per-slot
-DEFINE_HOOK(71AB30, TemporalClass_GetHelperDamage, 5)
-{
-	GET(TemporalClass *, Temp, ESI);
-	TechnoClass *T = Temp->Owner;
-	TechnoExt::ExtData *pData = TechnoExt::ExtMap.Find(T);
-	WeaponStruct *W = T->GetWeapon(pData->idxSlot_Warp);
-	WarheadTypeExt::Temporal_WH = W->WeaponType->Warhead;
-	R->EAX<WeaponStruct *>(W);
-	return 0x71AB47;
-}
 
 // parasite per-slot
 DEFINE_HOOK(62A020, ParasiteClass_Update, A)
@@ -606,7 +596,7 @@ DEFINE_HOOK(747BBD, UnitTypeClass_LoadFromINI, 5)
 }
 
 // godawful hack - Desolator deploy fire is triggered by ImmuneToRadiation !
-DEFINE_HOOK(5215F9, InfantryClass_UpdateDeploy, 6)
+DEFINE_HOOK(5215F9, InfantryClass_UpdateDeployment_Deso1, 6)
 {
 	GET(TechnoClass *, I, ESI);
 	return TechnoTypeExt::ExtMap.Find(I->GetTechnoType())->Is_Deso
@@ -617,15 +607,13 @@ DEFINE_HOOK(5215F9, InfantryClass_UpdateDeploy, 6)
 // 52138C, 6
 // godawful hack 2 - Desolator deploy fire is triggered by ImmuneToRadiation !
 // DON'T USE
-EXPORT_FUNC(InfantryClass_UpdateDeploy2)
+DEFINE_HOOK(52138C , InfantryClass_UpdateDeployment_Deso2, 6)
 {
-/*
+
 	GET(TechnoClass *, I, ESI);
-	TechnoTypeClassExt::TechnoTypeClassData *pData = TechnoTypeClassExt::Ext_p[I->GetTechnoType()];
-	return pData->Is_Deso_Radiation ? 0x52139A : 0x5214B9;
-	WRONG: needs more code to reimplement weapon shooting without rad checks
-*/
-	return 0;
+	return TechnoTypeExt::ExtMap.Find(I->GetTechnoType())->Is_Deso_Radiation ?
+		0x52139A :
+		0x5214B9;
 }
 
 // stops movement sound from being played while unit is being pulled by a magnetron (see terror drone)
@@ -649,6 +637,7 @@ DEFINE_HOOK(4DAA68, FootClass_Update_MoveSound, 6)
 	return 0x4DAA70;
 }
 
+// moved ? -Otamaa
 /* #397 - AffectsEnemies */
 DEFINE_HOOK(701C97, TechnoClass_ReceiveDamage_AffectsEnemies, 6)
 {
@@ -1290,7 +1279,7 @@ DEFINE_HOOK(70DEBA, TechnoClass_UpdateGattling_Cycle, 6)
 // make the space between gunner name segment and ifv
 // name smart. it disappears if one of them is empty,
 // eliminating leading and trailing spaces.
-DEFINE_HOOK(746C55, UnitClass_GetUIName, 6)
+DEFINE_HOOK(746C55, UnitClass_GetUIName_Space, 6)
 {
 	GET(UnitClass*, pThis, ESI);
 	GET(wchar_t*, pGunnerName, EAX);
@@ -1786,7 +1775,7 @@ DEFINE_HOOK(6FE31C, TechnoClass_Fire_AllowDamage, 8)
 }
 
 // issue #1324: enemy repair wrench visible when it shouldn't
-DEFINE_HOOK(6F525B, TechnoClass_DrawExtras_PowerOff, 5)
+DEFINE_HOOK(6F526C, TechnoClass_DrawExtras_PowerOff, 5)
 {
 	GET(TechnoClass*, pTechno, EBP);
 	GET_STACK(RectangleStruct*, pRect, 0xA0);
@@ -2145,3 +2134,299 @@ DEFINE_HOOK(739ADA, UnitClass_SimpleDeploy_Height, A)
 	R->EAX(true);
 	return 0x739B14;
 }
+
+DEFINE_HOOK(416CF4 , AircraftClass_Carryall_Unload_Guard, 5)
+{
+	GET(FootClass*, pThis, ESI);
+	pThis->Transporter = nullptr;
+	pThis->QueueMission(Mission::Guard,true);
+	//yeah not there yet !
+	if(auto pTeam = pThis->Team)
+		pTeam->Add(pThis,false); 
+
+	return 0;
+}
+
+DEFINE_HOOK(701914 ,TechnoClass_ReceiveDamage_Damaging, 7)
+{
+	R->Stack(0xE, R->EAX<int>() > 0);
+	return 0x0;
+}
+
+// ToDo : this
+DEFINE_HOOK(6FC0D3, TechnoClass_CanFire_DisableWeapons, 8)
+{
+	GET(TechnoClass*, pThis, ESI);
+
+	auto pThisExt = TechnoExt::ExtMap.Find(pThis);
+
+	return pThisExt->DisableWeaponTimer.GetTimeLeft() ? 0x6FC0DF : 0x0;
+}
+
+// ToDo : this
+DEFINE_HOOK(6FC417, TechnoClass_CanFire_PsionicsImmune, 6)
+{
+	GET(TechnoClass*, pTarget, EAX);
+
+	//ares add ability check here
+	R->CL(pTarget->GetTechnoType()->ImmuneToPsionics);
+
+	return 0x6FC41D;
+}
+
+DEFINE_HOOK(701BFE, TechnoClass_ReceiveDamage_Abilities, 6)
+{
+	enum
+	{
+		NullifyDamage = 0x701C1C,
+		ContinueCheck = 0x701D2E,
+		NullifyDamage_B = 0x701CC2, //it is kind a same but why this one use ?, stack ?
+		ApplyDamage = 0x701DCC,
+		Return_Unaffected = 0x701CFC
+	};
+
+	GET(TechnoClass*, pThis, ESI);
+	GET(WarheadTypeClass*, pWarhead, EBP);
+	GET_STACK(TechnoClass*, pAttacker, STACK_OFFS(0xC4, -0x10));
+	GET_STACK(HouseClass*, pSourceHouse, STACK_OFFS(0xC4, -0x18));
+
+	auto pThisType = pThis->GetTechnoType();
+	auto pThisTypeExt = TechnoTypeExt::ExtMap.Find(pThisType);
+	auto& nVet = pThis->Veterancy;
+	auto pOwner = pAttacker ? pAttacker->Owner : pSourceHouse;
+
+	if (WarheadTypeExt::CanAffectTarget(pThis, pOwner, pWarhead))
+	{
+		if (pWarhead->Radiation)
+		{
+			bool IsRadImmune = nVet.IsElite() && pThisTypeExt->EliteRadImmune ||
+				nVet.IsVeteran() && (pThisTypeExt->VetRadImmune || pThisTypeExt->EliteRadImmune);
+
+			if (pThisType->ImmuneToRadiation || IsRadImmune)
+				return NullifyDamage;
+		}
+
+		if (pWarhead->PsychicDamage)
+		{
+			//check TypeImmune!
+			if (pThisType->ImmuneToPsionicWeapons)
+				return NullifyDamage;
+		}
+
+		if (pWarhead->Poison)
+		{
+			//check TypeImmune!
+			if (pThisType->ImmuneToPoison)
+				return NullifyDamage;
+		}
+
+		if (pWarhead->Psychedelic)
+		{
+			//check TypeImmune!
+			bool bImmune = pThisType->ImmuneToPsionics;
+			return bImmune ? Return_Unaffected : ContinueCheck;
+		}
+
+		return ApplyDamage;
+	}
+
+	return NullifyDamage;
+}
+
+/* //
+416C3A = AircraftClass_Carryall_Unload_Facing, 5
+747BCF = UnitTypeClass_LoadFromINI_Turrets, 5
+746B89 = UnitClass_GetUIName, 8
+5240BD = InfantryTypeClass_LoadFromINI_DamageSparks, 7
+70BE80 = TechnoClass_ShouldSelfHealOneStep, 5
+6FA743 = TechnoClass_Update_SelfHeal, A
+417DD2 = AircraftClass_GetActionOnObject_NoManualUnload, 6
+51E748 = InfantryClass_GetActionOnObject_NoSelfGuardArea, 8
+
+DEFINE_HOOK(702E64, TechnoClass_RegisterDestruction_Bounty, 6)
+{
+	GET(TechnoClass*, pKiller, ESI);
+	GET(TechnoClass*, pVictim, EDI);
+
+	TechnoExt::CalculateBounty(pKiller, pVictim);
+
+	return 0;
+}
+
+5F3FB2 = ObjectClass_Update_MaxFallRate, 6
+
+DEFINE_HOOK(702819, TechnoClass_ReceiveDamage_Aftermath, A)
+{
+	GET(TechnoClass*, pThis, ESI);
+
+	//GET(DamageState, nCurrentState, EDI);
+	//GET_STACK(DamageState, nDamageState_B, 0x20);
+	GET_STACK(int, nDamageState_B, 0x20);
+
+	GET_STACK(int*, pDamage, STACK_OFFS(0xC4, -0x4));
+	GET_STACK(int, nDistance, STACK_OFFS(0xC4, -0x8));
+	GET_STACK(WarheadTypeClass*, pWarhead, STACK_OFFS(0xC4, -0xC));
+	GET_STACK(TechnoClass*, pAttacker, STACK_OFFS(0xC4, -0x10));
+	GET_STACK(bool, bIgnoreDefenses, STACK_OFFS(0xC4, -0x14));
+	GET_STACK(HouseClass*, pSourceHouse, STACK_OFFS(0xC4, -0x18));
+	GET_STACK(bool, bSomething, STACK_OFFS(0xC4, 0xB2)); //0x12
+
+	if (!pAttacker)
+		return 0x702823;
+
+	bool bAffected = false;
+	auto pThisExt = TechnoExt::ExtMap.Find(pThis);
+	auto pThisTypeExt = TechnoTypeExt::ExtMap.Find(pThis->GetTechnoType());
+
+	if (!nDamageState_B ||
+		bIgnoreDefenses ||
+		!bSomething ||
+		pDamage
+		)
+	{
+		if (!nDamageState_B)
+		{
+			if (bSomething)
+			{
+				pThisExt->SelfHealing_CombatDelayTimer.Start(pThisTypeExt->SelfHealing_CombatDelay.Get());
+			}
+		}
+	}
+	else
+	{
+		bAffected = true;
+	}
+
+	if (pWarhead)
+	{
+		auto pWarheadExt = WarheadTypeExt::ExtMap.Find(pWarhead);
+		auto nVerses = std::abs(pWarheadExt->GetVerses(pThis->GetTechnoType()->Armor).Verses) >= 0.001;
+
+		if (!bAffected ||
+			!pWarheadExt->EffectsRequireDamage.Get() &&
+			(!pWarheadExt->EffectsRequireVerses.Get() || nVerses)
+			)
+		{
+			pWarheadExt->applyKillDriver(pAttacker, pThis);
+
+			int nSonarDur = 20; //Ext
+			if (nSonarDur > 0)
+			{
+				auto const delay = Math::max(pThisExt->CloakSkipTimer.GetTimeLeft(), nSonarDur);
+				pThisExt->CloakSkipTimer.Start(delay);
+
+				// this part may implemented on TechnoClass::Ai or somewhere to decloak the unit , hmm 
+				if (pThis->CloakState != CloakState::Uncloaked)
+				{
+					pThis->Uncloak(true);
+					pThis->NeedsRedraw = true;
+				}
+			}
+
+			int nDisableWeaponDuer = 20; //Ext
+			if (nDisableWeaponDuer > 0)
+			{
+				auto const delay = Math::max(pThisExt->DisableWeaponTimer.GetTimeLeft(), nDisableWeaponDuer);
+				pThisExt->DisableWeaponTimer.Start(delay);
+			}
+
+			int nFlashDuration = 200; //Ext
+			if (nFlashDuration > 0 && nFlashDuration > pThis->Flashing.DurationRemaining)
+			{
+				pThis->Flash(nFlashDuration);
+			}
+		}
+	}
+
+	return 0;
+}
+
+739956 = UnitClass_Deploy_Transfer, 6
+44A03C = BuildingClass_Mi_Selling_Transfer, 6
+415544 = AircraftClass_Mi_Unload_Blocked, b
+73DE90 = UnitClass_Mi_Unload_SimpleDeployer, 6
+739ADA = UnitClass_SimpleDeploy_Height, A
+739B8A = UnitClass_SimpleDeploy_Facing, 6
+54C767 = JumpjetLocomotionClass_State4_54C550_DeployDir, 6
+514A21 = HoverLocomotionClass_ILocomotion_Process_DeployToLand, 9
+513EAA = HoverLocomotionClass_UpdateHover_DeployToLand, 5
+514DFE = HoverLocomotionClass_ILocomotion_MoveTo_DeployToLand, 7
+4D9EBD = FootClass_CanBeSold_SellUnit, 6
+4DFE00 = FootClass_GarrisonStructure_TakeVehicle, 6
+4566B0 = BuildingClass_GetRangeOfRadial_Radius, 6
+41BE80 = ObjectClass_DrawRadialIndicator, 3
+*/
+
+/* overly complex !
+DEFINE_HOOK(718275, TeleportLocomotionClass_MakeRoom, 9)
+{
+	bool ChronoInfantryCrush = false;
+	GET_STACK(CoordStruct*, pCoord, 0x3C);
+	GET_BASE(FootClass*, pTeleporter, 0xC);
+
+	auto pCell = Map.TryGetCellAt(*pCoord);
+
+	R->EBX(pCell->OverlayTypeIndex);
+	R->EDI(0);
+
+	auto nReceiveDamage = [&R, &pCell](ObjectClass* pObject)
+	{
+		if (pObject)
+		{
+			auto nStr = pObject->GetTechnoType()->Strength;
+			pObject->ReceiveDamage(&nStr, 0, RulesGlobal->C4Warhead, nullptr, true, false, nullptr);
+		}
+	};
+
+	bool bInfCrush = false;
+	if (auto pCellContent = pCell->GetContent())
+	{
+		for (NextObject obj(pCellContent); obj; ++obj)
+		{
+			auto pObject = *obj;
+			bool bChronoCrush = false;
+			bool bIsICEd = pObject->IsIronCurtained() || bChronoCrush;
+
+			if (bInfCrush &&
+				pObject->WhatAmI() == AbstractType::Infantry &&
+				pTeleporter->WhatAmI() != AbstractType::Infantry)
+				break;
+
+			if (!bIsICEd &&
+				pObject->WhatAmI() == AbstractType::Infantry &&
+				pTeleporter->WhatAmI() == AbstractType::Infantry
+				)
+			{
+				auto nCoord = pObject->GetCenterCoords();
+				if (nCoord == *pCoord)
+				{
+					nReceiveDamage(pObject);
+				}
+			}
+			else
+			{
+				if (bIsICEd)
+					break;
+				if (auto pFoot = generic_cast<FootClass*>(pObject))
+				{
+					nReceiveDamage(pFoot);
+				}
+
+				R->Stack(0x48, 1);
+			}
+
+			nReceiveDamage(pObject);
+		}
+	}
+
+	if (((pCell->Flags & cf_Bridge) != cf_None) &&
+		((pCell->Flags & cf_Something) == cf_None))
+	{
+		R->Stack(0x48, 1);
+	}
+
+	R->Stack(0x20, pTeleporter->GetCell());
+	R->EAX(1);
+
+	return 0x7184CE;
+}*/

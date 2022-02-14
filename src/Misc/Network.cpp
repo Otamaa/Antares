@@ -139,3 +139,9 @@ void AresNetEvent::Handlers::RespondToFirewallToggle(NetworkEvent *Event) {
 		pData->SetFirestormState(FS);
 	}
 }
+
+/*
+64B704 = sub_64B660_PayloadSize, 8
+64BE83 = sub_64BDD0_PayloadSize1, 8
+64C314 = sub_64BDD0_PayloadSize2, 8
+*/

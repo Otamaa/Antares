@@ -22,7 +22,7 @@ struct SHPStruct;
 class VocClass;
 class WarheadTypeClass;
 class WaveClass;
-
+class ParticleSystemTypeClass;
 class WeaponTypeExt
 {
 public:
@@ -103,10 +103,12 @@ public:
 
 		ValueableIdx<CursorType> Attack_Cursor;
 		ValueableIdx<CursorType> OutOfRange_Cursor;
+		Nullable<ParticleSystemTypeClass*> Bolt_ParticleSystem;
 
 		ExtData(WeaponTypeClass* OwnerObject) : Extension<WeaponTypeClass>(OwnerObject),
 			Weapon_Loaded(false),
 			//
+			Bolt_ParticleSystem(),
 			Attack_Cursor(20),
 			OutOfRange_Cursor(21),
 			//
@@ -149,8 +151,7 @@ public:
 		virtual void LoadFromINIFile(CCINIClass* pINI) override;
 		virtual void Initialize() override;
 
-		virtual void InvalidatePointer(void *ptr, bool bRemoved) override {
-		}
+		virtual void InvalidatePointer(void *ptr, bool bRemoved) override {}
 
 		virtual void LoadFromStream(AresStreamReader &Stm) override;
 
@@ -166,7 +167,8 @@ public:
 		ColorStruct GetWaveColor() const;
 		ColorStruct GetBeamColor() const;
 
-		bool conductAbduction(BulletClass *);
+		bool conductAbduction(BulletClass* Bullet);
+		bool conductAbduction(TechnoClass* pOwner, AbstractClass* pTarget, CoordStruct nTargetCoords = CoordStruct::Empty);
 
 		void PlantBomb(TechnoClass* pSource, ObjectClass* pTarget) const;
 
@@ -209,11 +211,20 @@ public:
 
 	static AresMap<BombClass*, const ExtData*> BombExt;
 	static AresMap<WaveClass*, const ExtData*> WaveExt;
+	static DWORD WaveColorTemp;
+
 	static AresMap<EBolt*, const ExtData*> BoltExt;
+
+	static WORD DecidedBoltColor1;
+	static WORD DecidedBoltColor2;
+	static WORD DecidedBoltColor3;
+
 	static AresMap<RadSiteClass*, const ExtData*> RadSiteExt;
 
 	// @return skipNormalHandling?
 	static bool ModifyWaveColor(WORD src, WORD& dest, int intensity, WaveClass* pWave);
+	static bool ModifyWaveColor(WORD src, WORD& dest, int intensity, DWORD nSelected);
+	static ColorStruct SelectColor(WaveClass* pWave);
 
 	static EBolt* CreateBolt(WeaponTypeClass* pWeapon);
 	static EBolt* CreateBolt(WeaponTypeExt::ExtData* pWeapon = nullptr);

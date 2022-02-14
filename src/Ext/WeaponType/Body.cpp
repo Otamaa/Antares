@@ -20,7 +20,13 @@ const ColorStruct WeaponTypeExt::ExtData::DefaultWaveColorSonic = ColorStruct(0,
 
 AresMap<BombClass*, const WeaponTypeExt::ExtData*> WeaponTypeExt::BombExt;
 AresMap<WaveClass*, const WeaponTypeExt::ExtData*> WeaponTypeExt::WaveExt;
+DWORD WeaponTypeExt::WaveColorTemp;
+
 AresMap<EBolt*, const WeaponTypeExt::ExtData*> WeaponTypeExt::BoltExt;
+WORD WeaponTypeExt::DecidedBoltColor1;
+WORD WeaponTypeExt::DecidedBoltColor2;
+WORD WeaponTypeExt::DecidedBoltColor3;
+
 AresMap<RadSiteClass*, const WeaponTypeExt::ExtData*> WeaponTypeExt::RadSiteExt;
 
 void WeaponTypeExt::ExtData::Initialize()
@@ -133,7 +139,7 @@ void WeaponTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->Attack_Cursor.Read(exINI, section, "Cursor.Attack");
 	this->OutOfRange_Cursor.Read(exINI, section, "Cursor.AttackOutOfRange");
-
+	this->Bolt_ParticleSystem.Read(exINI, section, "Bolt.ParticleSystem");
 	//this->Ammo.Read(exINI, section, "Ammo");
 }
 
@@ -149,20 +155,39 @@ void WeaponTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	\retval false No abduction was performed. This can be because the weapon is not an abductor, or because an error occurred. The target should still be on the map.
 	\todo see if TechnoClass::Transporter needs to be set in here
 */
-bool WeaponTypeExt::ExtData::conductAbduction(BulletClass * Bullet) {
+bool WeaponTypeExt::ExtData::conductAbduction(BulletClass* Bullet) {
+	bool bAllow = conductAbduction(Bullet->Owner, Bullet->Target, Bullet->TargetCoords);
+	
+	if(bAllow)
+	{ 
+		// ..and neuter the bullet, since it's not supposed to hurt the prisoner after the abduction
+		Bullet->Health = 0;
+		Bullet->DamageMultiplier = 0;
+		Bullet->Limbo();
+		return true;
+	}
+
+	return false;
+}
+
+bool WeaponTypeExt::ExtData::conductAbduction(TechnoClass * pOwner, AbstractClass * pTarget ,CoordStruct nTargetCoords){
+
 	// ensuring a few base parameters
-	if(!this->Abductor || !Bullet->Target || !Bullet->Owner) {
+	if(!this->Abductor || !pOwner || !pTarget) {
 		return false;
 	}
 
-	auto Target = abstract_cast<FootClass*>(Bullet->Target);
+	auto Target = abstract_cast<FootClass*>(pTarget);
 
 	if(!Target) {
 		// the target was not a valid passenger type
 		return false;
 	}
 
-	auto Attacker = Bullet->Owner;
+	if (nTargetCoords == CoordStruct::Empty)
+		nTargetCoords = pTarget->GetCoords();
+
+	auto Attacker = pOwner;
 	auto TargetType = Target->GetTechnoType();
 	auto TargetTypeExt = TechnoTypeExt::ExtMap.Find(TargetType);
 	auto AttackerType = Attacker->GetTechnoType();
@@ -172,7 +197,7 @@ bool WeaponTypeExt::ExtData::conductAbduction(BulletClass * Bullet) {
 		return false;
 	}
 
-	if(!WarheadTypeExt::CanAffectTarget(Target, Attacker->Owner, Bullet->WH)) {
+	if(!WarheadTypeExt::CanAffectTarget(Target, Attacker->Owner, this->OwnerObject()->Warhead)) {
 		return false;
 	}
 
@@ -255,8 +280,8 @@ bool WeaponTypeExt::ExtData::conductAbduction(BulletClass * Bullet) {
 
 	// if we have an abducting animation, play it
 	if(this->Abductor_AnimType) {
-		if(auto pAnim = GameCreate<AnimClass>(this->Abductor_AnimType, Bullet->TargetCoords)){
-			AnimTypeExt::SetMakeInfOwner(pAnim,Bullet->Owner->GetOwningHouse(),Bullet->Target->GetOwningHouse(),Bullet->Owner->GetOwningHouse());
+		if(auto pAnim = GameCreate<AnimClass>(this->Abductor_AnimType, nTargetCoords)){
+			AnimTypeExt::SetMakeInfOwner(pAnim,Attacker->GetOwningHouse(),Target->GetOwningHouse(), Attacker->GetOwningHouse());
 		}
 	}
 
@@ -306,11 +331,6 @@ bool WeaponTypeExt::ExtData::conductAbduction(BulletClass * Bullet) {
 	}
 	Attacker->AddPassenger(Target);
 	Attacker->Undiscover();
-
-	// ..and neuter the bullet, since it's not supposed to hurt the prisoner after the abduction
-	Bullet->Health = 0;
-	Bullet->DamageMultiplier = 0;
-	Bullet->Limbo();
 
 	return true;
 }
@@ -397,6 +417,17 @@ ColorStruct WeaponTypeExt::ExtData::GetBeamColor() const {
 	return this->Beam_Color.Get(RulesClass::Instance->RadColor);
 }
 
+ColorStruct WeaponTypeExt::SelectColor(WaveClass* const pWave)
+{
+	auto const pData = WeaponTypeExt::WaveExt.get_or_default(pWave);
+
+	ColorStruct const currentColor = (pData->Wave_IsHouseColor && pWave->Owner)
+		? pWave->Owner->Owner->Color
+		: pData->GetWaveColor();
+
+	return currentColor;
+}
+
 bool WeaponTypeExt::ModifyWaveColor(
 	WORD const src, WORD& dest, int const intensity, WaveClass* const pWave)
 {
@@ -407,6 +438,32 @@ bool WeaponTypeExt::ModifyWaveColor(
 		: pData->GetWaveColor();
 
 	if(currentColor == ColorStruct(0, 0, 0)) {
+		return false;
+	}
+
+	auto modified = Drawing::WordColor(src);
+
+	// ugly hack to fix byte wraparound problems
+	auto const upcolor = [=, &modified](BYTE ColorStruct::* member) {
+		auto const component = Math::clamp(modified.*member
+			+ (intensity * currentColor.*member) / 256, 0, 255);
+		modified.*member = static_cast<BYTE>(component);
+	};
+
+	upcolor(&ColorStruct::R);
+	upcolor(&ColorStruct::G);
+	upcolor(&ColorStruct::B);
+
+	dest = Drawing::Color16bit(modified);
+	return true;
+}
+
+bool WeaponTypeExt::ModifyWaveColor(
+	WORD const src, WORD& dest, int const intensity, DWORD nSelected)
+{
+	auto const currentColor = ColorStruct(nSelected);
+
+	if (currentColor == ColorStruct(0, 0, 0)) {
 		return false;
 	}
 
@@ -452,6 +509,7 @@ void WeaponTypeExt::ExtData::Serialize(T& Stm) {
 		//
 		.Process(this->Attack_Cursor)
 		.Process(this->OutOfRange_Cursor)
+		.Process(this->Bolt_ParticleSystem)
 		//
 		.Process(this->Beam_Color)
 		.Process(this->Beam_Duration)
@@ -518,9 +576,7 @@ bool WeaponTypeExt::SaveGlobals(AresStreamWriter& Stm) {
 // =============================
 // container
 
-WeaponTypeExt::ExtContainer::ExtContainer() : Container("WeaponTypeClass") {
-}
-
+WeaponTypeExt::ExtContainer::ExtContainer() : Container("WeaponTypeClass") {}
 WeaponTypeExt::ExtContainer::~ExtContainer() = default;
 
 // =============================

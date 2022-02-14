@@ -7,7 +7,7 @@ const char* const IniIteratorChar::iteratorReplacementFormat = "%d";
 
 int IniIteratorChar::iteratorValue = 0;
 
-DEFINE_HOOK(5260A2, IteratorChar_Process_Method1, 6)
+DEFINE_HOOK(5260A2, INIClass_Parse_IteratorChar1, 6)
 {
 	//GET(CCINIClass*, ini, EBP);
 	GET(CCINIClass::INIEntry*, entry, ESI);
@@ -28,7 +28,7 @@ DEFINE_HOOK(5260A2, IteratorChar_Process_Method1, 6)
 	return 0;
 }
 
-DEFINE_HOOK(525D23, IteratorChar_Process_Method2, 5)
+DEFINE_HOOK(525D23, INIClass_Parse_IteratorChar2, 5)
 {
 	GET(char*, value, ESI);
 	LEA_STACK(char*, key, 0x78)

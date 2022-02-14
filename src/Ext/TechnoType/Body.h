@@ -273,6 +273,9 @@ public:
 		bool VetRadImmune;
 
 		Valueable<bool> Passengers_BySize;
+		NullableIdx<VocClass> Slam_Sound;
+		Valueable<CSFText> EnemyUIName;
+		Valueable<bool> Is_Fake;
 
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject),
 			//
@@ -285,6 +288,9 @@ public:
 			EliteRadImmune(false),
 			VetRadImmune(false),
 			Passengers_BySize(true),
+			Slam_Sound(),
+			EnemyUIName(),
+			Is_Fake(false),
 			//
 			Survivors_PilotChance(-1),
 			Survivors_PassengerChance(-1),

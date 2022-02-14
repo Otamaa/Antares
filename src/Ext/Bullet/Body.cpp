@@ -110,13 +110,35 @@ bool BulletExt::ExtData::DamageOccupants() {
 	return true;
 }
 
+
+void BulletExt::ExtData::CreateParticleSys()
+{
+	auto pThis = this->OwnerObject();
+
+	if (!this->ParticleSys.get())
+	{
+		auto pOwner = pThis->Owner ? pThis->Owner->GetOwningHouse() : nullptr;
+		auto pTypeExt = BulletTypeExt::ExtMap.Find(pThis->Type);
+
+		if (pTypeExt->AttachedSystem.Get())
+		{
+			if (auto pSys = GameCreate<ParticleSystemClass>(pTypeExt->AttachedSystem.Get(), pThis->Location, pThis->Owner,pThis, CoordStruct::Empty, pOwner))
+			{
+				this->ParticleSys.reset(pSys);
+			}
+		}
+	}
+}
+
 // =============================
 // load / save
 
 template <typename T>
 void BulletExt::ExtData::Serialize(T& Stm) {
 	Stm
-		.Process(this->NukeSW);
+		.Process(this->NukeSW)
+		.Process(this->ParticleSys)
+		;
 }
 
 void BulletExt::ExtData::LoadFromStream(AresStreamReader &Stm) {
@@ -132,9 +154,7 @@ void BulletExt::ExtData::SaveToStream(AresStreamWriter &Stm) {
 // =============================
 // container
 
-BulletExt::ExtContainer::ExtContainer() : Container("BulletClass") {
-}
-
+BulletExt::ExtContainer::ExtContainer() : Container("BulletClass") {}
 BulletExt::ExtContainer::~ExtContainer() = default;
 
 // =============================

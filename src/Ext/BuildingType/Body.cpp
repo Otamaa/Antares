@@ -170,9 +170,6 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->LightningRod_Modifier.Read(exINI, pID, "LightningRod.Modifier");
 
-	//	this->LegacyRadarEffect = pINI->ReadBool(pID, "SpyEffect.LegacyRadar", this->LegacyRadarEffect);
-	//	this->DisplayProduction = pINI->ReadBool(pID, "SpyEffect.DisplayProduction", this->DisplayProduction);
-
 	this->RubbleDestroyed.Read(exINI, pID, "Rubble.Destroyed");
 	this->RubbleIntact.Read(exINI, pID, "Rubble.Intact");
 	this->RubbleDestroyedAnim.Read(exINI, pID, "Rubble.Destroyed.Anim");
@@ -258,6 +255,9 @@ void BuildingTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->DockUnload_Facing.Read(exArt, pArtID, "DockUnloadCell");
 	this->DockUnload_Cell.Read(exArt, pArtID, "DockUnloadFacing");
 	this->IsMassSelectable.Read(exINI, pID, "MassSelectable");
+	this->Sell_Anim.Read(exArt, pArtID, "SellAnim");
+	this->AI_BaseNormal.Read(exINI, pID, "AIBaseNormal");
+	this->AI_InnerBase.Read(exINI, pID, "AIInnerBase");
 }
 
 void BuildingTypeExt::ExtData::CompleteInitialization() {
@@ -530,7 +530,11 @@ void BuildingTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->ImmuneToSaboteurs)
 		.Process(this->AIBuildCounts)
 		.Process(this->AIExtraCounts)
-		.Process(this->BuildupTime);
+		.Process(this->BuildupTime)
+		.Process(this->Sell_Anim)
+		.Process(this->AI_BaseNormal)
+		.Process(this->AI_InnerBase)
+		;
 }
 
 void BuildingTypeExt::ExtData::LoadFromStream(AresStreamReader& Stm) {
@@ -578,9 +582,7 @@ bool BuildingTypeExt::SaveGlobals(AresStreamWriter& Stm) {
 // =============================
 // container
 
-BuildingTypeExt::ExtContainer::ExtContainer() : Container("BuildingTypeClass") {
-}
-
+BuildingTypeExt::ExtContainer::ExtContainer() : Container("BuildingTypeClass") {}
 BuildingTypeExt::ExtContainer::~ExtContainer() = default;
 
 // =============================

@@ -477,7 +477,9 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->NoEnter_Cursor.Read(exINI, section, "Cursor.NoEnter");
 	this->Move_Cursor.Read(exINI, section, "Cursor.Move");
 	this->NoMove_Cursor.Read(exINI, section, "Cursor.NoMove");
-
+	this->Slam_Sound.Read(exINI, section, "SlamSound");
+	this->EnemyUIName.Read(exINI, section, "EnemyUIName");
+	this->Is_Fake.Read(exINI, section, "Fake");
 	//this->NoManualEnter.Read(exINI, section, "NoManualEnter");
 
 	// quick fix - remove after the rest of weapon selector code is done
@@ -713,6 +715,9 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->Move_Cursor)
 		.Process(this->NoMove_Cursor)
 		.Process(this->Passengers_BySize)
+		.Process(this->Slam_Sound)
+		.Process(this->EnemyUIName)
+		.Process(this->Is_Fake)
 		//
 		.Process(this->Survivors_Pilots)
 		.Process(this->Survivors_PilotChance)

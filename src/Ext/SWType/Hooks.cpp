@@ -7,7 +7,7 @@
 #include <StringTable.h>
 #include <VoxClass.h>
 
-DEFINE_HOOK(6CEF84, SuperWeaponTypeClass_GetCursorOverObject, 7)
+DEFINE_HOOK(6CEF84, SuperWeaponTypeClass_GetAction, 7)
 {
 	GET(SuperWeaponTypeClass*, pThis, ECX);
 
@@ -165,7 +165,7 @@ DEFINE_HOOK(6AAF9D, SidebarClass_ProcessCameoClick_SelectTarget, 5)
 	return 0x6AB95A;
 }
 
-DEFINE_HOOK(6A932B, CameoClass_GetTip_MoneySW, 6) {
+DEFINE_HOOK(6A932B, StripClass_GetTip_MoneySW, 6) {
 	GET(SuperWeaponTypeClass*, pSW, EAX);
 
 	if(SWTypeExt::ExtData *pData = SWTypeExt::ExtMap.Find(pSW)) {
@@ -202,7 +202,7 @@ DEFINE_HOOK(6A932B, CameoClass_GetTip_MoneySW, 6) {
 }
 
 // 6CEE96, 5
-DEFINE_HOOK(6CEE96, SuperWeaponTypeClass_GetTypeIndex, 5)
+DEFINE_HOOK(6CEE96, SuperWeaponTypeClass_FindIndex, 5)
 {
 	GET(const char *, TypeStr, EDI);
 	auto customType = NewSWType::FindIndex(TypeStr);
@@ -446,7 +446,7 @@ DEFINE_HOOK(6CC2B0, SuperClass_NameReadiness, 5) {
 }
 
 // #896002: darken SW cameo if player can't afford it
-DEFINE_HOOK(6A99B7, TabCameoListClass_Draw_SuperDarken, 5)
+DEFINE_HOOK(6A99B7, StripClass_Draw_SuperDarken, 5)
 {
 	GET(int, idxSW, EDI);
 
@@ -484,7 +484,7 @@ DEFINE_HOOK(4FAF2A, HouseClass_SWDefendAgainst_Aborted, 8)
 	return (pSW && !pSW->IsCharged) ? 0x4FAF32 : 0x4FB0CF;
 }
 
-DEFINE_HOOK(6CBF5B, SuperClass_GetCameoChargeState_ChargeDrainRatio, 9) {
+DEFINE_HOOK(6CBF5B, SuperClass_GetCameoChargeStage_ChargeDrainRatio, 9) {
 	GET_STACK(int, rechargeTime1, 0x10);
 	GET_STACK(int, rechargeTime2, 0x14);
 	GET_STACK(int, timeLeft, 0xC);
@@ -508,7 +508,7 @@ DEFINE_HOOK(6CBF5B, SuperClass_GetCameoChargeState_ChargeDrainRatio, 9) {
 	return 0;
 }
 
-DEFINE_HOOK(6CC053, SuperClass_GetCameoChargeState_FixFullyCharged, 5) {
+DEFINE_HOOK(6CC053, SuperClass_GetCameoChargeStage_FixFullyCharged, 5) {
 	GET(int, charge, EAX);
 
 	// some smartass capped this at 53, causing the last
@@ -762,3 +762,6 @@ DEFINE_HOOK(6CEEB0, SuperWeaponTypeClass_FindFirstOfAction, 8) {
 	R->EAX(pFound);
 	return 0x6CEEE5;
 }
+
+//6D49D1 = TacticalClass_Draw_TimerVisibility, 5
+//6CB70C = SuperClass_Grant_InitialReady, A

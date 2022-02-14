@@ -216,13 +216,16 @@ public:
 		ValueableVector<int> AIExtraCounts;
 
 		Nullable<double> BuildupTime;
-		//ValueableIdx::ReadCursor(&a2, v4, "Cursor.Spy");
 		NullableIdx<CursorType> Spy_Cursor;
 		Nullable<bool> EngineerRepairable;
 
 		Nullable<int> DockUnload_Facing;
 		Nullable<CellStruct> DockUnload_Cell;
 		Nullable<bool> IsMassSelectable;
+		Valueable<AnimTypeClass*> Sell_Anim;
+		Nullable<bool> AI_BaseNormal;
+		Nullable<bool> AI_InnerBase;
+
 		ExtData(BuildingTypeClass* OwnerObject) : Extension<BuildingTypeClass>(OwnerObject),
 			//
 			DockUnload_Facing(),
@@ -278,7 +281,10 @@ public:
 			PrismForwarding(),
 			ReverseEngineersVictims(false),
 			CloningFacility(false),
-			Factory_ExplicitOnly(false)
+			Factory_ExplicitOnly(false),
+			Sell_Anim(nullptr),
+			AI_BaseNormal(),
+			AI_InnerBase()
 		{ }
 
 		virtual ~ExtData() = default;
@@ -287,8 +293,7 @@ public:
 		virtual void Initialize() override;
 		virtual void CompleteInitialization();
 
-		virtual void InvalidatePointer(void *ptr, bool bRemoved) override {
-		}
+		virtual void InvalidatePointer(void *ptr, bool bRemoved) override {}
 
 		virtual void LoadFromStream(AresStreamReader &Stm) override;
 

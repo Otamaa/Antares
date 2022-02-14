@@ -11,7 +11,7 @@
 // =============================
 // other hooks
 
-DEFINE_HOOK(732D10, TacticalClass_CollectSelectedIDs, 5)
+DEFINE_HOOK(732D47, TacticalClass_CollectSelectedIDs, 5)
 {
 	// create in dll. all internal memory will be allocated on the game's heap
 	// but as our vtable is used, the virtual destructor will free this instance
@@ -50,7 +50,7 @@ DEFINE_HOOK(732D10, TacticalClass_CollectSelectedIDs, 5)
 	}
 
 	R->EAX(pNames);
-	return 0x732FE1;
+	return 0x732FD9;
 }
 
 DEFINE_HOOK(7327AA, TechnoClass_PlayerOwnedAliveAndNamed_GroupAs, 8)
@@ -107,7 +107,6 @@ DEFINE_HOOK(715320, TechnoTypeClass_LoadFromINI_EarlyReader, 6)
 	return 0;
 }
 
-
 DEFINE_HOOK(5F79B0, TechnoTypeClass_FindFactory, 6)
 {
 	enum { Eligible = 0x5F79C7, Ineligible = 0x5F7A57 };
@@ -122,6 +121,26 @@ DEFINE_HOOK(5F79B0, TechnoTypeClass_FindFactory, 6)
 		: Ineligible
 	;
 }
+
+/*reworked 
+DEFINE_HOOK(5F7900, ObjectTypeClass_FindFactory, 5)
+{
+	enum { Eligible = 0x5F79C7, Ineligible = 0x5F7A57 };
+
+	GET(TechnoTypeClass *, pProduction, EDI);
+	GET(BuildingClass *, pFactory, ESI);
+
+	auto pData = TechnoTypeExt::ExtMap.Find(pProduction);
+
+	return (pData->CanBeBuiltAt(pFactory->Type))
+		? Eligible
+		: Ineligible
+	;
+
+	R->EAX();
+	return 0x5F7A89;
+}
+*/
 
 DEFINE_HOOK(4444E2, BuildingClass_KickOutUnit_FindAlternateKickout, 6)
 {
@@ -186,7 +205,19 @@ DEFINE_HOOK(44441A, BuildingClass_KickOutUnit_Clone_NavalUnit, 6) {
 	return 0;
 }
 
-DEFINE_HOOK(4449DF, BuildingClass_KickOutUnit_PreventClone, 6)
-{
+DEFINE_HOOK(4449DF, BuildingClass_KickOutUnit_PreventClone, 6) {
 	return 0x444A53;
 }
+
+/*
+455DA0 = BuildingClass_IsFactory_CloningFacility, 6
+50BEB0 = HouseClass_GetCostMult, 6
+
+6AB8BB = SelectClass_ProcessInput_BuildTime, 6
+731E08 = sub_731D90_FakeOf, 6
+523932 = InfantryTypeClass_CTOR_Initialize, 8
+45E416 = BuildingTypeClass_CTOR_Initialize, 6
+
+//ares RC1
+4444B3 = BuildingClass_KickOutUnit_NoAlternateKickout, 6
+*/

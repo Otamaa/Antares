@@ -50,6 +50,8 @@ DEFINE_HOOK(702050, TechnoClass_ReceiveDamage_SuppressUnitLost, 6)
 	return 0x0;
 }
 
+// bugfix #379: Temporal friendly kills give veterancy
+// bugfix #1266: Temporal kills gain double experience
 DEFINE_HOOK(71A917, TemporalClass_Update_Erase, 5)
 {
 	GET(TemporalClass*, pThis, ESI);

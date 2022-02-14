@@ -16,6 +16,7 @@ BulletTypeExt::ExtContainer BulletTypeExt::ExtMap;
 void BulletTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 {
 	auto pThis = this->OwnerObject();
+	auto const pID = pThis->ID;
 
 	INI_EX exINI(pINI);
 
@@ -37,6 +38,7 @@ void BulletTypeExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	this->BallisticScatterMax.Read(exINI, pThis->ID, "BallisticScatter.Max");
 
 	this->AnimLength.Read(exINI, pThis->ID, "AnimLength");
+	this->AttachedSystem.Read(exINI, pID, "AttachedSystem");
 }
 
 // get the custom palette of the animation this bullet type uses
@@ -98,7 +100,10 @@ void BulletTypeExt::ExtData::Serialize(T& Stm) {
 		.Process(this->AroundTarget)
 		.Process(this->BallisticScatterMin)
 		.Process(this->BallisticScatterMax)
-		.Process(this->AnimLength);
+		.Process(this->AnimLength)
+		
+		.Process(this->AttachedSystem)
+		;
 }
 
 void BulletTypeExt::ExtData::LoadFromStream(AresStreamReader &Stm) {

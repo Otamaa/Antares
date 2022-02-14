@@ -8,6 +8,15 @@
 #include <RocketLocomotionClass.h>
 #include <SpawnManagerClass.h>
 
+DEFINE_HOOK(6B72F9, SpawnManagerClass_Update_Buildings, 5)
+{
+	GET(SpawnManagerClass*, pThis, ESI);
+	GET(SpawnNode*, pNode, EAX);
+
+	return (pNode->Status != SpawnNodeStatus::TakeOff ||
+		pThis->Owner->WhatAmI() == AbstractType::Building) ? 0x6B735C : 0x6B72FE;
+}
+
 DEFINE_HOOK(6622E0, RocketLocomotionClass_ILocomotion_Process_CustomMissile, 6)
 {
 	GET(AircraftClass*, pThis, ECX);

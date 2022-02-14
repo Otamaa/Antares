@@ -698,7 +698,7 @@ DEFINE_HOOK(48A59A, MapClass_SelectDamageAnimation_LightningWarhead, 5) {
 	return 0;
 }
 
-DEFINE_HOOK(44C9FF, BuildingClass_Missile_PsiWarn, 6) {
+DEFINE_HOOK(44C9FF, BuildingClass_Mi_Missile_PsiWarn, 6) {
 	GET(BuildingClass* const, pThis, ESI);
 
 	auto const type = pThis->FiringSWType;
@@ -720,60 +720,32 @@ DEFINE_HOOK(44C9FF, BuildingClass_Missile_PsiWarn, 6) {
 }
 
 // upward pointing missile, launched from missile silo.
-DEFINE_HOOK(44CABA, BuildingClass_Missile_CreateBullet, 6) {
-	GET(CellClass* const, pCell, EAX);
+//DEFINE_HOOK(44CABA, BuildingClass_Mi_Missile_NukeTakeOff, 6) 
+DEFINE_HOOK(44CB4C ,BuildingClass_Mi_Missile_NukeTakeOff, 7)
+{
+	GET(CoordStruct const, nCoord, EAX);
 	GET(BuildingClass* const, pThis, ESI);
+	GET(BulletClass* const , pBullet , EDI);
 
 	auto const type = pThis->FiringSWType;
+	double nAdjust = pBullet->Type->Vertical ? 10.0 :100.0;
+	if (!pBullet->MoveTo(nCoord, { 0,0,nAdjust }))
+		return 0x44CC42;
 
-	if(auto const pSW = SuperWeaponTypeClass::Array->GetItemOrDefault(type)) {
-		if(auto const pWeapon = pSW->WeaponType) {
-			auto const pBullet = pWeapon->Projectile->CreateBullet(
-				pCell, pThis, pWeapon->Damage, pWeapon->Warhead, 255, true);
-
-			if(pBullet) {
-				auto const pBulletExt = BulletExt::ExtMap.Find(pBullet);
-				pBulletExt->NukeSW = pSW;
-
-				R->EBX(pSW->WeaponType);
-				R->EAX(pBullet);
-
-				return 0x44CAF2;
-			}
-		}
-	}
-
-	return 0;
-}
-
-// special takeoff anim.
-DEFINE_HOOK(44CC8B, BuildingClass_Missile_NukeTakeOff, 6) {
-	GET(BuildingClass* const, pThis, ESI);
-
-	auto const type = pThis->FiringSWType;
-
-	if(auto const pSW = SuperWeaponTypeClass::Array->GetItemOrDefault(type)) {
+	if (auto const pSW = SuperWeaponTypeClass::Array->GetItemOrDefault(type)) 
+	{
+		auto const pBulletExt = BulletExt::ExtMap.Find(pBullet);
+		pBulletExt->NukeSW = pSW;	
 		auto const pExt = SWTypeExt::ExtMap.Find(pSW);
+		auto const pAnimType = pExt->Nuke_TakeOff.Get(RulesClass::Instance->NukeTakeOff);
 
-		auto const pAnimType = pExt->Nuke_TakeOff.Get(
-			RulesClass::Instance->NukeTakeOff);
-
-		if(pAnimType) {
-			R->ECX(pAnimType);
-			return 0x44CC91;
+		if (auto pAnim = GameCreate<AnimClass>(pAnimType, nCoord, 0, 1, 0x600, 0, 0))
+		{
+			if (!pAnim->ZAdjust)
+				pAnim->ZAdjust = -100;
 		}
 	}
 
-	return 0;
-}
-
-// remove ZAdjust hardcoding
-DEFINE_HOOK(44CC9D, BuildingClass_Missile_NukeTakeOffB, A) {
-	GET(AnimClass* const, pAnim, EAX);
-
-	if(!pAnim->ZAdjust) {
-		pAnim->ZAdjust = -100;
-	}
 	return 0x44CCA7;
 }
 
@@ -885,65 +857,6 @@ DEFINE_HOOK(467E59, BulletClass_Update_NukeBall, 5) {
 	}
 
 	return FireNow;
-}
-
-// iron curtained units would crush themselves
-DEFINE_HOOK(7187DA, TeleportLocomotionClass_Unwarp_PreventSelfCrush, 6) {
-	GET(TechnoClass*, pTeleporter, EDI);
-	GET(TechnoClass*, pContent, ECX);
-	return (pTeleporter == pContent) ? 0x71880A : 0;
-}
-
-// sink stuff that simply cannot exist on water
-DEFINE_HOOK(7188F2, TeleportLocomotionClass_Unwarp_SinkJumpJets, 7) {
-	GET(CellClass*, pCell, EAX);
-	GET(TechnoClass**, pTechno, ESI);
-
-	if(pCell->Tile_Is_Wet()) {
-		if(UnitClass* pUnit = specific_cast<UnitClass*>(pTechno[3])) {
-			if(pUnit->Deactivated) {
-				// this thing does not float
-				R->BL(0);
-			}
-
-			// manually sink it
-			if(pUnit->Type->SpeedType == SpeedType::Hover && pUnit->Type->JumpJet) {
-				return 0x718A66;
-			}
-		}
-	}
-
-	return 0;
-}
-
-DEFINE_HOOK(446AAF, BuildingClass_Place_SkipFreeUnits, 6)
-{
-	// allow free units and non-separate aircraft to be created
-	// only once.
-	GET(BuildingClass*, pBld, EBP);
-	BuildingExt::ExtData* pExt = BuildingExt::ExtMap.Find(pBld);
-	if(!pExt->FreeUnits_Done) {
-		pExt->FreeUnits_Done = true;
-		return 0;
-	}
-
-	// skip handling free units
-	return 0x446FB6;
-}
-
-DEFINE_HOOK(71AE85, TemporalClass_CanWarpTarget_PreventChronoBuilding, A)
-{
-	// prevent warping buildings that are about to be chronoshifted.
-	// if such building is attacked, it will be removed by the chronosphere
-	// and it won't come back and the affected player can't be defeated.
-	GET(BuildingClass*, pBld, ESI);
-	if(BuildingExt::ExtData* pExt = BuildingExt::ExtMap.Find(pBld)) {
-		if(pExt->AboutToChronoshift) {
-			return 0x71AE93;
-		}
-	}
-
-	return 0;
 }
 
 DEFINE_HOOK(44CE46, BuildingClass_Mi_Missile_Pulsball, 5)

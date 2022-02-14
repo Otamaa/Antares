@@ -17,12 +17,8 @@ public:
 	{
 	public:
 
-		DWORD LastChecksumTime;
-		DWORD LastChecksum;
 
-		ExtData(AbstractClass* OwnerObject) : Extension<AbstractClass>(OwnerObject),
-			LastChecksumTime(0),
-			LastChecksum(0)
+		ExtData(AbstractClass* OwnerObject) : Extension<AbstractClass>(OwnerObject)
 		{ }
 
 		virtual ~ExtData() = default;

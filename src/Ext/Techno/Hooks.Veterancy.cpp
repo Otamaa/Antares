@@ -190,3 +190,55 @@ DEFINE_HOOK(702E9D, TechnoClass_RegisterDestruction_Veterancy, 6) {
 	// skip the entire veterancy handling
 	return 0x702FF5;
 }
+
+/*completely rewritten
+void TechnoExt::Promote(TechnoClass* pThis, bool bSilent, bool bFlash)
+{
+	auto newRank = pThis->Veterancy.GetRemainingLevel();
+
+	if (pThis->CurrentRanking != newRank)
+	{
+		if (pThis->CurrentRanking != Rank::Invalid)
+		{
+			TechnoTypeClass* pConvertType = nullptr;
+			if (!bSilent)
+			{
+				int sound = -1;
+				if (pThis->Veterancy.IsVeteran())
+				{
+					sound = RulesGlobal->UpgradeVeteranSound;
+					pConvertType = nullptr;
+				}
+				else if (pThis->Veterancy.IsElite())
+				{
+					sound = RulesGlobal->UpgradeEliteSound;
+					pConvertType = nullptr;
+				}
+
+				if (pThis->Owner->ControlledByHuman())
+				{
+					auto pTech = pThis->Transporter ? pThis->Transporter : pThis;
+
+					VocClass::PlayAt(sound, pTech->Location, nullptr);
+					VoxClass::Play("EVA_UnitPromoted");
+				}
+			}
+
+			if (bFlash)
+			{
+				//not yet
+				pThis->Flashing.DurationRemaining = 100;
+			}
+
+			if (pConvertType)
+			{
+				//not yet
+			}
+		}
+
+		pThis->CurrentRanking = newRank;
+	}
+}
+
+*/
+//6FA054 = TechnoClass_Update_Veterancy, 6

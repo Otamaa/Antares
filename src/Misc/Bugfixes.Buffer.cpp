@@ -54,7 +54,7 @@ static void ParseList(DynamicVectorClass<T> &List, CCINIClass * pINI, const char
 
 /* issue 193 - increasing the buffer length for certain flag parsing */
 
-DEFINE_HOOK(511D16, Buf_CountryVeteran, 9)
+DEFINE_HOOK(511D16, HouseTypeClass_LoadFromINI_Buffer_CountryVeteran, 9)
 {
 	GET(HouseTypeClass *, H, EBX);
 	GET(CCINIClass *, pINI, ESI);
@@ -338,7 +338,7 @@ DEFINE_HOOK(475297, INIClass_GetAlliesBitfield_Strtok, 5)
 	return 0;
 }
 
-DEFINE_HOOK(6A9348, CameoClass_GetTip_FixLength, 9)
+DEFINE_HOOK(6A9348, StripClass_GetTip_FixLength, 9)
 {
 	DWORD HideObjectName = R->AL();
 

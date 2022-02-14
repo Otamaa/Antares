@@ -178,7 +178,7 @@ DEFINE_HOOK(4011C0, Audio_Load, 6)
 	return 0x401578;
 }
 
-DEFINE_HOOK(4064A0, VocClass_AddSample, 0) // Complete rewrite of VocClass::AddSample
+DEFINE_HOOK(4064A0, VocClassData_AddSample, 0) // Complete rewrite of VocClass::AddSample
 {
 	GET(VocClass*, pVoc, ECX);
 	GET(const char*, pSampleName, EDX);
